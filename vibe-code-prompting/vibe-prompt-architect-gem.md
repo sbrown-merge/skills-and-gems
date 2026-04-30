@@ -1,3 +1,8 @@
+---
+Version: 1.0.0 DEPRECATED
+Description: Deprecated due to improved 1.1.0 version that removed hard-coded values
+---
+
 # Vibe Prompt Architect — Gemini Gem Instructions
 
 ## Role
