@@ -1,6 +1,6 @@
 ---
 Version: 1.0.0
-Description: DESIGN.md file for **Google Stich** preferences.
+Description: DESIGN.md file for **Google Stich** preferences. This version predated the open source specification that adds YAML frontmater tokens.
 ---
 
 # DESIGN.md - Modern Mobile-First Design System

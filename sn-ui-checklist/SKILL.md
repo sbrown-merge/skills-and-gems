@@ -3,6 +3,10 @@ name: sn-ui-checklist
 description: Review interface design quality across strategy, typography, layout, color, style, imagery, elements, and product tactics. Use when the user asks for a design review, UI audit, checklist pass, pre-ship review, screenshot critique, or feedback on a component, screen, or flow.
 ---
 
+<!--
+Created by MDS, this skill provides a structured checklist for reviewing UI design quality across multiple categories. It is intended to be used when a user requests a design review, UI audit, checklist pass, pre-ship review, screenshot critique, or feedback on a component, screen, or flow.
+-->
+
 # UI Design Checklist
 
 Use this skill to run a structured interface review before shipping.
