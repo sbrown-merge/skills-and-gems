@@ -1,6 +1,6 @@
 # pptx-visual-qa
 
-A Claude Code skill for rendering, inspecting and structurally checking PowerPoint decks on a Mac that has no LibreOffice, `pdftoppm` or PyObjC. Scripted Keynote is the renderer. It also records the PDF route for the same kind of machine.
+A Claude Code skill for rendering, inspecting and structurally checking PowerPoint decks on a Mac that has no LibreOffice, `pdftoppm` or PyObjC. Scripted Keynote is the renderer. **On MERGE-owned Macs, LibreOffice is blocked by company policy, so this is the standard path for everyone on the team, not a personal workaround.** It also records the PDF route for the same kind of machine.
 
 Written by Steve Brown with Claude, consolidated 2026-09-09 from three projects' hard-won notes. Built for Claude to use on its own whenever a `.pptx` needs to be seen or verified; a person can run the two scripts directly.
 

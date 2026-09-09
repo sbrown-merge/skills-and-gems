@@ -1,12 +1,12 @@
 # Environment facts: what is and is not installed
 
-**This file is per machine.** The values below are one laptop, Steve Brown's MERGE Mac, verified on the dates shown. On any other Mac, treat every row as a question to re-answer, then replace the row. The skill works anywhere Keynote does; the rows are what tells you which checks you can trust.
+**This file is per machine, with one exception.** The values below are one laptop, Steve Brown's MERGE Mac, verified on the dates shown. On any other Mac, treat every row as a question to re-answer, then replace the row. The exception is LibreOffice: it is blocked by MERGE policy on all company-owned Macs, so that row is organizational rather than personal and Keynote is the standard renderer across the team. The skill works anywhere Keynote does; the other rows are what tells you which checks you can trust.
 
 ## Renderers
 
 | | Status | Notes |
 | --- | --- | --- |
-| LibreOffice (`soffice`) | **Absent** (2026-08-26, 2026-09-08, 2026-09-09) | Not in PATH, not in /Applications. The pptx skill's `soffice.py` wrapper therefore fails with "No such file or directory: 'soffice'" |
+| LibreOffice (`soffice`) | **Blocked by MERGE policy on company-owned Macs** (Steve Brown, 2026-09-09) | Not a missing install: the organization prohibits it, so this row holds for every MERGE laptop, not just this one. Do not attempt to install or look for it. The pptx skill's `soffice.py` wrapper therefore fails with "No such file or directory: 'soffice'", and Keynote is the standard path, not a workaround. Confirmed absent 2026-08-26, 2026-09-08, 2026-09-09 |
 | `pdftoppm`, `pdftocairo` (poppler) | **Absent** | No PDF rasterization; the image viewer cannot show a PDF page |
 | `gs` (Ghostscript), `mutool` | **Absent** | |
 | PyObjC / Quartz | **Absent** | |
