@@ -49,6 +49,8 @@ Two Fraunces facts worth keeping, and they generalize to any variable font famil
 
 ## PDFs
 
+**Checking a PDF here (added 2026-09-09):** the *PDF Tools* MCP server rasterizes any page via Quick Look (`render_pdf_page`, 1-indexed, up to ~1800 px) and extracts text per page (`read_pdf_pages`); it may only touch `~/Documents`, `~/Downloads` and `~/Desktop`. Use it for the visual pass and the fidelity read-back. No Python PDF text extractor is installable: `pip install --user pypdf` is refused as an externally managed environment (PEP 668). A font-leak check must look at text-showing operators, not font names, because every ReportLab file lists `/BaseFont /Helvetica` from the canvas's initial state; page streams are ASCII85-wrapped Flate, so decode both before scanning for `Tf` and `Tj`.
+
 **Producing:** ReportLab is the only working route here. Pure-Python wheel, no system libraries. Working implementations to copy or extend: `scripts/make_brief_pdf.py` in `merge-casting-app-internal`, and `scripts/build-pdfs.py` in `CCE-AI-strategy`.
 
 **Checking, without a rasterizer:**
