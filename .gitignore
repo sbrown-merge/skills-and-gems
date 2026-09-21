@@ -8,5 +8,27 @@
 .VolumeIcon.icns
 .com.apple.timemachine.donotpresent
 .fseventsd
-Icon
+# Finder custom-icon files are named "Icon" plus a carriage return
+Icon
 .TemporaryItems
+
+# Downloaded or re-zipped skill archives. The extracted folder is the source of truth.
+# Packaged .skill files are also zips, but are tracked on purpose as installable releases.
+*.zip
+
+# Office lock files, left behind while a deck or document is open
+~$*
+
+# Python (pptx-visual-qa scripts)
+__pycache__/
+*.py[cod]
+.venv/
+
+# Editor and local tool settings
+.vscode/
+.claude/settings.local.json
+
+# Secrets and logs
+.env
+.env.*
+*.log
