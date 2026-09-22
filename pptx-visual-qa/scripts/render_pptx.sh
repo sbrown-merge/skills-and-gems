@@ -43,7 +43,11 @@ open -a Keynote
 sleep 3
 
 # `close ... saving no` keeps Keynote from writing a .key next to the source.
-osascript <<AS
+# Two routes. The scripted `open` intermittently fails on a freshly launched
+# Keynote with -609 "Connection is invalid" or returns an import placeholder
+# (-1708 on close). When it does, open the file Finder-style and export the
+# front document instead; that route worked when the first did not (2026-09-22).
+if ! osascript <<AS
 set src to POSIX file "$src"
 set dst to POSIX file "$out"
 tell application "Keynote"
@@ -54,6 +58,23 @@ tell application "Keynote"
 end tell
 return "exported"
 AS
+then
+  echo "scripted open failed; retrying via Finder-style open" >&2
+  osascript -e 'tell application "Keynote" to quit' >/dev/null 2>&1 || true
+  sleep 2
+  open -a Keynote "$src"
+  sleep 8
+  rm -rf "$out"
+  osascript <<AS
+set dst to POSIX file "$out"
+tell application "Keynote"
+	set doc to front document
+	export doc to dst as slide images with properties {image format:$asfmt, compression factor:0.9, skipped slides:false}
+	close doc saving no
+end tell
+return "exported"
+AS
+fi
 
 n=$(ls -1 "$out" | wc -l | tr -d ' ')
 echo "$n slides -> $out"

@@ -58,6 +58,17 @@ Two Fraunces facts worth keeping, and they generalize to any variable font famil
 - The in-app browser preview renders PDFs but **caches aggressively**; it keeps serving a stale copy after a re-render. Write each render to a new filename.
 - For text-level verification, decode the streams. ReportLab writes them **ASCII85-encoded then Flate-compressed**: `base64.a85decode(data, adobe=True)` first, then `zlib.decompress`, then pull the visible words from the `(...)` operators. A first guess that the streams were plain or single-Flate was wrong and cost time.
 
+## Keynote scripting (added 2026-09-22)
+
+| Fact | Status | Notes |
+| --- | --- | --- |
+| Automation (Apple Events) to Keynote | **Granted** | `get name`, `count of documents`, `export … as slide images`, `close saving no` all work |
+| **Accessibility (assistive access)** | **Locked by IT; cannot be granted** (Steve Brown, 2026-09-22) | Any `tell application "System Events" to tell process "Keynote" …` fails with -1719/-1728 and raises a prompt the user cannot accept. Do not use System Events on this Mac |
+| Scripted `open` of a .pptx on a fresh Keynote | **Unreliable** | -609 with a crash dialog, or -1708 import placeholder, seen 2026-09-22 on both new and old pptxgenjs decks; the same files opened via `open -a Keynote <file>`. `render_pptx.sh` now falls back to that route and exports `front document` |
+| Crash reports | `~/Library/Logs/DiagnosticReports/Keynote-*.ips` | Not readable from a sandboxed session; the user can share them with IT |
+
+The incident is written up for IT in the CCE AI strategy repo, `scripts/2026-09-22 keynote-automation-incident-note-for-it.md`.
+
 ## Where this came from
 
 Consolidated 2026-09-09 from two project memories that had begun to diverge, `proposals` (Keynote recipe, fonts, Python inventory; proven 2026-08-26 on the Subway proposal deck) and `merge-casting-app-internal` (PDF route; 2026-07-28), plus the 2026-09-09 `CCE-AI-strategy` session (orphaned comment parts, comments as content, auto-fit under images, estimate undercount, `/tmp` denial, render-the-original diagnostic, the missing variable Fraunces). The canonical copy lives in the `skills-and-gems` repo; the installed copy is `~/.claude/skills/pptx-visual-qa/`.
