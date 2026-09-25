@@ -30,7 +30,7 @@ To re-verify on a new machine: `which soffice pdftoppm gs mutool; ls /Applicatio
 
 **Image tooling for screenshots (verified 2026-09-25):** `uv run --no-project --with pillow --with opencv-python-headless python script.py` gives Pillow 12.3.0 and OpenCV 5.0.0 on numpy 2.5.3. Use the headless OpenCV build; the full `opencv-python` adds only GUI windows, which a script never uses. **pypdf** the same way: `uv run --no-project --with pypdf python script.py`.
 
-**A session started before 2026-09-25 may still have the old PATH**, where bare `markitdown` resolves to `~/Library/Python/3.12/bin/markitdown`, a copy without PDF support that fails with `MissingDependencyException`. Call `~/.local/bin/markitdown` explicitly if in doubt. The old Homebrew 3.12 and the Command Line Tools 3.9 (`/usr/bin/python3`) still exist with their per-user packages until they are cleaned up; **TBD:** remove this sentence once they are.
+**The old interpreters' packages are gone (2026-09-25).** Homebrew `python@3.12` was uninstalled, and the per-user packages it and Apple's Command Line Tools Python 3.9 carried (`~/Library/Python/3.12` and `3.9`) were removed. `/usr/bin/python3` (3.9) still exists because macOS owns it, but has none of our packages. A shell started before that may still put the deleted `~/Library/Python/3.12/bin` on PATH; open a new one, or call `~/.local/bin/markitdown` explicitly.
 
 Absent: `pandoc`, `wkhtmltopdf`, `weasyprint`.
 
