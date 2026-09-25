@@ -20,7 +20,7 @@ cp -R pptx-visual-qa ~/.claude/skills/
 chmod +x ~/.claude/skills/pptx-visual-qa/scripts/*
 ```
 
-Claude Code picks up user-level skills from `~/.claude/skills/` at the start of a session. The first render will ask macOS for permission to let your terminal or the Claude app control Keynote; allow it once. Optional: `python3 -m pip install --user "markitdown[pptx]"` for the text-dump check (add `--break-system-packages` on a Homebrew Python).
+Claude Code picks up user-level skills from `~/.claude/skills/` at the start of a session. The first render will ask macOS for permission to let your terminal or the Claude app control Keynote; allow it once. Optional, for the text-dump check: `uv tool install "markitdown[pdf,pptx]"` (install uv first with `brew install uv`).
 
 ## Try it
 

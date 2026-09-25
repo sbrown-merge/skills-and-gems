@@ -20,13 +20,21 @@ To re-verify on a new machine: `which soffice pdftoppm gs mutool; ls /Applicatio
 
 ## Python
 
-Default `python3` is Homebrew **3.12** at `/opt/homebrew/opt/python@3.12`. It is PEP-668 externally managed, so installs need `python3 -m pip install --user --break-system-packages <pkg>`. A CommandLineTools Python 3.9 also exists and has ReportLab 5.0.0.
+**Rebuilt 2026-09-25 around `uv`.** Default `python3` is Homebrew **3.14** (`/opt/homebrew/opt/python`, which follows Homebrew's current version). It has **no third-party packages, on purpose**: it is PEP-668 externally managed, and nothing is installed into it or with `pip install --user` any more. Packages come from `uv` (`/opt/homebrew/bin/uv`) in one of three ways:
 
-Present on 3.12 (installed and smoke-tested 2026-08-26): **Pillow, numpy, python-pptx, lxml, defusedxml, markitdown, pyyaml, reportlab**. The `markitdown` CLI is at `~/Library/Python/3.12/bin/markitdown`, on PATH via `~/.zshrc`, so it runs bare.
+| Need | Use | Notes |
+| --- | --- | --- |
+| A command-line tool | `uv tool install <pkg>` | Own isolated environment; the command lands in `~/.local/bin`, which is on PATH. Installed 2026-09-25: **`markitdown`** 0.1.8 with the `pdf,pptx,docx,xlsx` extras (so it reads PDFs now), and **`fonttools`** 4.66.0 (`fonttools`, `ttx`, `pyftsubset`, `pyftmerge`) |
+| A library for a one-off script, outside any repo | `uv run --no-project --with <pkg> python script.py` | Nothing installed permanently; uv caches the environment, so a repeat run starts in about 0.4 s |
+| A library a repo's own scripts need | `uv add <pkg>` in that repo | Recorded in its `pyproject.toml` and `uv.lock`; run scripts with `uv run python …`. epp-experience-project-planning converted 2026-09-25 |
+
+**Image tooling for screenshots (verified 2026-09-25):** `uv run --no-project --with pillow --with opencv-python-headless python script.py` gives Pillow 12.3.0 and OpenCV 5.0.0 on numpy 2.5.3. Use the headless OpenCV build; the full `opencv-python` adds only GUI windows, which a script never uses. **pypdf** the same way: `uv run --no-project --with pypdf python script.py`.
+
+**A session started before 2026-09-25 may still have the old PATH**, where bare `markitdown` resolves to `~/Library/Python/3.12/bin/markitdown`, a copy without PDF support that fails with `MissingDependencyException`. Call `~/.local/bin/markitdown` explicitly if in doubt. The old Homebrew 3.12 and the Command Line Tools 3.9 (`/usr/bin/python3`) still exist with their per-user packages until they are cleaned up; **TBD:** remove this sentence once they are.
 
 Absent: `pandoc`, `wkhtmltopdf`, `weasyprint`.
 
-The skill's own scripts need only the standard library and `zsh`. `Pillow` is optional, for reading image sizes.
+The skill's own scripts need only the standard library and `zsh`, so bare `python3` runs them. `Pillow` is optional, for reading image sizes; get it with `uv run --no-project --with pillow`.
 
 ## Node
 
@@ -49,7 +57,7 @@ Two Fraunces facts worth keeping, and they generalize to any variable font famil
 
 ## PDFs
 
-**Checking a PDF here (added 2026-09-09):** the *PDF Tools* MCP server rasterizes any page via Quick Look (`render_pdf_page`, 1-indexed, up to ~1800 px) and extracts text per page (`read_pdf_pages`); it may only touch `~/Documents`, `~/Downloads` and `~/Desktop`. Use it for the visual pass and the fidelity read-back. No Python PDF text extractor is installable: `pip install --user pypdf` is refused as an externally managed environment (PEP 668). A font-leak check must look at text-showing operators, not font names, because every ReportLab file lists `/BaseFont /Helvetica` from the canvas's initial state; page streams are ASCII85-wrapped Flate, so decode both before scanning for `Tf` and `Tj`.
+**Checking a PDF here (added 2026-09-09):** the *PDF Tools* MCP server rasterizes any page via Quick Look (`render_pdf_page`, 1-indexed, up to ~1800 px) and extracts text per page (`read_pdf_pages`); it may only touch `~/Documents`, `~/Downloads` and `~/Desktop`. Use it for the visual pass and the fidelity read-back. Since 2026-09-25 there are two Python text extractors as well: `markitdown file.pdf` (the uv tool has the `pdf` extra), and pypdf through `uv run --no-project --with pypdf`. The note that pypdf could not be installed is obsolete; `pip install --user` was refused under PEP 668, and uv is the route round that. A font-leak check must look at text-showing operators, not font names, because every ReportLab file lists `/BaseFont /Helvetica` from the canvas's initial state; page streams are ASCII85-wrapped Flate, so decode both before scanning for `Tf` and `Tj`.
 
 **Producing:** ReportLab is the only working route here. Pure-Python wheel, no system libraries. Working implementations to copy or extend: `scripts/make_brief_pdf.py` in `merge-casting-app-internal`, and `scripts/build-pdfs.py` in `CCE-AI-strategy`.
 
