@@ -6,6 +6,7 @@ Repo for Claude Skills and Gemini Gems
 | Folder | What it is | Kind |
 | --- | --- | --- |
 | `pptx-visual-qa/` | Render, inspect and structurally check PowerPoint decks on a Mac without LibreOffice; scripted Keynote is the renderer. Two scripts and a per-machine environment record | Claude Code skill |
+| `re-fresh/` | Start a clean Claude session with only the context the next task needs, instead of `/compact`: captures the next goal, points to files rather than copying them, and outputs a self-contained prompt. Three levels, lite, full and ultra | Claude Code skill |
 | `sn-ui-checklist/` | UI design review checklist across strategy, typography, layout, color, imagery and product tactics | Claude Code skill |
 | `type-scale-generator/` | Type scale tokens, as a skill and as a Gemini Gem | Skill + Gem |
 | `DESIGN.md-creation-gem/` | Gem for producing a `DESIGN.md` | Gemini Gem |
