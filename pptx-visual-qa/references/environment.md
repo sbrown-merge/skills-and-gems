@@ -26,7 +26,7 @@ To re-verify on a new machine: `which soffice pdftoppm gs mutool; ls /Applicatio
 | --- | --- | --- |
 | A command-line tool | `uv tool install <pkg>` | Own isolated environment; the command lands in `~/.local/bin`, which is on PATH. Installed 2026-09-25: **`markitdown`** 0.1.8 with the `pdf,pptx,docx,xlsx` extras (so it reads PDFs now), and **`fonttools`** 4.66.0 (`fonttools`, `ttx`, `pyftsubset`, `pyftmerge`) |
 | A library for a one-off script, outside any repo | `uv run --no-project --with <pkg> python script.py` | Nothing installed permanently; uv caches the environment, so a repeat run starts in about 0.4 s |
-| A library a repo's own scripts need | `uv add <pkg>` in that repo | Recorded in its `pyproject.toml` and `uv.lock`; run scripts with `uv run python …`. epp-experience-project-planning converted 2026-09-25 |
+| A library a repo's own scripts need | `uv add <pkg>` in that repo, or an inline PEP 723 header in the script | A repo with a build (epp-experience-project-planning) records packages in `pyproject.toml` and `uv.lock` and runs `uv run python …`. Repos with standalone scripts (merge-docs-kit 0.9.2 and every repo vendoring it, merge-one-related, CCE-AI-strategy, proposals) declare them in each script's header and run `uv run scripts/<name>.py`. All converted 2026-09-25 |
 
 **Image tooling for screenshots (verified 2026-09-25):** `uv run --no-project --with pillow --with opencv-python-headless python script.py` gives Pillow 12.3.0 and OpenCV 5.0.0 on numpy 2.5.3. Use the headless OpenCV build; the full `opencv-python` adds only GUI windows, which a script never uses. **pypdf** the same way: `uv run --no-project --with pypdf python script.py`.
 
