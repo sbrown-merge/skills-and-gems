@@ -57,7 +57,7 @@ A faithful extraction reads `ppt/slides/slideN.xml`, and most sessions stop ther
 ## Environment traps that cost time
 
 - `timeout` is GNU coreutils and **is not on macOS**; wrapping `osascript` in it fails before Keynote is even asked. Use nothing, or a background job with a manual kill.
-- `/tmp` can be blocked by a session's sandbox deny rules. Work in a dot-directory inside the repo (`.render/`) and remove it when done; check the repo's `.gitignore` covers `*.pptx` before leaving rendered decks in it.
+- `/tmp` can be blocked by a session's sandbox deny rules. Work inside the repo instead: in its `.scratch/` folder (for example `.scratch/render/`) where it has one, since MERGE docs-kit repos keep temporary tool files there and gitignore it, and otherwise in a dot-directory such as `.render/`, removed when done; check the repo's `.gitignore` covers `*.pptx` before leaving rendered decks in it.
 - `qlmanage -t` renders only the first slide. Fine as a "does it open" sanity check, useless for QA.
 - `osascript` error `-1743` is macOS Automation permission. Grant it in System Settings → Privacy & Security → Automation (the terminal or Claude app needs permission to control Keynote). Expect this prompt on first use on a new machine.
 - `osascript` errors `-1719` and `-1728` with *not allowed assistive access* come from **System Events UI scripting** (window titles, buttons), which needs **Accessibility**. **On MERGE Macs Accessibility is locked by IT** (Steve Brown, 2026-09-22) and asking for it puts a permission prompt in front of the user that cannot be granted. Never script System Events; everything the render needs is plain Apple Events to Keynote (`open`, `export`, `close`, `front document`), which Automation covers.
