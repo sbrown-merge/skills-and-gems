@@ -1,0 +1,5 @@
+# Controlled vocabulary for OKF frontmatter `type:` values in this repo.
+# Values are lowercase and hyphenated. Add a genuinely new kind here
+# deliberately, in the same commit that first uses it; never coin one inline.
+types:
+  - guide    # how-to and best-known-method documents

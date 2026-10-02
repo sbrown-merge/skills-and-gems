@@ -10,4 +10,5 @@ Repo for Claude Skills and Gemini Gems
 | `sn-ui-checklist/` | UI design review checklist across strategy, typography, layout, color, imagery and product tactics | Claude Code skill |
 | `type-scale-generator/` | Type scale tokens, as a skill and as a Gemini Gem | Skill + Gem |
 | `DESIGN.md-creation-gem/` | Gem for producing a `DESIGN.md` | Gemini Gem |
+| [`claude-skills-best-practices.md`](claude-skills-best-practices.md) | Our best known method for building Claude Skills: seven layout and verification rules, a pass/fail audit checklist tuned for Opus 5.5, and a paste-in audit prompt | Guideline |
 
