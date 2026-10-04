@@ -74,6 +74,7 @@ Everything lives in `skills-and-gems/merge-build-readiness/`. Only `SKILL.md` is
 | `checklist.md` | The full checklist, each check with its reason, source and platform notes. `SKILL.md` carries the compressed form. |
 | `PLAN.md` | This plan. |
 | `research/` | The three research notes from 2026-10-03. |
+| `scripts/` | The read-only Plugin API scripts, one file each, tested at step 3, with a README of what they found. `SKILL.md` carries them inline. |
 | `diagnostics/` | Logs pasted back from test-mode runs inside Figma. |
 | `EVAL.md` | Test cases, their expected findings, and each run's results. |
 | `UPGRADES.md` | Improvements waiting on something outside our control. |
@@ -116,7 +117,7 @@ It ends with one JSON log in the chat carrying the skill version, the date, the 
 
 1. **Save the research and this plan.** Done on 2026-10-03.
 2. **Write `checklist.md`**, then stop for Steve's review. It decides everything downstream. Drafted on 2026-10-03 and revised to version 0.5 from Steve's comments, which settled the linked-repo wording, the annotation schema and the mobile check; waiting for his full read.
-3. **Test each script in Claude Code** against Andrew's Abbott library (file key `0VTZx0ZXc08vCIjdzb8Xza`) through the Figma MCP before it goes into `SKILL.md`, so the first Figma run isn't the code's first run. Remember that `use_figma` forbids `loadAllPagesAsync`; use `page.loadAsync()` per page there, which worked in the 2026-09-30 audit.
+3. **Test each script in Claude Code** against Andrew's Abbott library (file key `0VTZx0ZXc08vCIjdzb8Xza`) through the Figma MCP before it goes into `SKILL.md`, so the first Figma run isn't the code's first run. Remember that `use_figma` forbids `loadAllPagesAsync`; use `page.loadAsync()` per page there, which worked in the 2026-09-30 audit. Done on 2026-10-03: all nine scripts in [scripts/](scripts/README.md) ran against the library, which settled BR-05's node budget and how slots read, and showed that `use_figma` can't read `devStatus`, the file thumbnail or style publish status.
 4. **Write `SKILL.md`**, including test mode. Check its frontmatter against the spec, and have a separate Opus 5.5 agent (not the author) audit it against [claude-skills-best-practices.md](../claude-skills-best-practices.md), sections A to I.
 5. **Run test mode in Figma.** Steve uploads the skill privately, runs `/merge-build-readiness test`, and pastes the log into `diagnostics/`. Adjust the skill to what the log shows.
 6. **Run the evaluations.** Three cases, each first without the skill as a baseline, then with it, in Claude Code and in Figma's agent:
@@ -127,7 +128,7 @@ It ends with one JSON log in the chat carrying the skill version, the date, the 
 
 ## Open questions
 
-- **TBD (test mode):** which reads Figma's agent supports, especially variable scopes, code syntax, annotations, prototype links and publish status.
+- **TBD (test mode):** which reads Figma's agent supports. Under `use_figma`, step 3 found that variable scopes, code syntax, annotations, prototype links, slots and component and variable publish status all read, while `devStatus`, the file thumbnail and style publish status don't.
 - **TBD (test mode):** which model runs it, if the agent can say.
 
 ## Where this came from

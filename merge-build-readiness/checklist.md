@@ -3,7 +3,7 @@ title: "merge-build-readiness: the checklist"
 description: "The 34 checks merge-build-readiness runs on a Figma file, BR-01 to BR-34, each with its rank, reason, how a Plugin API script or the agent verifies it, the platforms it applies to, and the MERGE One playbook practice it came from."
 type: checklist
 status: draft
-version: "0.5"
+version: "0.6"
 created: 2026-10-03
 maintainer: Steve Brown
 tags: [figma, figma-agent, skill, agentic-build, design-system, audit, checklist]
@@ -111,7 +111,7 @@ These checks come first because they decide whether Figma's agent and a coding a
 
 Figma's agent only references a library once it's published ([H1][note]), and a market or product team can't pull components from an unpublished one. That's why this check runs first: the Abbott library's own Start Here badge said "Not Published" on 2026-09-30, and nothing else in the file could reach its users until that changed.
 
-For a library, the script calls `getPublishStatusAsync()` on every local component set, standalone component, style, variable collection and variable, and counts `UNPUBLISHED`, `CHANGED` and `CURRENT`. Pass when everything meant for use is `CURRENT`. Partly when the library is published but some items are `CHANGED` (edited since the last publish) or new items are `UNPUBLISHED`. Fail when nothing is published. Items hidden from publishing (`hiddenFromPublishing`, or a name starting with `_` or `.`) are left out, because hiding them is deliberate ([H10][note]). For a product file, the script instead counts instances whose main component has `remote: true`; Pass when the screens in scope are built from a published library, and Fail when they use only local components that aren't published anywhere. Whether `getPublishStatusAsync()` works inside Figma's agent is a test-mode question.
+For a library, the script calls `getPublishStatusAsync()` on every local component set, standalone component, variable collection and variable, and on styles where the method exists, and counts `UNPUBLISHED`, `CHANGED` and `CURRENT`. Pass when everything meant for use is `CURRENT`. Partly when the library is published but some items are `CHANGED` (edited since the last publish) or new items are `UNPUBLISHED`. Fail when nothing is published. Items hidden from publishing (`hiddenFromPublishing`, or a name starting with `_` or `.`) are left out, because hiding them is deliberate ([H10][note]). For a product file, the script instead counts instances whose main component has `remote: true`; Pass when the screens in scope are built from a published library, and Fail when they use only local components that aren't published anywhere. Under `use_figma` the method works on components, collections and variables but doesn't exist on styles, so styles are reported as Couldn't check there (tested 2026-10-03); test mode will show whether Figma's agent can read them.
 
 ### BR-02 A cover or Start Here page comes first, and pages follow a clear order
 
@@ -119,7 +119,7 @@ For a library, the script calls `getPublishStatusAsync()` on every local compone
 
 The first page is where a person or an agent learns what the file is, who owns it and how to use it, and Figma's own library skill puts the cover first, foundations before components, and utility pages last ([G4][note]). The Abbott library's `00 / Start Here` page was the strongest part of the file in the audit, because it explained the tiers, the naming and the ownership.
 
-The script returns the page names in order, the node set as the file thumbnail (`figma.getFileThumbnailNodeAsync()`), and the text on the first page. The agent judges whether the first page says what the file is for, who owns it and its status, and whether pages run from foundations to components to utility pages, with one naming pattern and separators (`---` or a decorated name) between groups. Pass when both hold. Partly when there's a guide but the order or naming is mixed. Fail when there's no cover or guide page. A file can follow its own convention rather than Figma's defaults, as long as it's consistent ([G3][note]).
+The script returns the page names in order, the text on the first page with any line that looks like a credential withheld, and the file thumbnail where it can be read. `use_figma` refuses the thumbnail call (`figma.getFileThumbnailNodeAsync()`, tested 2026-10-03), so the first page decides the check. The agent judges whether the first page says what the file is for, who owns it and its status, and whether pages run from foundations to components to utility pages, with one naming pattern and separators (`---` or a decorated name) between groups. Pass when both hold. Partly when there's a guide but the order or naming is mixed. Fail when there's no cover or guide page. A file can follow its own convention rather than Figma's defaults, as long as it's consistent ([G3][note]).
 
 ### BR-03 Build status is marked in the file, and Ready for dev is used
 
@@ -127,7 +127,7 @@ The script returns the page names in order, the node set as the file thumbnail (
 
 An agent can't tell an approved frame from an exploration unless the file says so. On MERGE One, ratified prototypes sat under a "(proposal…)" title, so nothing in the file said they were approved. Dev Mode's Ready for dev status is Figma's own handoff signal and is on every paid plan ([H7][note]).
 
-The script reads `devStatus` on every node directly under a page or section in scope (the only nodes that can carry it, [F12][note]), and returns section and frame names that contain status words such as approved, ratified, final, ready, draft, proposal, review, deprecated, archive or "do not build". The agent judges whether someone reading only the file could tell which frames to build from. Pass when frames meant for build are marked Ready for dev or Completed, or their section names say their status, and explorations and deprecated frames are labeled as such (for example `REVIEW · not for build`). Partly when status is marked at page level or in a guide but not on the frames themselves, as in the Abbott library. Fail when nothing in scope says what's approved.
+The script reads `devStatus` on every node directly under a page or section in scope (the only nodes that can carry it, [F12][note]), and returns section and frame names that contain status words such as approved, ratified, final, ready, draft, proposal, review, deprecated, archive or "do not build". The agent judges whether someone reading only the file could tell which frames to build from. Pass when frames meant for build are marked Ready for dev or Completed, or their section names say their status, and explorations and deprecated frames are labeled as such (for example `REVIEW · not for build`). Partly when status is marked at page level or in a guide but not on the frames themselves, as in the Abbott library. Fail when nothing in scope says what's approved. `use_figma` can't read `devStatus` (tested 2026-10-03), so there the check judges from names alone and the report says Ready for dev couldn't be read; test mode will show whether Figma's agent can read it.
 
 ### BR-04 An Examples page shows real compositions
 
@@ -143,7 +143,7 @@ The script looks for a page named `Examples` (any letter case) and for frames or
 
 A coding agent works best when it's pointed at a section or a component rather than a whole page, because "large, deeply nested frames can overwhelm the context window and slow things down, or silently fail" ([F2][note]). Claude Code caps each MCP response at 25,000 tokens ([F6][note]).
 
-The script returns, per page in scope, the top-level nodes that sit outside any section, and the number of descendant nodes under each top-level frame, section and component set. The agent judges whether each thing a person would hand to an agent is its own section, frame or page, and whether section names match what's in them (a row component filed under "Files & Attachments" is the playbook's example). Pass when build frames sit in named sections, or one component family per page, and none is over the node budget. Partly when some are over budget or loose on the page. Fail when build frames sit loose on large pages. **TBD (step 3):** the node budget. We'll start from 500 descendant nodes and set the real figure by measuring how many tokens `get_design_context` returns per node on the Abbott library.
+The script returns, per page in scope, the top-level nodes that sit outside any section, and the number of descendant nodes under each top-level frame, section and component set. The agent judges whether each thing a person would hand to an agent is its own section, frame or page, and whether section names match what's in them (a row component filed under "Files & Attachments" is the playbook's example). Pass when build frames sit in named sections, or one component family per page, and none is over the node budget. Partly when some are over budget or loose on the page. Fail when build frames sit loose on large pages. The node budget is 500 layers: on the Abbott library, `get_design_context` returned about 45 to 55 tokens a layer (measured 2026-10-03), so 500 layers is about Claude Code's 25,000-token limit for one response.
 
 ### BR-06 A linked-repo signal is detected and reported
 
@@ -309,7 +309,7 @@ The script searches inside every main component and component set in scope for l
 
 Slots are good for repeating and freeform content, but the MCP server can't read what's inside a slot, which Figma staff confirmed as a current limitation on 2026-06-30 ([R4][note]). A coding agent therefore needs the slot's expected content described somewhere it can read.
 
-The script finds components in scope that contain slots and checks each for a description or an annotation that mentions the slot. N/A when there are no slots. Pass when every slotted component says what goes in its slots. Partly when some don't, and the report carries the warning either way. **TBD (step 3):** how slots appear in the Plugin API; the typings bundled with Figma's plugin 2.2.12 don't mention them. The Abbott templates use slots for navigation and content, so step 3 can find out, and until then this check comes back Couldn't check rather than N/A.
+Slots appear in the Plugin API as `SLOT` nodes and as `SLOT` component properties, and a slot property can carry its own description (confirmed on the Abbott library, 2026-10-03, where 8 of 36 slot properties had one). The script finds components that contain slots and checks each slot property for a description, and each slotted component for a description that mentions its slots. N/A when there are no slots. Pass when every slot is described one of those ways. Partly when some aren't, and the report carries the warning either way.
 
 ## Handoff
 
@@ -404,7 +404,7 @@ The script reads each visible text layer in scope, segment by segment (`getStyle
 
 The parts of a control that show it's there or show its state, such as an input's border, a checkbox's box or a focus ring, and graphics that carry meaning, such as a one-color icon without a text label, need at least 3:1 against the colors next to them. A coding agent can't tell which of these matter from the code it's given, so the file has to get them right.
 
-The script returns, for each interactive component the agent found in BR-20, the fill and stroke colors of its outermost visible shape and of its focus and selected states, and for one-color icons in scope, each with the background next to it and the ratio in every mode. The agent decides which visual identifies the control or its state; a button whose fill contrasts with the page doesn't also need a contrasting border. Disabled controls are exempt. Pass when every identifying visual meets 3:1. Fail when any doesn't.
+The script returns, for each interactive component the agent found in BR-20, the fill and stroke colors of its outermost visible shape and of its focus and selected states, and for one-color icons in scope, each with the background next to it and the ratio in every mode. It only checks targets that draw a fill or border against what's behind them, because a text-only link is identified by its text, which BR-32 covers. It compares each target with its nearest ancestor's fill, not the layers beside it, so the agent confirms every result under 3:1 against a screenshot before reporting it; on the Abbott navigation, most low results were a yellow Active tint measured against a white documentation frame rather than the dark bar it sits on. The agent decides which visual identifies the control or its state; a button whose fill contrasts with the page doesn't also need a contrasting border. Disabled controls are exempt. Pass when every identifying visual meets 3:1. Fail when any doesn't.
 
 ### BR-34 Tap and click targets are at least 24 by 24px
 
@@ -422,7 +422,7 @@ These are the rules:
 
 1. **Annotate the layer the note is about**, not its parent frame, because a coding agent only receives an annotation when it reads that layer ([R2][note]).
 2. **Use Figma's four preset categories, Development, Interaction, Accessibility and Content, for anything a coding agent should act on.** They exist in every file and mean the same thing everywhere. People can add other categories when they need them, such as Design or Agent feedback; those sit outside the schema and aren't checked against it, but the report lists them. Add one deliberately, because a category can't be renamed or deleted once it's in a file. A layer can have one annotation in each category.
-3. **Write one fact per line, as `Key: value`**, with the category's required key first. **TBD (step 3):** confirm that line breaks survive in `labelMarkdown`.
+3. **Write one fact per line, as `Key: value`**, with the category's required key first. **TBD (test mode):** confirm that line breaks survive in `labelMarkdown`; step 3 couldn't, because Andrew's library has no annotations and the tests don't write to it.
 4. **Use pinned properties for measurements** (width, padding, gap, text style and so on) rather than typing numbers, because they show the live value and stay right when the design changes.
 5. **Mark anything not ready to build with `Status: Open question for <name>`**, and delete that line when it's answered, so a stale question doesn't read as live work. A team that already uses its own question categories, such as MERGE One's `Question - PM`, can keep them, and the report lists them with the other custom categories.
 6. **Write "and" rather than "&", and use typographic quotes and arrows (’ ” →)**, because Figma's API escapes `&` and straight quotes again on every round trip.
@@ -479,28 +479,29 @@ This table accounts for every practice in the [playbook][playbook], so a reviewe
 
 ## Notes for the scripts
 
-These rules come from the playbook's Won'ts and its writing mechanics, and from the 2026-09-30 audit. They're for step 3, when each script is tested in Claude Code through the Figma MCP before it goes into `SKILL.md`.
+These rules come from the playbook's Won'ts and its writing mechanics, the 2026-09-30 audit, and the step 3 tests on 2026-10-03. The tested scripts and what they found are in [scripts/](scripts/README.md).
 
 - **Read only.** No script in the reading step changes the file. The only writes in a run are the comments or annotations the person asked for, at the delivery step.
-- **List pages with `figma.root.children`**, never from `get_metadata`, which listed 3 of the Abbott file's pages on 2026-09-10 when it had more, and 4 of 17 on MERGE One ([FP-W06][wont]). Load each page with `page.loadAsync()` under `use_figma`, which forbids `figma.loadAllPagesAsync()`; whether Figma's agent allows the latter is a test-mode question.
+- **List pages with `figma.root.children`**, never from `get_metadata`, which listed 3 of the Abbott file's pages on 2026-09-10 when it had more, and 4 of 17 on MERGE One ([FP-W06][wont]). Load each page with `page.loadAsync()` under `use_figma`, which forbids `figma.loadAllPagesAsync()`; loading all 46 Abbott pages that way took 5.5 seconds. Whether Figma's agent allows `loadAllPagesAsync()` is a test-mode question.
 - **Address nodes by ID, never by name**, because names change and a name lookup fails silently ([FP-W01][wont]). Placeholders such as `__SCOPE_ID__` are the only edits to a script.
 - **Keep each return under about 20 KB**, the limit `use_figma` sets ([F9][note]); the playbook saw failures from about 14 KB. Return counts and up to ten example node IDs per finding, and page through anything larger.
 - **Don't descend into instances**, except to read the fields an instance overrides, so each library problem is counted once.
 - **Count hidden layers inside components**, because a boolean property can show them.
+- **Search with `findAllWithCriteria`, not `findAll` with a callback**, on anything large; a file-wide `findAll` callback broke the `use_figma` transport on 2026-10-03.
+- **Check `typeof` before comparing a number property**, because properties such as `strokeWeight` can be `figma.mixed`.
 - **Don't call something impossible without probing it** ([FP-W07][wont]). If a read fails, the check is Couldn't check, and the report says which read failed.
-- **Members to confirm at step 3:** `getPublishStatusAsync()` on variables and collections (BR-01), `detachedInfo` (BR-16), `getFileThumbnailNodeAsync()` (BR-02) and `InstanceNode.overrides` (BR-07) are all in the typings bundled with Figma's plugin 2.2.12, but haven't been run against a real file. Slots aren't in those typings (BR-23).
+- **Confirmed under `use_figma` on 2026-10-03:** `getPublishStatusAsync()` on variables, collections and components; `detachedInfo`; `InstanceNode.overrides`; `explicitVariableModes`; annotations and their categories; `reactions`; and slots. **Not available there:** `getFileThumbnailNodeAsync()`, `devStatus`, and `getPublishStatusAsync()` on styles.
 
 ## Open questions
 
 These need an answer before or during the next build steps.
 
-- **TBD (step 3):** BR-05's node budget, starting from 500 descendant nodes.
-- **TBD (step 3):** how slots appear in the Plugin API, for BR-23.
-- **TBD (step 3):** whether a frame pinned to a non-default mode reaches a coding agent with the default mode's values, which decides BR-14's Partly case.
-- **TBD (test mode):** whether `getPublishStatusAsync()`, `devStatus` and annotations can be read from inside Figma's agent, for BR-01, BR-03 and BR-24.
+- **TBD (step 6):** whether a frame pinned to a non-default mode reaches a coding agent with the default mode's values, which decides BR-14's Partly case. No frame in the Abbott library is pinned, so the MERGE One case or the test file has to settle it.
+- **TBD (test mode):** whether Figma's agent can read `devStatus`, the file thumbnail and style publish status, which `use_figma` can't, for BR-01, BR-02 and BR-03.
 
 ## Version history
 
+- **0.6** (2026-10-04): Results of build step 3, the script tests on the Abbott library. BR-05's node budget is set at 500 layers from a measurement. BR-23 checks slot descriptions now that slots are readable. BR-01, BR-02 and BR-03 say what `use_figma` can't read. BR-33 checks only targets that draw a boundary, confirmed against a screenshot.
 - **0.5** (2026-10-03): Steve approved the linked-repo wording and the annotation schema. The schema now allows custom annotation categories, such as Design or Agent feedback, which BR-26 lists for the build brief but never scores. BR-31 now checks that every desktop view has a mobile view, with tablet views optional, and stays a Should.
 - **0.4** (2026-10-03): BR-34, WCAG 2.2's AA minimum target size, joins the Accessibility group.
 - **0.3** (2026-10-03): Steve's second comments. BR-25 (Dev Mode annotations rather than on-canvas notes) and BR-26 (the annotation schema) are new, so 0.2's BR-25 to BR-29 are now BR-27 to BR-31. A proposed Dev Mode annotation schema is added. BR-27 now covers CMS-driven content. A new Accessibility group adds BR-32 and BR-33, contrast checks against WCAG 2.2 AA.
