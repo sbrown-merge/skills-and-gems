@@ -3,7 +3,7 @@ title: "merge-build-readiness: the checklist"
 description: "The 34 checks merge-build-readiness runs on a Figma file, BR-01 to BR-34, each with its rank, reason, how a Plugin API script or the agent verifies it, the platforms it applies to, and the MERGE One playbook practice it came from."
 type: checklist
 status: draft
-version: "0.4"
+version: "0.5"
 created: 2026-10-03
 maintainer: Steve Brown
 tags: [figma, figma-agent, skill, agentic-build, design-system, audit, checklist]
@@ -30,7 +30,7 @@ This is the full checklist that `merge-build-readiness` runs on a Figma file, wr
 - Components
 - Handoff
 - Accessibility
-- Proposed Dev Mode annotation schema
+- Dev Mode annotation schema
 - Where each playbook practice went
 - Notes for the scripts
 - Open questions
@@ -41,7 +41,7 @@ This is the full checklist that `merge-build-readiness` runs on a Figma file, wr
 
 Each check has an ID, a rank, a way of being verified, the platforms and kinds of file it applies to, and the playbook practice it came from where there is one. This section defines those terms once.
 
-**Ranks** use the playbook's scale, adapted to any project. **Must** means a coding agent will build the wrong thing without it, and we've seen that happen on MERGE One or in the [Abbott audit][abbott], or Figma says its agent can't use the file without it. **Should** means it measurably improves what the agent builds or saves a correction cycle. **Could** is worth doing when you're already working in that area. The playbook's fourth rank, Won't, has no checks here; the [mapping table](#where-each-playbook-practice-went) says where each Won't went.
+**Ranks** use the playbook's scale, adapted to any project. **Must** means a coding agent will build the wrong thing without it, and we've seen that happen on MERGE One or in the [Abbott audit][abbott], or Figma says its agent can't use the file without it, or it's a standard we hold every project to, such as WCAG 2.2 AA. **Should** means it measurably improves what the agent builds or saves a correction cycle. **Could** is worth doing when you're already working in that area. The playbook's fourth rank, Won't, has no checks here; the [mapping table](#where-each-playbook-practice-went) says where each Won't went.
 
 **Results** are Pass, Partly, Fail, Couldn't check or N/A, as the plan sets out. Couldn't check means a read failed or the Plugin API doesn't expose what the check needs, and the report says which; the agent never guesses a result. N/A means the check doesn't apply to this file's kind or platform. Every result carries evidence that links to the layers at fault, with the total count and up to ten examples.
 
@@ -94,7 +94,7 @@ This table is the index for tools and for `SKILL.md`. The sections after it give
 | BR-28 | Names are unique | Must | Script | File and scope | All | [FP-M07][must] |
 | BR-29 | Build frames have no default layer names | Should | Script | Scope | All | [FP-S07][should] |
 | BR-30 | No stray instances | Could | Script | Scope | All | none |
-| BR-31 | Screens are drawn mobile first | Should | Judgment | Scope | Web; product files | none |
+| BR-31 | Every desktop view has a mobile view | Should | Judgment | Scope | Web; product files | none |
 | BR-32 | Text contrast meets WCAG 2.2 AA | Must | Script | Scope | All | none |
 | BR-33 | Controls and meaningful graphics meet WCAG 2.2 AA non-text contrast | Must | Judgment | Scope | All | none |
 | BR-34 | Tap and click targets are at least 24 by 24px | Must | Judgment | Scope | All | none |
@@ -151,7 +151,7 @@ The script returns, per page in scope, the top-level nodes that sit outside any 
 
 Some teams keep build rules and decisions in a repo that a coding agent reads alongside the file, as the Abbott team does. Version 1 of the skill only detects that signal and reports it; it never follows the link. Reading the repo through Figma's GitHub connector is the first item planned for `UPGRADES.md`.
 
-**Where it goes (decided, Steve, 2026-10-03):** the file's first page, which is usually named Cover. **Proposed form, for Steve to approve:** one text layer on that page whose text is a single line, `Linked repo: ` followed by the repo's GitHub URL, for example `Linked repo: https://github.com/mergeworld/abbott-fs-libre-global-iva-specs`. A branch and folder go in the URL in GitHub's own form, `https://github.com/<owner>/<repo>/tree/<branch>/<folder>`. The URL has to be in the visible text rather than only in a hyperlink, so an agent reading the layer sees it, and naming the layer `Linked repo` helps people find it in the layers panel. The script finds the signal by its text, not the layer name, because names change ([FP-W01][wont]).
+**Where it goes and what it says (decided, Steve, 2026-10-03):** the file's first page, which is usually named Cover, holds one text layer on that page whose text is a single line, `Linked repo: ` followed by the repo's GitHub URL, for example `Linked repo: https://github.com/mergeworld/abbott-fs-libre-global-iva-specs`. A branch and folder go in the URL in GitHub's own form, `https://github.com/<owner>/<repo>/tree/<branch>/<folder>`. The URL has to be in the visible text rather than only in a hyperlink, so an agent reading the layer sees it, and naming the layer `Linked repo` helps people find it in the layers panel. The script finds the signal by its text, not the layer name, because names change ([FP-W01][wont]).
 
 The script searches text on the first page, and on any other page whose name contains "cover", "start here" or "readme", for lines matching `^\s*linked repo:\s*(\S+)\s*$` (any letter case). N/A when there's no signal, because a linked repo is optional. Pass when there's exactly one signal, it's on the first page, and its URL matches `^https://github\.com/[A-Za-z0-9-]+/[A-Za-z0-9._-]+(/tree/\S+)?$`. Partly when it's on another page, or points to a host other than GitHub, which the planned connector check couldn't read. Fail when the line is malformed or two signals disagree. Every result repeats the URL in the report and says the skill didn't open it.
 
@@ -333,11 +333,11 @@ The script returns layers in scope that look like on-canvas notes: text layers a
 
 ### BR-26 Annotations follow the annotation schema
 
-**Should · Script · Scope · All · no playbook practice (the [proposed schema](#proposed-dev-mode-annotation-schema))**
+**Should · Script · Scope · All · no playbook practice (the [annotation schema](#dev-mode-annotation-schema))**
 
-When every file writes annotations the same way, a coding agent can read them the same way in every project, and this skill can check them. The [schema below](#proposed-dev-mode-annotation-schema) sets the categories, the keys and the format.
+When every file writes its handoff annotations the same way, a coding agent can read them the same way in every project, and this skill can check them. The [schema below](#dev-mode-annotation-schema) sets the format for Figma's four preset categories. People may add their own categories as well, such as Design or Agent feedback, and those aren't held to the schema.
 
-The script reads every annotation in scope and checks that its category is one of Figma's four presets (the category's `isPreset` is true), that each line of its label reads `Key: value`, that every key belongs to its category or to the shared keys, and that the category's required keys are present. It also reports how many annotations use pinned properties. The default rule decides the result, counted over annotations. N/A when there are no annotations in scope.
+The script reads every annotation in scope and sorts it by category. For annotations in the four preset categories (the category's `isPreset` is true), it checks that each line of the label reads `Key: value`, that every key belongs to that category or to the shared keys, and that the category's required keys are present. The default rule decides the result, counted over those annotations; N/A when there are none. Annotations in any other category are never scored. The report lists every annotation that doesn't follow the schema, whether it's in a preset category and malformed or in a custom category, with its category, its layer and its text, so a build brief can pass it on to the coding agent. It also reports how many annotations use pinned properties.
 
 ### BR-27 Content is realistic where it's meant for build
 
@@ -378,13 +378,13 @@ An instance placed loose on a page or in a section, outside any frame, looks lik
 
 The script finds instances whose parent is a page or a section. Pass when there are none, and Partly otherwise.
 
-### BR-31 Screens are drawn mobile first
+### BR-31 Every desktop view has a mobile view
 
-**Should · Judgment · Scope · Web; product files · no playbook practice (Steve's direction, 2026-10-03; proposed)**
+**Should · Judgment · Scope · Web; product files · no playbook practice (Steve's direction, 2026-10-03)**
 
-We're pushing our teams to design mobile first, because that's how most people use the web now. A coding agent given only a desktop frame has to invent the phone layout, and it usually does that by squeezing the desktop one; given the phone layout, it can build that first and add breakpoints upward, which is how a mobile-first front end is written.
+We build web products mobile first, because that's how most people use the web now. A coding agent given only a desktop frame has to invent the phone layout, and it usually does that by squeezing the desktop one. So every desktop view needs a matching mobile view. Tablet views are optional, and the check doesn't ask for them.
 
-The script returns the width of every top-level frame in scope, grouped by name with breakpoint words such as mobile, tablet, desktop, sm, md or lg removed, and flags groups with no frame between 320 and 430px wide, the range that covers common phone viewports (360 on many Android phones, 375 to 430 on current iPhones). The agent matches frames that show the same screen when their names don't line up. Pass when every screen in scope has a phone-width frame. Partly when some screens have only wider frames. Fail when none has a phone-width frame. N/A for a library, and for iOS, Android and Other.
+The script returns the width of every top-level frame in scope and sorts it by width. Under 600px is mobile, following Material Design's compact window class, which covers phones from 320px up. From 1,200px wide is desktop, which covers the common 1280, 1440 and 1920 frames. Anything in between is tablet and is ignored. It groups frames by name with breakpoint words such as mobile, tablet, desktop, sm, md and lg removed, and flags desktop frames whose group has no mobile frame. The agent matches frames that show the same screen when their names don't line up, and decides when a desktop frame isn't a view of its own, such as a modal drawn over a page. Pass when every desktop view has a mobile view. Partly when some don't. Fail when none do. N/A for a library, for iOS, Android and Other, and when there are no desktop views in scope.
 
 ## Accessibility
 
@@ -414,17 +414,17 @@ Anything someone clicks or taps needs a target of at least 24 by 24 CSS pixels, 
 
 The script returns the width and height of every instance of an interactive component the agent found in BR-20, and of every layer with a prototype interaction (`reactions`), in scope. For each target under 24px in either direction, it applies WCAG's spacing test: a 24px circle centered on the target mustn't overlap another target or another small target's circle. Links inside a run of text are exempt as inline targets, and the script leaves them out. The agent removes the other exceptions WCAG allows: a larger control that does the same thing on the same screen, a control the browser draws and the design doesn't change, and a size that's essential to what's shown. Pass when every target is at least 24 by 24px or meets an exception. Fail when any doesn't, and the evidence names each target, its size and the nearest target it crowds.
 
-## Proposed Dev Mode annotation schema
+## Dev Mode annotation schema
 
-This is a proposal for Steve to approve. We're proposing one way to write Dev Mode annotations across all MERGE projects, so a coding agent reads them the same way in every file and BR-26 can check them. The skill will also write its own annotations this way when someone asks for findings as annotations.
+This is how we write Dev Mode annotations for agent handoff across all MERGE projects (approved, Steve, 2026-10-03), so a coding agent reads them the same way in every file and BR-26 can check them. The skill will also write its own annotations this way when someone asks for findings as annotations.
 
 These are the rules:
 
 1. **Annotate the layer the note is about**, not its parent frame, because a coding agent only receives an annotation when it reads that layer ([R2][note]).
-2. **Use only Figma's four preset categories: Development, Interaction, Accessibility and Content.** They exist in every file and mean the same thing everywhere, while a category added to a file can't be renamed or deleted later. A layer can have one annotation in each category.
+2. **Use Figma's four preset categories, Development, Interaction, Accessibility and Content, for anything a coding agent should act on.** They exist in every file and mean the same thing everywhere. People can add other categories when they need them, such as Design or Agent feedback; those sit outside the schema and aren't checked against it, but the report lists them. Add one deliberately, because a category can't be renamed or deleted once it's in a file. A layer can have one annotation in each category.
 3. **Write one fact per line, as `Key: value`**, with the category's required key first. **TBD (step 3):** confirm that line breaks survive in `labelMarkdown`.
 4. **Use pinned properties for measurements** (width, padding, gap, text style and so on) rather than typing numbers, because they show the live value and stay right when the design changes.
-5. **Mark anything not ready to build with `Status: Open question for <name>`**, and delete that line when it's answered, so a stale question doesn't read as live work. This replaces separate question categories such as MERGE One's `Question - PM`.
+5. **Mark anything not ready to build with `Status: Open question for <name>`**, and delete that line when it's answered, so a stale question doesn't read as live work. A team that already uses its own question categories, such as MERGE One's `Question - PM`, can keep them, and the report lists them with the other custom categories.
 6. **Write "and" rather than "&", and use typographic quotes and arrows (’ ” →)**, because Figma's API escapes `&` and straight quotes again on every round trip.
 
 The keys for each category are below; required keys come first and are marked.
@@ -449,7 +449,7 @@ This table accounts for every practice in the [playbook][playbook], so a reviewe
 | [FP-M05][must] | BR-20, with the states made platform-specific. |
 | [FP-M06][must] | BR-03. |
 | [FP-M07][must] | BR-28. |
-| [FP-M08][must] | BR-24, BR-25 and BR-26. MERGE One's `Question - PM`, `Question - Design` and `Question - Dev` categories are replaced by the schema's `Status` line. |
+| [FP-M08][must] | BR-24, BR-25 and BR-26. MERGE One's `Question - PM`, `Question - Design` and `Question - Dev` categories are allowed as custom categories; the schema's `Status` line is the shared way to mark a question. |
 | [FP-M09][must] | Partly carried by the schema's `Status` line, which marks open questions. Whether an annotation has been answered is known to the team or the repo, not the file, so there's no check. |
 | [FP-M10][must] | The publishing half is BR-01. Recording variable changes as rulings needs a repo, so it's dropped. |
 | [FP-M11][must], [FP-M12][must] | Dropped. They govern how a coding agent reads the file and how a repo cites it. |
@@ -494,9 +494,6 @@ These rules come from the playbook's Won'ts and its writing mechanics, and from 
 
 These need an answer before or during the next build steps.
 
-- **TBD (Steve):** approve the linked-repo signal's form in BR-06, or change it.
-- **TBD (Steve):** approve the [Dev Mode annotation schema](#proposed-dev-mode-annotation-schema), its keys, and replacing question categories with the `Status` line.
-- **TBD (Steve):** keep or drop BR-31, the proposed mobile-first check, and whether its 320 to 430px phone range is right.
 - **TBD (step 3):** BR-05's node budget, starting from 500 descendant nodes.
 - **TBD (step 3):** how slots appear in the Plugin API, for BR-23.
 - **TBD (step 3):** whether a frame pinned to a non-default mode reaches a coding agent with the default mode's values, which decides BR-14's Partly case.
@@ -504,6 +501,7 @@ These need an answer before or during the next build steps.
 
 ## Version history
 
+- **0.5** (2026-10-03): Steve approved the linked-repo wording and the annotation schema. The schema now allows custom annotation categories, such as Design or Agent feedback, which BR-26 lists for the build brief but never scores. BR-31 now checks that every desktop view has a mobile view, with tablet views optional, and stays a Should.
 - **0.4** (2026-10-03): BR-34, WCAG 2.2's AA minimum target size, joins the Accessibility group.
 - **0.3** (2026-10-03): Steve's second comments. BR-25 (Dev Mode annotations rather than on-canvas notes) and BR-26 (the annotation schema) are new, so 0.2's BR-25 to BR-29 are now BR-27 to BR-31. A proposed Dev Mode annotation schema is added. BR-27 now covers CMS-driven content. A new Accessibility group adds BR-32 and BR-33, contrast checks against WCAG 2.2 AA.
 - **0.2** (2026-10-03): Steve's first comments. The 4 and 8px grid check is back as BR-08, so the 0.1 checks BR-08 to BR-27 became BR-09 to BR-28. Web is the default platform, and its states cover touch because our web work is mobile first. The linked-repo signal goes on the first page, usually named Cover. A mobile-first check was proposed as BR-29.
