@@ -2,7 +2,9 @@
 // Feeds BR-01, BR-08 (variable values), BR-09 to BR-14. Placeholder: __PLATFORM__ (WEB, iOS, ANDROID or ANY).
 const MAX_EX = 10;
 const ex = (arr, item) => { if (arr.length < MAX_EX) arr.push(item); };
-const PLATFORM = '__PLATFORM__';
+const PLATFORM_IN = '__PLATFORM__';
+const PLATFORM = { WEB: 'WEB', IOS: 'iOS', ANDROID: 'ANDROID', ANY: 'ANY' }[PLATFORM_IN.trim().toUpperCase()];
+if (!PLATFORM) return { error: 'PLATFORM must be WEB, iOS, ANDROID or ANY, not ' + PLATFORM_IN };
 const SYNTAX = {
   WEB: /^var\(--[A-Za-z0-9_-]+\)$/,
   iOS: /^\.?[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*$/,
@@ -34,7 +36,11 @@ for (const c of cols) {
       if (!target) aliasBroken.push({ id: v.id, name: v.name });
     } else raw++;
   }
-  out.collections.push({ id: c.id, name: c.name, modes: c.modes.map(m => m.name), defaultMode: (c.modes.find(m => m.modeId === c.defaultModeId) || {}).name, variables: cv.length, aliasValues: alias, rawValues: raw, hiddenFromPublishing: c.hiddenFromPublishing, publish: await status(c), isExtension: !!c.isExtension });
+  // Per-collection counts let the agent judge BR-10 to BR-12 over the semantic collections only
+  const described = cv.filter(v => v.description && v.description.trim()).length;
+  const allScopes = cv.filter(v => v.resolvedType !== 'BOOLEAN' && v.scopes.includes('ALL_SCOPES')).length;
+  const withSyntax = cv.filter(v => { const cs = v.codeSyntax || {}; return PLATFORM === 'ANY' ? Object.keys(cs).length > 0 : !!cs[PLATFORM]; }).length;
+  out.collections.push({ id: c.id, name: c.name, modes: c.modes.map(m => m.name), defaultMode: (c.modes.find(m => m.modeId === c.defaultModeId) || {}).name, variables: cv.length, aliasValues: alias, rawValues: raw, described, allScopes, withSyntax, hiddenFromPublishing: c.hiddenFromPublishing, publish: await status(c), isExtension: !!c.isExtension });
 }
 for (const v of vars) {
   if (v.hiddenFromPublishing) publish.hidden++; else { const s = await status(v); publish[s] = (publish[s] || 0) + 1; }

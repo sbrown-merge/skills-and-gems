@@ -56,5 +56,5 @@ const visit = (n, top) => {
 const kids = 'children' in scope ? scope.children : [scope];
 for (const c of kids) { if (c.type === 'SECTION') for (const g of c.children) visit(g, g.name); else visit(c, c.name); }
 r.byTopLevel = Object.fromEntries(Object.entries(r.byTopLevel).sort((a, b) => b[1] - a[1]).slice(0, MAX_EX));
-r.grid.values = Object.fromEntries(Object.entries(r.grid.values).sort((a, b) => b[1] - a[1]).slice(0, 15));
+r.grid.values = Object.fromEntries(Object.entries(r.grid.values).sort((a, b) => b[1] - a[1]).slice(0, 15)); // the 15 commonest off-grid values, about 1 KB
 return r;

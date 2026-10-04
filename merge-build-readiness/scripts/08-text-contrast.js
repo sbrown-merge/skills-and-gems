@@ -17,7 +17,7 @@ const hex = c => '#' + [c.r, c.g, c.b].map(v => Math.round(v * 255).toString(16)
 const varCache = new Map();
 const getVar = async id => { if (!varCache.has(id)) varCache.set(id, await figma.variables.getVariableByIdAsync(id)); return varCache.get(id); };
 const resolveIn = async (id, modeId, depth = 0) => {
-  const v = await getVar(id); if (!v || depth > 8) return null;
+  const v = await getVar(id); if (!v || depth > 8) return null; // an alias chain deeper than 8 is a loop, not a real token tier
   const col = await figma.variables.getVariableCollectionByIdAsync(v.variableCollectionId);
   const val = v.valuesByMode[modeId] !== undefined ? v.valuesByMode[modeId] : v.valuesByMode[col.defaultModeId];
   if (val && val.type === 'VARIABLE_ALIAS') return resolveIn(val.id, modeId, depth + 1);

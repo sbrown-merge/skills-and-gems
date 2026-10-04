@@ -8,11 +8,18 @@ const ART = new Set(['VECTOR', 'BOOLEAN_OPERATION', 'STAR', 'POLYGON', 'ELLIPSE'
 const isArtOnly = n => ART.has(n.type) || ('children' in n && n.children.length > 0 && n.children.every(isArtOnly));
 const STATE_PROP = /state|status|interaction|disabled|selected|pressed|hover|focus|active/i;
 const BOOLISH = /^(yes|no|on|off|true|false)$/i;
+// Names that suggest a control someone clicks or taps; the agent confirms the list before script 09 uses it
+const INTERACTIVE_NAME = /button|link|tab|checkbox|radio|toggle|switch|input|field|select|dropdown|menu|nav|chip|pagination|arrow|accordion|slider|stepper|search|carousel|indicator|control/i;
 const MAX_VARIANTS = 30; // Figma's library skill splits a set past about 30 combinations (G3, G5)
+const MAX_CANDIDATES = 80; // about 4 KB of names and IDs; past that the list is truncated and says so
 const status = async o => { try { return await o.getPublishStatusAsync(); } catch (e) { return 'unavailable'; } };
 const owners = [];
+const exampleNodes = [];
+const examplesPage = { found: false, components: 0, other: 0 };
 for (const page of figma.root.children) {
   await page.loadAsync();
+  if (/^\s*examples\s*$/i.test(page.name)) { examplesPage.found = true; for (const c of page.children) { if (c.type === 'COMPONENT' || c.type === 'COMPONENT_SET') examplesPage.components++; else if (c.type !== 'SECTION') examplesPage.other++; } }
+  for (const n of page.findAllWithCriteria({ types: ['FRAME', 'COMPONENT', 'COMPONENT_SET'] })) if (/_example\s*$/i.test(n.name)) exampleNodes.push(n);
   for (const n of page.findAllWithCriteria({ types: ['COMPONENT_SET', 'COMPONENT'] })) {
     if (n.type === 'COMPONENT' && n.parent && n.parent.type === 'COMPONENT_SET') continue;
     owners.push({ n, page: page.name });
@@ -21,7 +28,7 @@ for (const page of figma.root.children) {
 const publish = { hiddenByPrefix: 0 };
 const names = new Map();
 const propIndex = {};
-const r = { owners: owners.length, sets: 0, standalone: 0, overThirty: [], overThirtyCount: 0, propOverThirty: [], descEmpty: 0, descEx: [], docLinks: 0, defaultPropNames: [], boolishValues: [], unwired: [], withDefaultChildren: 0, defaultChildEx: [], slots: { components: 0, slotProps: 0, slotPropsDescribed: 0, ex: [] }, stateProps: [], untrimmed: [] };
+const r = { owners: owners.length, sets: 0, standalone: 0, overThirty: [], overThirtyCount: 0, propOverThirty: [], descEmpty: 0, descEx: [], docLinks: 0, defaultPropNames: [], boolishValues: [], unwired: [], withDefaultChildren: 0, defaultChildEx: [], slots: { components: 0, slotProps: 0, slotPropsDescribed: 0, ex: [] }, stateProps: [], untrimmed: [], interactiveCandidates: [], interactiveCandidatesCount: 0, examples: { components: 0, frames: 0, ex: [] } };
 for (const { n } of owners) {
   if (/^[._]/.test(n.name)) publish.hiddenByPrefix++; else { const s = await status(n); publish[s] = (publish[s] || 0) + 1; }
   const key = n.name.trim().toLowerCase();
@@ -54,10 +61,14 @@ for (const { n } of owners) {
       if (def.type === 'BOOLEAN' && STATE_PROP.test(base)) ex(r.stateProps, n.name + ' > ' + base + ' (boolean)');
     }
   }
+  const hasStateProp = Object.entries(defs).some(([p, d]) => (d.type === 'VARIANT' || d.type === 'BOOLEAN') && STATE_PROP.test(p.split('#')[0]));
+  if (INTERACTIVE_NAME.test(n.name) || hasStateProp) { r.interactiveCandidatesCount++; if (r.interactiveCandidates.length < MAX_CANDIDATES) r.interactiveCandidates.push(n.name + ' ' + n.id); }
   const slotNodes = n.findAllWithCriteria({ types: ['SLOT'] }).length;
   if (slotNodes || slotProps) { r.slots.components++; ex(r.slots.ex, n.name + ' (' + slotNodes + ' slots, described: ' + (n.description && n.description.trim() ? 'yes' : 'no') + ')'); }
   const defaults = n.findAll(d => DEFAULT_NAME.test(d.name) && !isArtOnly(d));
   if (defaults.length) { r.withDefaultChildren++; ex(r.defaultChildEx, n.name + ' (' + defaults.length + ')'); }
 }
+for (const n of exampleNodes) { if (n.type === 'FRAME') r.examples.frames++; else r.examples.components++; ex(r.examples.ex, n.type + ' ' + n.name + ' ' + n.id); }
 const dupes = [...names.entries()].filter(([, ids]) => ids.length > 1).map(([k, ids]) => k + ' x' + ids.length + ' ' + ids.slice(0, 3).join(','));
+r.examplesPage = examplesPage;
 return { publish, ...r, duplicateNameCount: dupes.length, duplicateNames: dupes.slice(0, MAX_EX), nearDuplicatePropNames: Object.values(propIndex).filter(s => s.size > 1).map(s => [...s].join(' | ')).slice(0, MAX_EX) };

@@ -8,7 +8,7 @@ try { const t = await figma.getFileThumbnailNodeAsync(); thumbnail = t ? { id: t
 catch (e) { thumbnail = 'unavailable'; } // use_figma refuses this call (tested 2026-10-03)
 const LINKED = /^\s*linked repo:\s*(\S+)\s*$/i;
 const GH = /^https:\/\/github\.com\/[A-Za-z0-9-]+\/[A-Za-z0-9._-]+(\/tree\/\S+)?$/;
-const COVER_NAME = /^(\d+\s*[\/.\-–—|]\s*)?(project cover|cover|start here|read ?me)$/i;
+const COVER_NAME = /\b(cover|start here|read ?me)\b/i; // whole words, so "Discover" or "Recovery" doesn't count
 const first = figma.root.children[0];
 await first.loadAsync();
 const readText = page => page.findAllWithCriteria({ types: ['TEXT'] });
@@ -30,5 +30,5 @@ return {
   firstPage: { id: first.id, name: first.name, textLines: lines },
   otherGuidePages: pages.filter(p => p.i > 0 && COVER_NAME.test(p.name.trim())),
   linkedRepoSignals: signals,
-  examples: { pages: pages.filter(p => /^\s*examples\s*$/i.test(p.name)) },
+  examplesPages: pages.filter(p => /^\s*examples\s*$/i.test(p.name)),
 };

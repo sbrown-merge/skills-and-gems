@@ -9,7 +9,7 @@ if (scope.type === 'PAGE') await scope.loadAsync();
 const r = { scope: scope.name };
 let cats = [];
 try { cats = await figma.annotations.getAnnotationCategoriesAsync(); r.categories = cats.map(c => ({ label: c.label, preset: c.isPreset })); }
-catch (e) { r.categories = 'unreadable'; }
+catch (e) { r.categories = 'unavailable'; }
 const catById = new Map(cats.map(c => [c.id, c]));
 // The Dev Mode annotation schema in checklist.md (approved 2026-10-03)
 const SCHEMA = {
@@ -34,7 +34,7 @@ const checkLabel = (category, text) => {
 const TYPES = ['FRAME', 'COMPONENT', 'COMPONENT_SET', 'INSTANCE', 'TEXT', 'SECTION', 'RECTANGLE', 'GROUP', 'VECTOR', 'ELLIPSE'];
 const nodes = 'findAllWithCriteria' in scope ? scope.findAllWithCriteria({ types: TYPES }) : [];
 const inInstance = n => n.id.startsWith('I'); // instance sublayers: count each rule once, at its main component
-const ann = { total: 0, onLayers: 0, byCategory: {}, presetFollowing: 0, presetMalformed: 0, custom: 0, uncategorized: 0, outsideSchema: [], withPinnedProperties: 0 };
+const ann = { total: 0, onLayers: 0, byCategory: {}, presetFollowing: 0, presetMalformed: 0, custom: 0, uncategorized: 0, outsideSchema: [], withPinnedProperties: 0, content: [] };
 for (const n of nodes) {
   let list; try { list = n.annotations; } catch (e) { continue; }
   if (!list || !list.length) continue;
@@ -49,7 +49,7 @@ for (const n of nodes) {
     const where = label + ' | ' + n.name + ' ' + n.id + ' | ' + text.replace(/\s+/g, ' ').slice(0, 100);
     if (cat && cat.isPreset && SCHEMA[cat.label]) {
       const problems = checkLabel(cat.label, text);
-      if (!problems.length) ann.presetFollowing++; else { ann.presetMalformed++; ex(ann.outsideSchema, 'malformed (' + problems.join('; ') + '): ' + where); }
+      if (!problems.length) { ann.presetFollowing++; if (cat.label === 'Content') ex(ann.content, n.name + ' ' + n.id + ' | ' + text.replace(/\s*\n\s*/g, ' / ').slice(0, 120)); } else { ann.presetMalformed++; ex(ann.outsideSchema, 'malformed (' + problems.join('; ') + '): ' + where); }
     } else { if (cat) ann.custom++; else ann.uncategorized++; ex(ann.outsideSchema, (cat ? 'custom category' : 'no category') + ': ' + where); }
   }
 }
@@ -66,6 +66,7 @@ for (const n of nodes) {
   if (n.type === 'TEXT' && !inInstance(n)) {
     text.total++;
     const s = n.characters;
+    // a rule is a short sentence; text of 200 characters or more is copy or documentation
     if (RULE.test(s) && s.length < 200) { text.ruleLikeCount++; ex(text.ruleLike, n.id + ' ' + s.replace(/\s+/g, ' ').slice(0, 90)); }
     if (PLACEHOLDER.test(s)) { text.placeholders++; ex(text.placeholderEx, n.id + ' ' + s.replace(/\s+/g, ' ').slice(0, 60)); }
   }

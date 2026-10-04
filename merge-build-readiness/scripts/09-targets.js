@@ -9,7 +9,9 @@ const scope = await figma.getNodeByIdAsync(SCOPE_ID);
 if (!scope) return { error: 'scope not found: ' + SCOPE_ID };
 if (scope.type === 'PAGE') await scope.loadAsync();
 const page = (() => { let n = scope; while (n.type !== 'PAGE') n = n.parent; return n; })();
-const want = new Set(INTERACTIVE);
+// Entries can be passed as scripts 04 and 05 return them: "Buttons 33065:310933" or "Button x12"
+const want = new Set();
+for (const e of INTERACTIVE) { const s = String(e).trim(); want.add(s); const id = s.match(/^(.*?)\s+(I?\d+:\d+)$/); if (id) { want.add(id[1]); want.add(id[2]); } const cnt = s.match(/^(.*?)\s+x\d+$/); if (cnt) want.add(cnt[1]); }
 const lin = c => (c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
 const lum = ({ r, g, b }) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
 const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
@@ -28,8 +30,19 @@ for (const n of ('findAllWithCriteria' in scope ? scope.findAllWithCriteria({ ty
   targetSet.add(n);
   targets.push({ n, set: set.name, variant: mc.name, b: n.absoluteBoundingBox });
 }
+// Layers with a prototype interaction are targets too. Text layers are left out: a link inside a run of text is an
+// inline target, which WCAG exempts, and the script can't size a link that is only part of a text layer.
 let prototypeLinks = 0;
-for (const n of ('findAllWithCriteria' in scope ? scope.findAllWithCriteria({ types: ['FRAME', 'INSTANCE', 'GROUP', 'TEXT'] }) : [])) { try { if (n.reactions && n.reactions.length) prototypeLinks++; } catch (e) {} }
+for (const n of ('findAllWithCriteria' in scope ? scope.findAllWithCriteria({ types: ['FRAME', 'INSTANCE', 'GROUP'] }) : [])) {
+  let has = false; try { has = !!(n.reactions && n.reactions.length); } catch (e) {}
+  if (!has || !n.visible) continue;
+  prototypeLinks++;
+  if (targetSet.has(n)) continue;
+  let inside = false; for (let p = n.parent; p && p !== scope; p = p.parent) if (targetSet.has(p)) { inside = true; break; }
+  if (inside) continue;
+  targetSet.add(n);
+  targets.push({ n, set: 'Layers with prototype links', variant: n.name, b: n.absoluteBoundingBox });
+}
 // BR-34: a target under 24px passes if a 24px circle centered on it overlaps no other target and no other small target's circle
 const center = b => ({ x: b.x + b.width / 2, y: b.y + b.height / 2 });
 const rectDist = (c, b) => Math.hypot(Math.max(b.x - c.x, 0, c.x - (b.x + b.width)), Math.max(b.y - c.y, 0, c.y - (b.y + b.height)));
@@ -44,16 +57,16 @@ for (const t of small) {
 const DISABLED = /disabled|inactive/i;
 const faint = []; let drawn = 0, faintCount = 0;
 for (const t of targets) {
-  if (DISABLED.test(t.variant)) continue;
+  if (!t.b || DISABLED.test(t.variant)) continue;
   const bg = bgOf(t.n); if (!bg) continue;
   const f = solid(t.n.fills), s = solid(t.n.strokes);
   const sw = typeof t.n.strokeWeight === 'number' ? t.n.strokeWeight : 1;
   const fr = f ? ratio(over(f.color, (f.opacity ?? 1) * (t.n.opacity ?? 1), bg), bg) : 1;
   const sr = s && sw > 0 ? ratio(over(s.color, s.opacity ?? 1, bg), bg) : 1;
-  if (Math.max(fr, sr) <= 1.05) continue; // nothing drawn against this background
+  if (Math.max(fr, sr) <= 1.05) continue; // 1.05 or less is the same color as the background, so nothing is drawn
   drawn++;
   if (Math.max(fr, sr) < 3) { faintCount++; if (faint.length < MAX_EX) faint.push(t.set + ' > ' + t.variant + ' ' + t.n.id + ' fill ' + fr.toFixed(2) + ' border ' + sr.toFixed(2)); }
 }
 const sizes = {};
-for (const t of targets) { const e = sizes[t.set] || (sizes[t.set] = { count: 0, minW: 1e9, minH: 1e9 }); e.count++; e.minW = Math.min(e.minW, Math.round(t.b.width)); e.minH = Math.min(e.minH, Math.round(t.b.height)); }
+for (const t of targets) { if (!t.b) continue; const e = sizes[t.set] || (sizes[t.set] = { count: 0, minW: 1e9, minH: 1e9 }); e.count++; e.minW = Math.min(e.minW, Math.round(t.b.width)); e.minH = Math.min(e.minH, Math.round(t.b.height)); }
 return { scope: scope.name, targets: targets.length, prototypeLinks, sizesBySet: sizes, under24: small.length, under24Failing: failSize.length, under24FailingEx: failSize.slice(0, MAX_EX), boundaryDrawn: drawn, boundaryUnder3: faintCount, boundaryUnder3Ex: faint };

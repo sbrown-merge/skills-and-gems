@@ -3,7 +3,7 @@ title: "merge-build-readiness: the checklist"
 description: "The 34 checks merge-build-readiness runs on a Figma file, BR-01 to BR-34, each with its rank, reason, how a Plugin API script or the agent verifies it, the platforms it applies to, and the MERGE One playbook practice it came from."
 type: checklist
 status: draft
-version: "0.6"
+version: "0.7"
 created: 2026-10-03
 maintainer: Steve Brown
 tags: [figma, figma-agent, skill, agentic-build, design-system, audit, checklist]
@@ -43,7 +43,7 @@ Each check has an ID, a rank, a way of being verified, the platforms and kinds o
 
 **Ranks** use the playbook's scale, adapted to any project. **Must** means a coding agent will build the wrong thing without it, and we've seen that happen on MERGE One or in the [Abbott audit][abbott], or Figma says its agent can't use the file without it, or it's a standard we hold every project to, such as WCAG 2.2 AA. **Should** means it measurably improves what the agent builds or saves a correction cycle. **Could** is worth doing when you're already working in that area. The playbook's fourth rank, Won't, has no checks here; the [mapping table](#where-each-playbook-practice-went) says where each Won't went.
 
-**Results** are Pass, Partly, Fail, Couldn't check or N/A, as the plan sets out. Couldn't check means a read failed or the Plugin API doesn't expose what the check needs, and the report says which; the agent never guesses a result. N/A means the check doesn't apply to this file's kind or platform. Every result carries evidence that links to the layers at fault, with the total count and up to ten examples.
+**Results** are Pass, Partly, Fail, Couldn't check or N/A, as the plan sets out. Couldn't check means a read failed or the Plugin API doesn't expose what the check needs, and the report says which; the agent never guesses a result. N/A means the check doesn't apply to this file's kind or platform. Every result carries evidence that links to the layers at fault: the scripts return the total count and up to ten examples per finding, and the report links up to three of them.
 
 **Verified by** is one of two things, and step 3 of the build tests them differently:
 
@@ -54,7 +54,7 @@ Unless a check says otherwise, a Script check passes when it finds nothing, is P
 
 **Scope** says what a check reads. **File** checks read the whole file, because variables, styles and publishing belong to the file, whatever the person picked. **Scope** checks read only the page, section or component the person chose in the opening question.
 
-**Platforms.** The opening question offers Web, iOS, Android or Other, and Web is the default, because almost all MERGE work is web-based (Steve, 2026-10-03). Much of that web work is a headless CMS with a React front end, and we build it mobile first, so a web product is tapped on phones as often as it's clicked on desktops; the Web checks cover both. **Touch** means iOS, Android, or Other when the person says it runs on a touch screen, such as the Abbott IVA, a fixed 1024 by 768 canvas inside Abbott's tablet app. Most checks hold on every platform, so the "Applies to" line says All unless a check changes with the platform.
+**Platforms.** The opening question offers Web, iOS, Android or Other, and Web is the default, because almost all MERGE work is web-based (Steve, 2026-10-03). Much of that web work is a headless CMS with a React front end, and we build it mobile first, so a web product is tapped on phones as often as it's clicked on desktops; the Web checks cover both. **Touch** means iOS, Android, or Other when the person says it runs on a touch screen. The commonest Other is an **IVA** (interactive visual aid), which MERGE builds at a fixed 1024 by 768 or 768 by 1024 for pharma sales reps to use on iPads (Steve, 2026-10-04); the Abbott library is one. An IVA is touch and a fixed canvas, so its canvas size is correct as drawn, BR-31 doesn't apply, and pressed states and 24px targets do. Most checks hold on every platform, so the "Applies to" line says All unless a check changes with the platform.
 
 **Kinds of file.** A **library** publishes components, styles or variables for other files to use; a **product file** holds screens built from a library; a file can be both. The agent decides which from the inventory (local components and their publish status, instances of remote components, page names) and says which it decided at the top of the report.
 
@@ -81,12 +81,12 @@ This table is the index for tools and for `SKILL.md`. The sections after it give
 | BR-15 | Text and effect styles are bound to variables | Should | Script | File | All | none |
 | BR-16 | Components are reused, not detached | Must | Script | Scope | All | [FP-M02][must] |
 | BR-17 | Auto layout, with deliberate hug, fill and fixed sizing | Must | Judgment | Scope | All | [FP-M03][must], [FP-M04][must] |
-| BR-18 | Component and property names are consistent, and each property controls one thing | Should | Judgment | Scope | All | [FP-S05][should], [FP-S07][should] |
-| BR-19 | Variant sets stay under about 30 variants | Should | Script | Scope | All | [FP-S06][should] |
-| BR-20 | Components draw the states the platform needs | Must | Judgment | Scope | Web and Touch differ | [FP-M05][must] |
-| BR-21 | Components have descriptions | Should | Script | Scope | All | [FP-S04][should] |
-| BR-22 | Child layers inside components are named | Should | Script | Scope | All | [FP-S07][should] |
-| BR-23 | Slot contents warning | Could | Script | Scope | All | none |
+| BR-18 | Component and property names are consistent, and each property controls one thing | Should | Judgment | File | All | [FP-S05][should], [FP-S07][should] |
+| BR-19 | Variant sets stay under about 30 variants | Should | Script | File | All | [FP-S06][should] |
+| BR-20 | Components draw the states the platform needs | Must | Judgment | File | Web and Touch differ | [FP-M05][must] |
+| BR-21 | Components have descriptions | Should | Script | File | All | [FP-S04][should] |
+| BR-22 | Child layers inside components are named | Should | Script | File | All | [FP-S07][should] |
+| BR-23 | Slot contents warning | Could | Script | File | All | none |
 | BR-24 | Build rules live in annotations on the layer, not in copy | Must | Judgment | Scope | All | [FP-M08][must] |
 | BR-25 | Notes are Dev Mode annotations, not on-canvas notes | Should | Judgment | Scope | All | [FP-M08][must] |
 | BR-26 | Annotations follow the annotation schema | Should | Script | Scope | All | none |
@@ -111,7 +111,7 @@ These checks come first because they decide whether Figma's agent and a coding a
 
 Figma's agent only references a library once it's published ([H1][note]), and a market or product team can't pull components from an unpublished one. That's why this check runs first: the Abbott library's own Start Here badge said "Not Published" on 2026-09-30, and nothing else in the file could reach its users until that changed.
 
-For a library, the script calls `getPublishStatusAsync()` on every local component set, standalone component, variable collection and variable, and on styles where the method exists, and counts `UNPUBLISHED`, `CHANGED` and `CURRENT`. Pass when everything meant for use is `CURRENT`. Partly when the library is published but some items are `CHANGED` (edited since the last publish) or new items are `UNPUBLISHED`. Fail when nothing is published. Items hidden from publishing (`hiddenFromPublishing`, or a name starting with `_` or `.`) are left out, because hiding them is deliberate ([H10][note]). For a product file, the script instead counts instances whose main component has `remote: true`; Pass when the screens in scope are built from a published library, and Fail when they use only local components that aren't published anywhere. Under `use_figma` the method works on components, collections and variables but doesn't exist on styles, so styles are reported as Couldn't check there (tested 2026-10-03); test mode will show whether Figma's agent can read them.
+For a library, the script calls `getPublishStatusAsync()` on every local component set, standalone component, variable collection and variable, and on styles where the method exists, and counts `UNPUBLISHED`, `CHANGED` and `CURRENT`. Pass when everything meant for use is `CURRENT`. Partly when the library is published but some items are `CHANGED` (edited since the last publish) or new items are `UNPUBLISHED`. Fail when nothing is published. Items hidden from publishing (`hiddenFromPublishing`, or a name starting with `_` or `.`) are left out, because hiding them is deliberate ([H10][note]). For a product file, script 05 instead counts the instances in scope whose main component has `remote: true`, meaning it comes from a library; Pass when the screens in scope are built from a published library, and Fail when they use only local components that aren't published anywhere. Under `use_figma` the method works on components, collections and variables but doesn't exist on styles, so styles are reported as Couldn't check there (tested 2026-10-03); test mode will show whether Figma's agent can read them.
 
 ### BR-02 A cover or Start Here page comes first, and pages follow a clear order
 
@@ -119,7 +119,7 @@ For a library, the script calls `getPublishStatusAsync()` on every local compone
 
 The first page is where a person or an agent learns what the file is, who owns it and how to use it, and Figma's own library skill puts the cover first, foundations before components, and utility pages last ([G4][note]). The Abbott library's `00 / Start Here` page was the strongest part of the file in the audit, because it explained the tiers, the naming and the ownership.
 
-The script returns the page names in order, the text on the first page with any line that looks like a credential withheld, and the file thumbnail where it can be read. `use_figma` refuses the thumbnail call (`figma.getFileThumbnailNodeAsync()`, tested 2026-10-03), so the first page decides the check. The agent judges whether the first page says what the file is for, who owns it and its status, and whether pages run from foundations to components to utility pages, with one naming pattern and separators (`---` or a decorated name) between groups. Pass when both hold. Partly when there's a guide but the order or naming is mixed. Fail when there's no cover or guide page. A file can follow its own convention rather than Figma's defaults, as long as it's consistent ([G3][note]).
+The script returns the page names in order, the text on the first page with any line that looks like a credential withheld, and the file thumbnail where it can be read. `use_figma` refuses the thumbnail call (`figma.getFileThumbnailNodeAsync()`, tested 2026-10-03), so the first page decides the check. The agent judges whether the first page says what the file is for, who owns it and its status, and whether pages run from foundations to components to utility pages, with one naming pattern and separators (`---` or a decorated name) between groups. Pass when both hold. Partly when there's a guide but the order or naming is mixed. Fail when there's no cover or guide page. A file can follow its own convention rather than Figma's defaults, as long as it's consistent ([G3][note]). MERGE keeps the Figma prototype password on the cover on purpose, because clients review in prototype mode, IT requires a password, and Figma shows it only once (Steve, 2026-10-04). The check never flags it, and the script withholds it so it never appears in a report.
 
 ### BR-03 Build status is marked in the file, and Ready for dev is used
 
@@ -135,7 +135,7 @@ The script reads `devStatus` on every node directly under a page or section in s
 
 Figma's agent learns how components fit together from up to 200 examples on a page named `Examples`, or from designs whose names end in `_example` ([H1][note]). Without them it has to guess at compositions. This is documented for Figma's agent, not for the MCP server.
 
-The script looks for a page named `Examples` (any letter case) and for frames or components whose names end in `_example`, and counts what it finds. Pass when there's at least one example and each is a component. Partly when examples exist but are plain frames, because Figma asks for each example to be a component. Fail when there are none. N/A for a product file.
+Script 01 looks for a page named `Examples` (any letter case), and script 04, which loads every page, looks for frames and components whose names end in `_example`, and counts each kind. Pass when there's at least one example and each is a component. Partly when examples exist but are plain frames, because Figma asks for each example to be a component. Fail when there are none. N/A for a product file.
 
 ### BR-05 Sections are small enough to point an agent at
 
@@ -197,7 +197,7 @@ The script reads `scopes` on every local variable. Primitives with no scopes (`[
 
 Figma's agent reads variable descriptions as context ([H1][note]), so "background for cards on the page surface; don't use for text" saves a wrong pairing. Whether the MCP server passes descriptions to a coding agent isn't documented yet. None of the Abbott library's 249 variables had one.
 
-The script counts local variables with an empty `description`, reporting semantic and primitive collections separately, and returns a few filled descriptions so the agent can say whether they explain use. The default rule decides the result, counted over the semantic variables when the file has a semantic layer, because those are the ones a person or agent chooses between, and over all variables when it doesn't. N/A when the file has no local variables.
+The script counts, for each collection, the variables that have a description, and returns a few filled descriptions so the agent can say whether they explain use. A semantic collection is one whose values are aliases. The default rule decides the result, counted over the semantic variables when the file has a semantic layer, because those are the ones a person or agent chooses between, and over all variables when it doesn't. N/A when the file has no local variables.
 
 ### BR-12 Code syntax is present and well formed
 
@@ -229,7 +229,7 @@ The script finds variables scoped to `FONT_WEIGHT` or bound to `fontWeight` or `
 
 The MCP server returns only each collection's default mode, the left-most column, so a coding agent never sees a dark theme, a second brand or a breakpoint mode ([R1][note]). Figma staff said multi-mode reading was on their list on 2025-06-20, and users still reported the gap on 2026-05-25. The person needs to tell the coding agent about the other modes themselves.
 
-The script lists each local collection's modes and its `defaultModeId`, and reads `explicitVariableModes` on frames in scope. N/A when every collection has one mode. Otherwise Pass, and the report always carries the warning, naming each collection with more than one mode, its default and its other modes. Partly when frames in scope are pinned to a non-default mode, because the agent will be given the default mode's values rather than what the designer sees; that consequence is our inference from [R1][note] and needs confirming at step 3.
+The script lists each local collection's modes and its `defaultModeId`, and reads `explicitVariableModes` on frames in scope. N/A when every collection has one mode. Otherwise Pass, and the report always carries the warning, naming each collection with more than one mode, its default and its other modes. Partly when frames in scope are set to a mode other than their collection's default, which script 05 checks by comparing each set mode with the default, because the agent will be given the default mode's values rather than what the designer sees; that consequence is our inference from [R1][note] and still needs confirming (see [Open questions](#open-questions)).
 
 ## Styles
 
@@ -253,7 +253,7 @@ Figma calls a component's variants, booleans and slots "a complete schema" for t
 
 A coding agent builds a detached copy from scratch, so one detached button becomes a second button implementation in code. On MERGE One, a screen existed as 37 detached frames, and per-feature copies in Figma became per-feature copies in code. Figma's Check designs flags detached components too ([H2][note]).
 
-The script finds frames in scope whose `detachedInfo` isn't null and returns the component each was detached from. Pass when there are none. Partly when there are some, but none inside a frame or section marked Ready for dev or Completed. Fail when any sits inside a frame or section marked Ready for dev or Completed, because that's the copy a coding agent will be pointed at.
+The script finds frames in scope whose `detachedInfo` isn't null and returns the component each was detached from and the top-level frame or section it sits in, with that frame's Ready for dev status. When Ready for dev can't be read, the result can't go past Partly. Pass when there are none. Partly when there are some, but none inside a frame or section marked Ready for dev or Completed. Fail when any sits inside a frame or section marked Ready for dev or Completed, because that's the copy a coding agent will be pointed at.
 
 ### BR-17 Auto layout, with deliberate hug, fill and fixed sizing
 
@@ -277,7 +277,7 @@ The script returns every component set's name and every property's name, type an
 
 Large variant sets are slow to use, hard to search and costly in memory, and Figma's library skill splits a set past about 30 combinations, moving icons to an instance swap and never making one variant per icon ([G3][note], [G5][note]). The 30 is that skill's working limit, not a product limit. The Abbott library's `Libre Icons` set has 320 variants.
 
-The script counts the variants in each component set in scope and the values of each variant property. Pass when every set has 30 variants or fewer. Partly when some sets are larger. Fail when any single variant property has more than 30 values, because that's one variant per icon or per item.
+The script counts the variants in each component set in the file and the values of each variant property. Pass when every set has 30 variants or fewer. Partly when some sets are larger. Fail when any single variant property has more than 30 values, because that's one variant per icon or per item.
 
 ### BR-20 Components draw the states the platform needs
 
@@ -285,7 +285,7 @@ The script counts the variants in each component set in scope and the values of 
 
 An agent fills an undrawn state by guessing. On MERGE One, a build comparison found three undrawn states that stranded users, and the Abbott library's buttons have only Default and Disabled, with no pressed state for a tablet that's tapped.
 
-The script returns each component set's variant and boolean properties whose names suggest state (State, Status, Interaction, Disabled, Selected and similar) with their values, and, in a product file, the names of frames and sections that suggest a screen state. The agent decides which components are interactive and what each needs. For Web, buttons, links and controls need Default, Hover, Focus, Pressed (or Active) and Disabled; Web needs both hover and pressed, because a mobile-first web product is tapped as well as clicked. For Touch, they need Default, Pressed, Focus (for keyboards and switch access) and Disabled; hover doesn't apply. Inputs on any platform also need Filled and Error, and in a product file, screens that load or fetch data need Empty, Loading and Error. Pass when every interactive component and screen in scope draws what its platform needs. Partly when some states are missing on a few components. Fail when interactive components mostly draw only the happy path.
+The script returns each component set's variant and boolean properties whose names suggest state (State, Status, Interaction, Disabled, Selected and similar) with their values, and, in a product file, the names of frames and sections that suggest a screen state. The agent decides which components are interactive and what each needs. For Web, buttons, links and controls need Default, Hover, Focus, Pressed (or Active, when it means being pressed rather than marking the current page) and Disabled; Web needs both hover and pressed, because a mobile-first web product is tapped as well as clicked. For Touch, they need Default, Pressed, Focus (for keyboards and switch access) and Disabled; hover doesn't apply. Inputs on any platform also need Filled and Error, and in a product file, screens that load or fetch data need Empty, Loading and Error. Pass when every interactive component and screen in scope draws what its platform needs. Partly when some states are missing on a few components. Fail when interactive components mostly draw only the happy path.
 
 ### BR-21 Components have descriptions
 
@@ -293,7 +293,7 @@ The script returns each component set's variant and boolean properties whose nam
 
 Figma's agent reads component descriptions as context, and Figma asks for descriptions that say when to use a component instead of a similar one, its states and its accessibility needs, rather than relying on documentation frames on the canvas ([H1][note]). Two of about 70 component sets in the Abbott library had one.
 
-The script counts component sets and standalone components in scope with an empty `description` (variants inside a set are left out, because the description lives on the set, [G-use][note]), and returns a few filled descriptions so the agent can say whether they explain use. It also counts `documentationLinks`, reported but not scored. The default rule decides the result.
+The script counts component sets and standalone components in the file with an empty `description` (variants inside a set are left out, because the description lives on the set, [G-use][note]), and returns a few filled descriptions so the agent can say whether they explain use. It also counts `documentationLinks`, reported but not scored. The default rule decides the result.
 
 ### BR-22 Child layers inside components are named
 
@@ -301,7 +301,7 @@ The script counts component sets and standalone components in scope with an empt
 
 Layer names reach the coding agent as `data-name` ([F1][note]), and the layers inside a component become its parts in code, so `Frame 404` tells the agent nothing. Figma's component reference treats unnamed children as a defect ([G5][note]).
 
-The script searches inside every main component and component set in scope for layer names matching `^(Frame|Group|Rectangle|Ellipse|Vector|Line|Polygon|Star|Union|Subtract|Intersect|Exclude|Section) \d+$`. It skips subtrees made only of vectors and boolean shapes, because those are artwork exported whole. The default rule decides the result, counting components that hold at least one default-named layer.
+The script searches inside every main component and component set in the file for layer names matching `^(Frame|Group|Rectangle|Ellipse|Vector|Line|Polygon|Star|Union|Subtract|Intersect|Exclude|Section) \d+$`. It skips subtrees made only of vectors and boolean shapes, because those are artwork exported whole. The default rule decides the result, counting components that hold at least one default-named layer.
 
 ### BR-23 Slot contents warning
 
@@ -321,7 +321,7 @@ These checks cover what a coding agent reads besides the components themselves: 
 
 A rule written as placeholder copy is overwritten the first time someone types real content, and the MCP server returns an annotation only when it reads the annotated layer itself, so a note on a parent frame is missed ([R2][note]). The Abbott templates carried rules such as "This should display 2 lines max." in their headline copy, and no layer had an annotation.
 
-The script returns every annotation in scope with its label, category (from `figma.annotations.getAnnotationCategoriesAsync()`) and the type and size of the layer it's on, plus text whose content reads like a rule: words such as should, must, max, min, only, limit, truncate, "do not" or "lines". The agent decides which text is a rule and whether each annotation sits on the layer it governs. Pass when build rules are in annotations on the layers they govern and none are left in copy. Partly when annotations exist but some rules sit in copy or on a parent frame. Fail when there are no annotations and rules live in copy.
+The script returns every annotation in scope with its label, category (from `figma.annotations.getAnnotationCategoriesAsync()`) and the type and size of the layer it's on, plus text whose content reads like a rule: words such as should, must, max, min, limit, truncate or "do not", or a number of lines such as "2 lines". The agent decides which text is a rule and whether each annotation sits on the layer it governs. Pass when build rules are in annotations on the layers they govern and none are left in copy. Partly when annotations exist but some rules sit in copy or on a parent frame. Fail when there are no annotations and rules live in copy.
 
 ### BR-25 Notes are Dev Mode annotations, not on-canvas notes
 
@@ -329,7 +329,7 @@ The script returns every annotation in scope with its label, category (from `fig
 
 We prefer Dev Mode annotations to notes drawn on the canvas (Steve, 2026-10-03). An on-canvas note, such as a text box, a callout from an annotation kit or a sticky, is just another layer: a coding agent can't tell it from the design, it isn't attached to the layer it describes, and it drifts out of place when the design moves. A Dev Mode annotation is attached to its layer, carries a category, and reaches the agent when the agent reads that layer ([R2][note]).
 
-The script returns layers in scope that look like on-canvas notes: text layers and frames outside components whose names or first words are note, notes, TODO, annotation, spec, dev note, redline or callout; instances of components whose names contain annotation, callout, redline, spec, note or marker, which is how annotation kits name their parts; and any sticky or shape-with-text layers. The agent decides which carry build guidance, rather than documentation or a cover's explanation. Pass when build guidance lives only in Dev Mode annotations. Partly when some on-canvas notes still carry build guidance. Fail when on-canvas notes are the main way the file gives it.
+The script returns layers in scope that look like on-canvas notes: text layers and frames outside components whose names or first words are note, notes, TODO, annotation, spec, dev note, redline or callout; instances of components whose names contain annotation, callout, redline, spec, note or marker, which is how annotation kits name their parts. The agent decides which carry build guidance, rather than documentation or a cover's explanation. Pass when build guidance lives only in Dev Mode annotations. Partly when some on-canvas notes still carry build guidance. Fail when on-canvas notes are the main way the file gives it.
 
 ### BR-26 Annotations follow the annotation schema
 
@@ -347,7 +347,7 @@ Demo copy in a frame that's become the spec gets read as canonical, and an agent
 
 Content from a headless CMS adds a second risk, because editors will type longer, shorter and missing content than the designer drew. If the file shows only one ideal headline, the agent builds for that headline, and the page breaks on the first long title or empty field.
 
-The script returns text containing lorem ipsum, `[FPO]`, text wholly in square brackets, and words such as placeholder, label or title used as the whole text, with counts per frame. It also returns the Content annotations in scope with their `Source`, `Limit`, `Overflow` and `Empty` lines, and groups top-level frames whose names differ only by words such as long, short, empty, min or max. The agent judges by what the frame is for, and decides which text is CMS-driven from the Content annotations, the layer names and the copy.
+The script returns text containing lorem ipsum, `[FPO]`, text wholly in square brackets, and words such as placeholder, label or title used as the whole text, with counts per frame. It also returns the well-formed Content annotations in scope with their `Source`, `Limit`, `Overflow` and `Empty` lines, and groups top-level frames whose names differ only by words such as long, short, empty, min or max. The agent judges by what the frame is for, and decides which text is CMS-driven from the Content annotations, the layer names and the copy.
 
 - In a library's components and templates, placeholder copy is expected and passes, unless it doubles as a rule (BR-24).
 - In frames meant for build, the copy should be realistic. CMS-driven text should also be drawn with its longest and shortest realistic content, plus empty where the field is optional, either as extra frames or as variants, and each CMS-driven text layer should carry a Content annotation giving its source and limit.
@@ -396,7 +396,7 @@ These checks hold the file to WCAG 2.2, the current W3C Recommendation (publishe
 
 Text needs a contrast ratio of at least 4.5:1 against its background, or 3:1 for large text, which WCAG defines as at least 18 point, or 14 point bold. On the web that's at least 24px, or at least 18.66px at a weight of 700 or more. The Abbott audit found one failure this way: `Abbott Medium Gray` (#88888d) at 14px on white is 3.53:1, used for the patient profile labels.
 
-The script reads each visible text layer in scope, segment by segment (`getStyledTextSegments`), and takes its solid fill color and opacity, then the solid fill of the nearest ancestor that has one, combining opacities, and works out the ratio. When either color is bound to a variable, it works out the ratio in every mode of that collection, not only the default, because the product ships every mode even though a coding agent only sees one (BR-14). Text over an image, a gradient or a stack of translucent layers can't be worked out this way, so the script lists it and the agent checks it from a screenshot, saying when it can't tell rather than guessing. WCAG exempts text in disabled controls, logotypes and pure decoration, and the agent removes those. Before reporting a failure, the agent confirms the background against a screenshot, because a layer beneath the text that isn't an ancestor can be the real background. Pass when every pair meets its threshold. Fail when any pair doesn't, and the evidence names each failing pair, its ratio, its size, the mode, where it's used, and the nearest color variable that would pass.
+The script reads each visible text layer in scope, segment by segment (`getStyledTextSegments`), and takes its solid fill color and opacity, then the solid fill of the nearest ancestor that has one, combining opacities, and works out the ratio. When either color is bound to a variable, it works out the ratio in every mode of that collection, not only the default, because the product ships every mode even though a coding agent only sees one (BR-14). Text over an image, a gradient or a stack of translucent layers can't be worked out this way, so the script lists it and the agent checks it from a screenshot, saying when it can't tell rather than guessing. WCAG exempts text in disabled controls, logotypes and pure decoration, and the agent removes those. Before reporting a failure, the agent confirms every failing pair against a screenshot, because a layer beneath the text that isn't an ancestor can be the real background, and looks at up to ten of the layers over images; the rest of those are Couldn't check, with the count. Pass when every pair meets its threshold. Fail when any confirmed pair doesn't, and the evidence names each failing pair, its ratio, its size, the mode and where it's used.
 
 ### BR-33 Controls and meaningful graphics meet WCAG 2.2 AA non-text contrast
 
@@ -404,7 +404,7 @@ The script reads each visible text layer in scope, segment by segment (`getStyle
 
 The parts of a control that show it's there or show its state, such as an input's border, a checkbox's box or a focus ring, and graphics that carry meaning, such as a one-color icon without a text label, need at least 3:1 against the colors next to them. A coding agent can't tell which of these matter from the code it's given, so the file has to get them right.
 
-The script returns, for each interactive component the agent found in BR-20, the fill and stroke colors of its outermost visible shape and of its focus and selected states, and for one-color icons in scope, each with the background next to it and the ratio in every mode. It only checks targets that draw a fill or border against what's behind them, because a text-only link is identified by its text, which BR-32 covers. It compares each target with its nearest ancestor's fill, not the layers beside it, so the agent confirms every result under 3:1 against a screenshot before reporting it; on the Abbott navigation, most low results were a yellow Active tint measured against a white documentation frame rather than the dark bar it sits on. The agent decides which visual identifies the control or its state; a button whose fill contrasts with the page doesn't also need a contrasting border. Disabled controls are exempt. Pass when every identifying visual meets 3:1. Fail when any doesn't.
+The script returns, for each interactive component the agent found in BR-20, the contrast of its own fill and border against the color behind it, as displayed. It doesn't measure icons, so the agent judges one-color icons that carry meaning from the screenshots. It only checks targets that draw a fill or border against what's behind them, because a text-only link is identified by its text, which BR-32 covers. It compares each target with its nearest ancestor's fill, not the layers beside it, so the agent confirms each distinct component and variant under 3:1 against a screenshot before reporting it; on the Abbott navigation, most low results were a yellow Active tint measured against a white documentation frame rather than the dark bar it sits on. The agent decides which visual identifies the control or its state; a button whose fill contrasts with the page doesn't also need a contrasting border. Disabled controls are exempt. Pass when every identifying visual meets 3:1. Fail when any doesn't.
 
 ### BR-34 Tap and click targets are at least 24 by 24px
 
@@ -412,7 +412,7 @@ The script returns, for each interactive component the agent found in BR-20, the
 
 Anything someone clicks or taps needs a target of at least 24 by 24 CSS pixels, which is WCAG 2.2's level AA minimum. A coding agent builds a control at the size it's drawn, so a 16px icon button in Figma becomes a 16px button that's hard to hit on a phone. Our web work is mobile first, so most of these targets will be tapped. 24px is the AA minimum. WCAG's level AAA asks for 44px, and Apple and Google ask for larger targets in native apps; this check holds only the AA minimum.
 
-The script returns the width and height of every instance of an interactive component the agent found in BR-20, and of every layer with a prototype interaction (`reactions`), in scope. For each target under 24px in either direction, it applies WCAG's spacing test: a 24px circle centered on the target mustn't overlap another target or another small target's circle. Links inside a run of text are exempt as inline targets, and the script leaves them out. The agent removes the other exceptions WCAG allows: a larger control that does the same thing on the same screen, a control the browser draws and the design doesn't change, and a size that's essential to what's shown. Pass when every target is at least 24 by 24px or meets an exception. Fail when any doesn't, and the evidence names each target, its size and the nearest target it crowds.
+The script returns the width and height of every instance of an interactive component the agent found in BR-20, and of every layer with a prototype interaction (`reactions`), in scope. For each target under 24px in either direction, it applies WCAG's spacing test: a 24px circle centered on the target mustn't overlap another target or another small target's circle. Text layers are left out: a link inside a run of text is an inline target, which WCAG exempts, and the script can't size a link that is only part of a text layer. The agent removes the other exceptions WCAG allows: a larger control that does the same thing on the same screen, a control the browser draws and the design doesn't change, and a size that's essential to what's shown. Pass when every target is at least 24 by 24px or meets an exception. Fail when any doesn't, and the evidence names each target, its size and the nearest target it crowds.
 
 ## Dev Mode annotation schema
 
@@ -501,7 +501,8 @@ These need an answer before or during the next build steps.
 
 ## Version history
 
-- **0.6** (2026-10-04): Results of build step 3, the script tests on the Abbott library. BR-05's node budget is set at 500 layers from a measurement. BR-23 checks slot descriptions now that slots are readable. BR-01, BR-02 and BR-03 say what `use_figma` can't read. BR-33 checks only targets that draw a boundary, confirmed against a screenshot.
+- **0.7** (2026-10-04): Matched to `SKILL.md` and the revised scripts after the step 4 audit. The component checks BR-18 to BR-23 read the whole file; BR-01 takes product-file instances from script 05; BR-04, BR-11, BR-14, BR-16 and BR-27 say which script returns their data; BR-32 and BR-33 say what's confirmed by screenshot; BR-33 no longer claims to measure icons or modes, and BR-32 no longer suggests a passing variable.
+- **0.6** (2026-10-04): Results of build step 3, the script tests on the Abbott library. BR-05's node budget is set at 500 layers from a measurement. BR-23 checks slot descriptions now that slots are readable. BR-01, BR-02 and BR-03 say what `use_figma` can't read. BR-33 checks only targets that draw a boundary, confirmed against a screenshot. The platform section names the IVA format, and BR-02 records the prototype-password convention.
 - **0.5** (2026-10-03): Steve approved the linked-repo wording and the annotation schema. The schema now allows custom annotation categories, such as Design or Agent feedback, which BR-26 lists for the build brief but never scores. BR-31 now checks that every desktop view has a mobile view, with tablet views optional, and stays a Should.
 - **0.4** (2026-10-03): BR-34, WCAG 2.2's AA minimum target size, joins the Accessibility group.
 - **0.3** (2026-10-03): Steve's second comments. BR-25 (Dev Mode annotations rather than on-canvas notes) and BR-26 (the annotation schema) are new, so 0.2's BR-25 to BR-29 are now BR-27 to BR-31. A proposed Dev Mode annotation schema is added. BR-27 now covers CMS-driven content. A new Accessibility group adds BR-32 and BR-33, contrast checks against WCAG 2.2 AA.
