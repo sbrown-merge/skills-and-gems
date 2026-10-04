@@ -37,7 +37,7 @@ It exists because the same file problems keep turning into code problems: hardco
 
 Three research notes in [research/](research/) hold the sources. These are the findings the design depends on:
 
-- **One file only.** Figma's custom skills must be a single Markdown file following the Agent Skills spec, with no `scripts/`, `references/` or `assets/` folders ([Figma help, updated 2026-09-23](https://help.figma.com/hc/en-us/articles/40283639496599)). The checklist, procedure, scripts and report format all live in `SKILL.md`.
+- **One file only.** Figma's custom skills must be a single Markdown file following the Agent Skills spec, with no `scripts/`, `references/` or `assets/` folders ([Figma help, updated 2026-09-23](https://help.figma.com/hc/en-us/articles/40283639496599)). The checklist, procedure, scripts and report format all live in `SKILL.md`. Figma's upload dialog also caps a skill's instructions at 65,536 characters (found by Steve on 2026-10-04, when the first upload was 88,746), so the scripts go in minified and test mode lives in its own skill.
 - **Scripts run.** The Figma Community skill `create-anatomy`, which Steve tested and says performs well, embeds Plugin API JavaScript in its body and has the agent run it step by step. It even calls `figma.loadAllPagesAsync()`, which the MCP's `use_figma` tool forbids. So precise, script-based reads work inside Figma, and a single file of almost 1,000 lines still performs.
 - **Publishing is from the chat, not the admin panel.** Anyone can add a skill from the + button in the agent's prompt box (Skills, then add a skill) and share it with the organization; an admin then marks it Recommended under Admin, Resources, Skills. Publishing doesn't need an admin (Steve, 2026-10-03).
 - **The model is unknown.** Figma doesn't say which model runs its Design agent and mentions several vendors. So the skill follows Anthropic's guidance for Opus 5.5 and Sonnet 5.5 (reasons rather than capital letters, explicit scope, report everything and then rank, no "think carefully", no request to write out reasoning) and assumes nothing Claude-specific.
@@ -56,7 +56,7 @@ Steve made these on 2026-10-03: the first eight while agreeing the plan, the res
 | It asks how to deliver findings | The opening question asks for report only (the default), comments, or Dev Mode annotations, because nobody would discover those options otherwise. |
 | It never changes the design | The only writes are the comments or annotations the person chose. A guard blocks every other write, and the last step proves the design is unchanged. |
 | Severity uses Must, Should and Could | The same ranking as the MERGE One playbook. |
-| Test mode exists | See its section below. |
+| Test mode exists, as its own skill | See its section below. It became the separate `merge-build-readiness-test` skill on 2026-10-04, when the combined skill came out over Figma's 65,536-character limit; it's a maintainer's tool, so designers don't need it in the organization's list. |
 | Web is the default platform | The opening question offers Web, iOS, Android or Other, and defaults to Web, because almost all MERGE work is web-based. Much of it is a headless CMS with a React front end, built mobile first, so the Web checks cover both clicking and tapping. |
 | The 4 and 8px grid is checked | Off-grid spacing and sizes are a common problem in our file handoffs, so the playbook's grid practice stays in, as BR-08. |
 | CMS content is checked | Where text comes from a CMS, the file should show its longest, shortest and empty content, with its source and limit in a Content annotation (BR-27). |
@@ -69,7 +69,8 @@ Everything lives in `skills-and-gems/merge-build-readiness/`. Only `SKILL.md` is
 
 | File | What it's for |
 | --- | --- |
-| `SKILL.md` | The skill, and the one file uploaded to Figma. Frontmatter holds only `name` and `description`, because uploads elsewhere reject keys outside the spec and Figma doesn't say what it accepts. The version and a "Tested with" line go in the body. |
+| `../merge-build-readiness-test/SKILL.md` | The test-mode skill, uploaded privately by the maintainer only. |
+| `SKILL.md` | The skill, and the one file uploaded to Figma for designers. Frontmatter holds only `name` and `description`, because uploads elsewhere reject keys outside the spec and Figma doesn't say what it accepts. The version and a "Tested with" line go in the body. |
 | `README.md` | For maintainers: what it does, how to publish and recommend it in Figma, the current version, what it was tested on, version history, and credit to uSpec (Ian Guisard, MIT) for the structural patterns borrowed from `create-anatomy`. |
 | `checklist.md` | The full checklist, each check with its reason, source and platform notes. `SKILL.md` carries the compressed form. |
 | `PLAN.md` | This plan. |
@@ -107,7 +108,7 @@ The structure follows `create-anatomy`, which works in Figma: an execution contr
 
 ## Test mode
 
-`/merge-build-readiness test` checks what Figma's agent can actually do, so the skill is built on evidence from inside Figma rather than assumptions. It changes nothing in the design.
+`/merge-build-readiness-test`, a separate skill, checks what Figma's agent can actually do, so the skill is built on evidence from inside Figma rather than assumptions. It changes nothing in the design.
 
 It tries each read the checklist depends on and records whether it worked and what came back: variables with scopes, code syntax and descriptions; styles; components and descriptions; annotations; prototype links; Ready for dev status; publish status; slot contents; loading every page. If the person allows it, it also tries a comment and an annotation on a throwaway layer it creates and then deletes.
 
@@ -119,7 +120,7 @@ It ends with one JSON log in the chat carrying the skill version, the date, the 
 2. **Write `checklist.md`**, then stop for Steve's review. It decides everything downstream. Drafted on 2026-10-03 and revised to version 0.5 from Steve's comments, which settled the linked-repo wording, the annotation schema and the mobile check; waiting for his full read.
 3. **Test each script in Claude Code** against Andrew's Abbott library (file key `0VTZx0ZXc08vCIjdzb8Xza`) through the Figma MCP before it goes into `SKILL.md`, so the first Figma run isn't the code's first run. Remember that `use_figma` forbids `loadAllPagesAsync`; use `page.loadAsync()` per page there, which worked in the 2026-09-30 audit. Done on 2026-10-03: all nine scripts in [scripts/](scripts/README.md) ran against the library, which settled BR-05's node budget and how slots read, and showed that `use_figma` can't read `devStatus`, the file thumbnail or style publish status.
 4. **Write `SKILL.md`**, including test mode. Check its frontmatter against the spec, and have a separate Opus 5.5 agent (not the author) audit it against [claude-skills-best-practices.md](../claude-skills-best-practices.md), sections A to I. Drafted on 2026-10-04 with six new scripts (scope, fingerprint, annotation delivery and test mode) and a sync tool that copies the tested scripts in; an independent Opus 5.5 audit found 16 failing items and 18 contradictions with `checklist.md`, and the high and medium ones were fixed the same day.
-5. **Run test mode in Figma.** Steve uploads the skill privately, runs `/merge-build-readiness test`, and pastes the log into `diagnostics/`. Adjust the skill to what the log shows.
+5. **Run test mode in Figma.** Steve uploads both skills privately, runs `/merge-build-readiness-test`, and pastes the log into `diagnostics/`. Adjust the skill to what the log shows.
 6. **Run the evaluations.** Three cases, each first without the skill as a baseline, then with it, in Claude Code and in Figma's agent:
    - Andrew's Abbott library, whose expected findings come from the 2026-09-30 audit in the abbott-fs-libre-global-iva-specs repo (`captures/2026-09-30 IVA design library audit.md`).
    - A section of the MERGE One Production file.

@@ -157,11 +157,12 @@ Whether these are the skills the in-Figma agent uses is not confirmed; they're i
 
 ## Added after the research
 
-Steve reported these three findings on 2026-10-03, after the research above was delivered. They come from his own use of Figma, not from Figma's documentation.
+Steve reported these findings on 2026-10-03 and 2026-10-04, after the research above was delivered. They come from his own use of Figma, not from Figma's documentation.
 
 1. **A long single-file skill that runs Plugin API code works in the in-Figma agent: reported (Steve, 2026-10-03), confirmed in use.** Steve downloaded the Figma Community skill "create-anatomy": one SKILL.md, 996 lines, 64,580 bytes, adapted from uSpec by Ian Guisard under the MIT license, and says it performs well in Figma. For each step it embeds Plugin API JavaScript with placeholders such as `__FRAME_ID__`, tells the agent to run each script unchanged, and calls `figma.loadAllPagesAsync()`, which the MCP's `use_figma` tool forbids. So Figma's in-app agent can run Plugin API code from a skill body, and a single-file skill well over 500 lines works there. Skills still can't bundle a scripts/ folder.
 2. **Web search and the GitHub connector work in the in-Figma agent: reported (Steve, 2026-10-03).** This matches the documentation under Reaching outside Figma.
 3. **Publishing to the organization doesn't need an admin: reported (Steve, 2026-10-03).** Any user adds a skill from the + button in the agent's prompt box, under Skills, and shares it; an admin's only part is marking it Recommended. This answers open question 1 below on who may publish.
+4. **A skill's instructions can be at most 65,536 characters: confirmed (Steve, 2026-10-04).** Figma's upload dialog rejected the first merge-build-readiness upload with "Instructions must be 65536 characters or fewer" and showed "88746 / 65536". The count matches the file's text after the frontmatter. This answers open question 2 below on size.
 
 ## Open questions
 
