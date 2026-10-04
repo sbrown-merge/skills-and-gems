@@ -61,6 +61,7 @@ Steve made these on 2026-10-03: the first eight while agreeing the plan, the res
 | The 4 and 8px grid is checked | Off-grid spacing and sizes are a common problem in our file handoffs, so the playbook's grid practice stays in, as BR-08. |
 | CMS content is checked | Where text comes from a CMS, the file should show its longest, shortest and empty content, with its source and limit in a Content annotation (BR-27). |
 | Dev Mode annotations, not on-canvas notes | Build guidance belongs in Dev Mode annotations attached to the layer, not in notes drawn on the canvas (BR-25). A standard schema for Figma's four preset categories is set out in [checklist.md](checklist.md#dev-mode-annotation-schema) and checked by BR-26. People may add other categories, such as Design or Agent feedback; those aren't scored, but the report lists every annotation outside the schema so a build brief can note it. |
+| Ready for dev is confirmed by the designer, not the skill | Nothing in Figma's agent can read Ready for dev status, so BR-03 and BR-16 top out at Partly and the report asks the designer to confirm it under Verify in Figma. Designers aren't asked to add status words to names, which they're unlikely to keep doing; clean frames and sections that leave the build agent nothing to invent matter more (Steve, 2026-10-04). |
 | Every desktop view has a mobile view | Web product files need a mobile view for each desktop view, because we build mobile first; tablet views are optional (BR-31). This replaced a broader mobile-first check that would have been hard to enforce. |
 
 ## The folder
@@ -120,7 +121,7 @@ It ends with one JSON log in the chat carrying the skill version, the date, the 
 2. **Write `checklist.md`**, then stop for Steve's review. It decides everything downstream. Drafted on 2026-10-03 and revised to version 0.5 from Steve's comments, which settled the linked-repo wording, the annotation schema and the mobile check; waiting for his full read.
 3. **Test each script in Claude Code** against Andrew's Abbott library (file key `0VTZx0ZXc08vCIjdzb8Xza`) through the Figma MCP before it goes into `SKILL.md`, so the first Figma run isn't the code's first run. Remember that `use_figma` forbids `loadAllPagesAsync`; use `page.loadAsync()` per page there, which worked in the 2026-09-30 audit. Done on 2026-10-03: all nine scripts in [scripts/](scripts/README.md) ran against the library, which settled BR-05's node budget and how slots read, and showed that `use_figma` can't read `devStatus`, the file thumbnail or style publish status.
 4. **Write `SKILL.md`**, including test mode. Check its frontmatter against the spec, and have a separate Opus 5.5 agent (not the author) audit it against [claude-skills-best-practices.md](../claude-skills-best-practices.md), sections A to I. Drafted on 2026-10-04 with six new scripts (scope, fingerprint, annotation delivery and test mode) and a sync tool that copies the tested scripts in; an independent Opus 5.5 audit found 16 failing items and 18 contradictions with `checklist.md`, and the high and medium ones were fixed the same day.
-5. **Run test mode in Figma.** Steve uploads both skills privately, runs `/merge-build-readiness-test`, and pastes the log into `diagnostics/`. Adjust the skill to what the log shows. First run on 2026-10-04: Figma's agent reads and writes the same way `use_figma` does; screenshots still need testing.
+5. **Run test mode in Figma.** Steve uploads both skills privately, runs `/merge-build-readiness-test`, and pastes the log into `diagnostics/`. Adjust the skill to what the log shows. Two runs on 2026-10-04: Figma's agent reads and writes the same way `use_figma` does, screenshots work but small text in them isn't reliably readable, and nothing in the agent can read Ready for dev status.
 6. **Run the evaluations.** Three cases, each first without the skill as a baseline, then with it, in Claude Code and in Figma's agent:
    - Andrew's Abbott library, whose expected findings come from the 2026-09-30 audit in the abbott-fs-libre-global-iva-specs repo (`captures/2026-09-30 IVA design library audit.md`).
    - A section of the MERGE One Production file.
@@ -129,7 +130,7 @@ It ends with one JSON log in the chat carrying the skill version, the date, the 
 
 ## Open questions
 
-- **Answered (test mode, 2026-10-04):** Figma's agent reads variable scopes, code syntax, annotations, prototype links, slots and component and variable publish status, and can't read `devStatus`, the file thumbnail or style publish status, the same as `use_figma`. **TBD (test mode):** whether it can take screenshots.
+- **Answered (test mode, 2026-10-04):** Figma's agent reads variable scopes, code syntax, annotations, prototype links, slots and component and variable publish status, and can't read `devStatus`, the file thumbnail or style publish status, the same as `use_figma`. Screenshots work (second run, 2026-10-04).
 - **TBD:** which model runs it; the first test-mode run reported "unknown".
 
 ## Where this came from

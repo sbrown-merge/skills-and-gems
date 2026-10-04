@@ -60,7 +60,7 @@ If a teammate can see the skill but can't run it, they need to switch it on with
 | --- | --- | --- | --- |
 | 0.1 | 2026-10-04 | Scripts 00 to 10 and 12, read-only, readable and minified versions alike, through `use_figma` in Claude Code (Claude Opus 5.5), against Andrew's Abbott IVA design library, file key `0VTZx0ZXc08vCIjdzb8Xza` | The read scripts work; see [scripts/README.md](scripts/README.md). Scripts 11, 13 and 14 haven't run. No agent has run the skill as a whole, inside Figma or anywhere else, and it hasn't been evaluated. |
 
-Test mode ran once in Figma's agent on 2026-10-04 ([log](<diagnostics/2026-10-04 test-mode log.json>)): scripts ran, annotations and comments wrote, and the fingerprint held. Screenshots weren't tried, so version 0.2 of the test skill asks for one. The main skill's first run in Figma and the evaluations (build step 6) come next.
+Test mode ran twice in Figma's agent on 2026-10-04 ([run 1](<diagnostics/2026-10-04 test-mode run 1.json>), [run 2](<diagnostics/2026-10-04 test-mode run 2.json>)): scripts ran, annotations and comments wrote, the fingerprint held, and screenshots worked, though small text wasn't reliably readable in them. Nothing in Figma's agent can read Ready for dev status. The main skill's first run in Figma and the evaluations (build step 6) come next.
 
 ## Version history
 

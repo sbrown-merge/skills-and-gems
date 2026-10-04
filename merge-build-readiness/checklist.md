@@ -3,7 +3,7 @@ title: "merge-build-readiness: the checklist"
 description: "The 34 checks merge-build-readiness runs on a Figma file, BR-01 to BR-34, each with its rank, reason, how a Plugin API script or the agent verifies it, the platforms it applies to, and the MERGE One playbook practice it came from."
 type: checklist
 status: draft
-version: "0.8"
+version: "0.9"
 created: 2026-10-03
 maintainer: Steve Brown
 tags: [figma, figma-agent, skill, agentic-build, design-system, audit, checklist]
@@ -127,7 +127,7 @@ The script returns the page names in order, the text on the first page with any 
 
 An agent can't tell an approved frame from an exploration unless the file says so. On MERGE One, ratified prototypes sat under a "(proposal…)" title, so nothing in the file said they were approved. Dev Mode's Ready for dev status is Figma's own handoff signal and is on every paid plan ([H7][note]).
 
-The script reads `devStatus` on every node directly under a page or section in scope (the only nodes that can carry it, [F12][note]), and returns section and frame names that contain status words such as approved, ratified, final, ready, draft, proposal, review, deprecated, archive or "do not build". The agent judges whether someone reading only the file could tell which frames to build from. Pass when frames meant for build are marked Ready for dev or Completed, or their section names say their status, and explorations and deprecated frames are labeled as such (for example `REVIEW · not for build`). Partly when status is marked at page level or in a guide but not on the frames themselves, as in the Abbott library. Fail when nothing in scope says what's approved. `use_figma` can't read `devStatus` (tested 2026-10-03), so there the check judges from names alone and the report says Ready for dev couldn't be read; test mode will show whether Figma's agent can read it.
+The script reads `devStatus` on every node directly under a page or section in scope (the only nodes that can carry it, [F12][note]), and returns section and frame names that contain status words such as approved, ratified, final, ready, draft, proposal, review, deprecated, archive or "do not build". Neither scripts nor any of the agent's own tools can read Ready for dev status in Figma's agent (test mode, 2026-10-04), so the best result is Partly (Steve, 2026-10-04): Partly when the file tells build frames apart from explorations, archive and deprecated work by its page or section names, as the Abbott library does, and Fail when nothing in scope says what's approved. The report always asks the designer, under Verify in Figma, to confirm that Ready for dev is set on the frames and sections to build. We don't ask designers to add status words to names, because it's a habit they're unlikely to keep, and on MERGE One the status was never relied on; clean frames and sections that leave the build agent nothing to invent matter more.
 
 ### BR-04 An Examples page shows real compositions
 
@@ -253,7 +253,7 @@ Figma calls a component's variants, booleans and slots "a complete schema" for t
 
 A coding agent builds a detached copy from scratch, so one detached button becomes a second button implementation in code. On MERGE One, a screen existed as 37 detached frames, and per-feature copies in Figma became per-feature copies in code. Figma's Check designs flags detached components too ([H2][note]).
 
-The script finds frames in scope whose `detachedInfo` isn't null and returns the component each was detached from and the top-level frame or section it sits in, with that frame's Ready for dev status. When Ready for dev can't be read, the result can't go past Partly. Pass when there are none. Partly when there are some, but none inside a frame or section marked Ready for dev or Completed. Fail when any sits inside a frame or section marked Ready for dev or Completed, because that's the copy a coding agent will be pointed at.
+The script finds frames in scope whose `detachedInfo` isn't null and returns the component each was detached from and the top-level frame or section it sits in. Pass when there are none. Partly when there are any (Steve, 2026-10-04): a detached copy inside work marked Ready for dev would be a Fail, but that status can't be read, so the report lists the copies under Verify in Figma for the designer to check.
 
 ### BR-17 Auto layout, with deliberate hug, fill and fixed sizing
 
@@ -422,7 +422,7 @@ These are the rules:
 
 1. **Annotate the layer the note is about**, not its parent frame, because a coding agent only receives an annotation when it reads that layer ([R2][note]).
 2. **Use Figma's four preset categories, Development, Interaction, Accessibility and Content, for anything a coding agent should act on.** They exist in every file and mean the same thing everywhere. People can add other categories when they need them, such as Design or Agent feedback; those sit outside the schema and aren't checked against it, but the report lists them. Add one deliberately, because a category can't be renamed or deleted once it's in a file. A layer can have one annotation in each category.
-3. **Write one fact per line, as `Key: value`**, with the category's required key first. Line breaks survive in `labelMarkdown`: test mode wrote a two-line annotation in Figma's agent and read it back intact on 2026-10-04 ([log](<diagnostics/2026-10-04 test-mode log.json>)).
+3. **Write one fact per line, as `Key: value`**, with the category's required key first. Line breaks survive in `labelMarkdown`: test mode wrote a two-line annotation in Figma's agent and read it back intact on 2026-10-04 ([log](<diagnostics/2026-10-04 test-mode run 1.json>)).
 4. **Use pinned properties for measurements** (width, padding, gap, text style and so on) rather than typing numbers, because they show the live value and stay right when the design changes.
 5. **Mark anything not ready to build with `Status: Open question for <name>`**, and delete that line when it's answered, so a stale question doesn't read as live work. A team that already uses its own question categories, such as MERGE One's `Question - PM`, can keep them, and the report lists them with the other custom categories.
 6. **Write "and" rather than "&", and use typographic quotes and arrows (’ ” →)**, because Figma's API escapes `&` and straight quotes again on every round trip.
@@ -497,11 +497,12 @@ These rules come from the playbook's Won'ts and its writing mechanics, the 2026-
 These need an answer before or during the next build steps.
 
 - **TBD (step 6):** whether a frame pinned to a non-default mode reaches a coding agent with the default mode's values, which decides BR-14's Partly case. No frame in the Abbott library is pinned, so the MERGE One case or the test file has to settle it.
-- **Answered by test mode, 2026-10-04 ([log](<diagnostics/2026-10-04 test-mode log.json>)):** Figma's agent can't read `devStatus`, the file thumbnail, `figma.currentUser` or style publish status either, with the same errors as `use_figma`, so the fallbacks in BR-01, BR-02, BR-03 and BR-16 are permanent. **TBD (Steve):** whether BR-03 and BR-16 should treat a status word in a frame or section name, such as "Ready for dev" or "Approved", as the build signal, since Figma's own status can't be read.
-- **TBD (test mode, second run):** whether Figma's agent can take a screenshot of a layer, which BR-32 and BR-33 rely on; the first run didn't try.
+- **Answered by test mode, 2026-10-04 ([log](<diagnostics/2026-10-04 test-mode run 1.json>)):** Figma's agent can't read `devStatus`, the file thumbnail, `figma.currentUser` or style publish status either, with the same errors as `use_figma`, so the fallbacks in BR-01, BR-02, BR-03 and BR-16 are permanent. A second run ([log](<diagnostics/2026-10-04 test-mode run 2.json>)) confirmed that none of the agent's own tools can read Ready for dev status either. **Decided (Steve, 2026-10-04):** BR-03 and BR-16 top out at Partly, and the report asks the designer to confirm Ready for dev under Verify in Figma, rather than relying on status words in names.
+- **Answered by the second test-mode run:** Figma's agent can take a screenshot of a layer, but small text wasn't reliably readable at the size its tool displays, so BR-32 and BR-33 use screenshots to confirm backgrounds rather than to read text.
 
 ## Version history
 
+- **0.9** (2026-10-04): BR-03 and BR-16 top out at Partly, because Ready for dev can't be read in Figma's agent; the report gains a Verify in Figma section asking the designer to confirm it.
 - **0.8** (2026-10-04): Recorded the first test-mode run in Figma's agent: annotation line breaks survive, and Ready for dev status, the file thumbnail and style publish status can't be read there either.
 - **0.7** (2026-10-04): Matched to `SKILL.md` and the revised scripts after the step 4 audit. The component checks BR-18 to BR-23 read the whole file; BR-01 takes product-file instances from script 05; BR-04, BR-11, BR-14, BR-16 and BR-27 say which script returns their data; BR-32 and BR-33 say what's confirmed by screenshot; BR-33 no longer claims to measure icons or modes, and BR-32 no longer suggests a passing variable.
 - **0.6** (2026-10-04): Results of build step 3, the script tests on the Abbott library. BR-05's node budget is set at 500 layers from a measurement. BR-23 checks slot descriptions now that slots are readable. BR-01, BR-02 and BR-03 say what `use_figma` can't read. BR-33 checks only targets that draw a boundary, confirmed against a screenshot. The platform section names the IVA format, and BR-02 records the prototype-password convention.

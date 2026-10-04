@@ -263,6 +263,10 @@ Checked <date> with merge-build-readiness 0.1. Scope: <scope>. Platform: <platfo
 
 <Anything misleading that fits no BR check, as a proposed check for the maintainer. Omit if none.>
 
+## Verify in Figma
+
+<What the skill can't read, for the designer to confirm: Ready for dev on the frames and sections to build (BR-03), and the detached copies (BR-16).>
+
 ## What couldn't be checked
 
 <Each Couldn't check, with the failed script.>
@@ -278,7 +282,7 @@ Before sending, check: 34 checks in BR order; each Fail and Partly has a count a
 
 - **BR-01 The library is published (Must, from 02 to 05).** Library: Pass when every component, variable and collection not hidden from publishing is `CURRENT`; Partly when published but some are `CHANGED` or `UNPUBLISHED`; Fail when nothing is published; styles whose status is `unavailable` are Couldn't check. Product file: Pass when script 05 finds screens built from remote instances, Fail when they use only unpublished local components.
 - **BR-02 A cover or Start Here page comes first, and pages follow a clear order (Should, from 01).** Pass when the first page says what the file is, who owns it and its status, and pages run foundations, components, utility, with one naming pattern; Partly when there's a guide but order or naming is mixed; Fail with no cover or guide.
-- **BR-03 Build status is marked, and Ready for dev is used (Must, from 05).** Pass when build frames are Ready for dev or Completed or their section names say their status, and explorations are labeled; Partly when status is only at page level or in a guide; Fail when nothing says what's approved. If `devStatus` is `unavailable`, judge from names and say so.
+- **BR-03 Build status is marked, and Ready for dev is used (Must, from 05).** Ready for dev can't be read here, so the best result is Partly. Partly when build frames are told apart from explorations, archive and deprecated work by page or section names; Fail when nothing says what's approved. Always ask the designer, under Verify in Figma, to confirm Ready for dev is set on the frames and sections to build.
 - **BR-04 An Examples page shows real compositions (Should, from 01 and 04, libraries only).** Pass when an `Examples` page or `_example` designs exist and are components (`examplesPage`, `examples`), Partly when they're plain frames, Fail when none, N/A for a product file.
 - **BR-05 Sections are small enough to point an agent at (Should, from 05).** Budget: 500 layers a frame, about one 25,000-token MCP response. Pass when build frames sit in named sections or one family per page and none is over budget; Partly when some are over or loose; Fail when build frames sit loose on large pages.
 - **BR-06 A linked-repo signal is detected (Could, from 01).** The signal is one first-page line, `Linked repo: https://github.com/<owner>/<repo>`. N/A when absent; Pass with exactly one well-formed GitHub URL on the first page; Partly when on another page or host; Fail when malformed or two disagree. Report the URL; say you didn't open it.
@@ -302,7 +306,7 @@ Before sending, check: 34 checks in BR order; each Fail and Partly has a count a
 
 These read the whole file.
 
-- **BR-16 Components are reused, not detached (Must, from 05).** Pass with no detached copies; Partly with some; Fail when `inReadyForDev` is above zero, since that's the copy a coding agent gets. When Ready for dev is `unavailable`, it can't go past Partly; say so.
+- **BR-16 Components are reused, not detached (Must, from 05).** Pass with no detached copies; Partly with any, since Ready for dev can't be read to tell whether a copy is in work marked for build. List them under Verify in Figma.
 - **BR-17 Auto layout, with deliberate hug, fill and fixed sizing (Must, from 05).** Leave out artwork, overlays and fixed canvases such as IVA templates. Pass when the rest uses auto layout and fixed sizes are ones a builder should keep, Partly when a few break it, Fail when build frames are mostly placed by hand.
 - **BR-18 Names are consistent, and each property controls one thing (Should, from 04).** Look for `Property 1`, Yes/No or On/Off where `true`/`false` belongs, near-duplicate names, unwired properties, values combining two differences, misspellings. Pass when clean, Partly with a few, Fail when one idea is commonly named several ways.
 - **BR-19 Variant sets stay under about 30 variants (Should, from 04).** Pass when every set has 30 or fewer, Partly when some are larger, Fail when one property has over 30 values (one variant per icon or item).
