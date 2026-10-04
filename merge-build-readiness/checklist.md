@@ -3,7 +3,7 @@ title: "merge-build-readiness: the checklist"
 description: "The 34 checks merge-build-readiness runs on a Figma file, BR-01 to BR-34, each with its rank, reason, how a Plugin API script or the agent verifies it, the platforms it applies to, and the MERGE One playbook practice it came from."
 type: checklist
 status: draft
-version: "0.7"
+version: "0.8"
 created: 2026-10-03
 maintainer: Steve Brown
 tags: [figma, figma-agent, skill, agentic-build, design-system, audit, checklist]
@@ -422,7 +422,7 @@ These are the rules:
 
 1. **Annotate the layer the note is about**, not its parent frame, because a coding agent only receives an annotation when it reads that layer ([R2][note]).
 2. **Use Figma's four preset categories, Development, Interaction, Accessibility and Content, for anything a coding agent should act on.** They exist in every file and mean the same thing everywhere. People can add other categories when they need them, such as Design or Agent feedback; those sit outside the schema and aren't checked against it, but the report lists them. Add one deliberately, because a category can't be renamed or deleted once it's in a file. A layer can have one annotation in each category.
-3. **Write one fact per line, as `Key: value`**, with the category's required key first. **TBD (test mode):** confirm that line breaks survive in `labelMarkdown`; step 3 couldn't, because Andrew's library has no annotations and the tests don't write to it.
+3. **Write one fact per line, as `Key: value`**, with the category's required key first. Line breaks survive in `labelMarkdown`: test mode wrote a two-line annotation in Figma's agent and read it back intact on 2026-10-04 ([log](<diagnostics/2026-10-04 test-mode log.json>)).
 4. **Use pinned properties for measurements** (width, padding, gap, text style and so on) rather than typing numbers, because they show the live value and stay right when the design changes.
 5. **Mark anything not ready to build with `Status: Open question for <name>`**, and delete that line when it's answered, so a stale question doesn't read as live work. A team that already uses its own question categories, such as MERGE One's `Question - PM`, can keep them, and the report lists them with the other custom categories.
 6. **Write "and" rather than "&", and use typographic quotes and arrows (’ ” →)**, because Figma's API escapes `&` and straight quotes again on every round trip.
@@ -497,10 +497,12 @@ These rules come from the playbook's Won'ts and its writing mechanics, the 2026-
 These need an answer before or during the next build steps.
 
 - **TBD (step 6):** whether a frame pinned to a non-default mode reaches a coding agent with the default mode's values, which decides BR-14's Partly case. No frame in the Abbott library is pinned, so the MERGE One case or the test file has to settle it.
-- **TBD (test mode):** whether Figma's agent can read `devStatus`, the file thumbnail and style publish status, which `use_figma` can't, for BR-01, BR-02 and BR-03.
+- **Answered by test mode, 2026-10-04 ([log](<diagnostics/2026-10-04 test-mode log.json>)):** Figma's agent can't read `devStatus`, the file thumbnail, `figma.currentUser` or style publish status either, with the same errors as `use_figma`, so the fallbacks in BR-01, BR-02, BR-03 and BR-16 are permanent. **TBD (Steve):** whether BR-03 and BR-16 should treat a status word in a frame or section name, such as "Ready for dev" or "Approved", as the build signal, since Figma's own status can't be read.
+- **TBD (test mode, second run):** whether Figma's agent can take a screenshot of a layer, which BR-32 and BR-33 rely on; the first run didn't try.
 
 ## Version history
 
+- **0.8** (2026-10-04): Recorded the first test-mode run in Figma's agent: annotation line breaks survive, and Ready for dev status, the file thumbnail and style publish status can't be read there either.
 - **0.7** (2026-10-04): Matched to `SKILL.md` and the revised scripts after the step 4 audit. The component checks BR-18 to BR-23 read the whole file; BR-01 takes product-file instances from script 05; BR-04, BR-11, BR-14, BR-16 and BR-27 say which script returns their data; BR-32 and BR-33 say what's confirmed by screenshot; BR-33 no longer claims to measure icons or modes, and BR-32 no longer suggests a passing variable.
 - **0.6** (2026-10-04): Results of build step 3, the script tests on the Abbott library. BR-05's node budget is set at 500 layers from a measurement. BR-23 checks slot descriptions now that slots are readable. BR-01, BR-02 and BR-03 say what `use_figma` can't read. BR-33 checks only targets that draw a boundary, confirmed against a screenshot. The platform section names the IVA format, and BR-02 records the prototype-password convention.
 - **0.5** (2026-10-03): Steve approved the linked-repo wording and the annotation schema. The schema now allows custom annotation categories, such as Design or Agent feedback, which BR-26 lists for the build brief but never scores. BR-31 now checks that every desktop view has a mobile view, with tablet views optional, and stays a Should.

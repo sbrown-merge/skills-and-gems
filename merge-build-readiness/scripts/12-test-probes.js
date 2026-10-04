@@ -33,5 +33,7 @@ await probe('devStatus', () => { const n = page.children.find(c => c.type === 'F
 await probe('detachedInfo', () => page.findAllWithCriteria({ types: ['FRAME'] }).filter(n => n.detachedInfo).length);
 await probe('explicitVariableModes', () => page.findAllWithCriteria({ types: ['FRAME'] }).filter(n => Object.keys(n.explicitVariableModes || {}).length).length);
 await probe('instanceOverrides', () => { const i = page.findAllWithCriteria({ types: ['INSTANCE'] })[0]; return i ? i.overrides.length : 'no instances on page'; });
+// Whether a layer can screenshot itself from a script; the agent also tries its own screenshot tool (test skill step 4)
+await probe('nodeScreenshotMethod', () => { const n = page.children[0]; return n ? typeof n.screenshot === 'function' || typeof n.exportAsync === 'function' : 'no layers on page'; });
 await probe('textSegments', () => { const t = page.findAllWithCriteria({ types: ['TEXT'] })[0]; return t ? t.getStyledTextSegments(['fills', 'fontSize', 'fontWeight']).length : 'no text on page'; });
 return { skill: 'merge-build-readiness', version: VERSION, date: new Date().toISOString().slice(0, 10), page: page.name, pageId: page.id, probes };
