@@ -5,3 +5,4 @@ types:
   - guide    # how-to and best-known-method documents
   - research-note  # dated findings with sources, kept so a skill's design can be traced and re-checked
   - plan           # an agreed plan for building or changing a skill, before the build starts
+  - checklist      # numbered checks, each with a rank, a reason and a pass rule, that a skill or a reviewer runs

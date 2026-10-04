@@ -10,7 +10,7 @@ tags: [figma, figma-agent, skill, agentic-build, design-system, audit]
 
 # merge-build-readiness: the build plan
 
-This is the plan for a skill that runs inside Figma's own agent and checks whether a Figma file is ready for a coding agent, such as Claude Code, to build from. Steve Brown agreed it on 2026-10-03, at the end of a research session that started from an audit of the Abbott IVA design library. The skill must work for any MERGE project, not only MERGE One or Abbott. Nothing has been built yet; the next session starts at step 2 of the build order below.
+This is the plan for a skill that runs inside Figma's own agent and checks whether a Figma file is ready for a coding agent, such as Claude Code, to build from. Steve Brown agreed it on 2026-10-03, at the end of a research session that started from an audit of the Abbott IVA design library. The skill must work for any MERGE project, not only MERGE One or Abbott. On 2026-10-03 the same day's session drafted [checklist.md](checklist.md), step 2 of the build order below, and Steve's first comments on it are recorded here as decisions. The checklist is waiting for Steve to read it in full; step 3 starts after he approves it.
 
 ## Contents
 
@@ -45,18 +45,22 @@ Three research notes in [research/](research/) hold the sources. These are the f
 
 ## Decisions
 
-Steve made these on 2026-10-03.
+Steve made these on 2026-10-03: the first eight while agreeing the plan, the rest while commenting on the checklist draft.
 
 | Decision | What it means |
 | --- | --- |
 | The name is `merge-build-readiness` | It becomes the slash command, and the MERGE prefix avoids clashing with Community skills, as Figma advises. |
-| Shift Nudge stays separate | This skill checks build readiness, not visual quality. The repo's `sn-ui-checklist` skill covers visual quality. |
+| Shift Nudge stays separate, except for accessibility | This skill checks build readiness, not visual quality, and the repo's `sn-ui-checklist` skill covers visual quality. The exception, decided later the same day, is accessibility: text contrast, non-text contrast and target size are checked here against WCAG 2.2 AA, because a coding agent copies a failing color or size straight into the product. |
 | Only what can be made in the file | The skill checks only what a person or an agent can create in the Figma file. It uses no web search, no connectors, no repo and no codebase. So Code Connect checks are out, and code syntax is checked only for presence and well-formed values. |
-| A linked repo is detected, not checked | A file that uses the linked-repo approach says so in the file (for example a "Linked repo" line on its Start Here page). Version 1 detects that signal and reports it. Checks that read the repo through Figma's GitHub connector are the first item in `UPGRADES.md`. Steve is giving teams this option, through the GitHub connector as in the Abbott repo. |
+| A linked repo is detected, not checked | A file that uses the linked-repo approach says so on its first page, which is usually named Cover. The proposed form is one line, `Linked repo: https://github.com/<owner>/<repo>`, set out in [checklist.md BR-06](checklist.md#br-06-a-linked-repo-signal-is-detected-and-reported). Version 1 detects that signal and reports it. Checks that read the repo through Figma's GitHub connector are the first item in `UPGRADES.md`. Steve is giving teams this option, through the GitHub connector as in the Abbott repo. |
 | It asks how to deliver findings | The opening question asks for report only (the default), comments, or Dev Mode annotations, because nobody would discover those options otherwise. |
 | It never changes the design | The only writes are the comments or annotations the person chose. A guard blocks every other write, and the last step proves the design is unchanged. |
 | Severity uses Must, Should and Could | The same ranking as the MERGE One playbook. |
 | Test mode exists | See its section below. |
+| Web is the default platform | The opening question offers Web, iOS, Android or Other, and defaults to Web, because almost all MERGE work is web-based. Much of it is a headless CMS with a React front end, built mobile first, so the Web checks cover both clicking and tapping. |
+| The 4 and 8px grid is checked | Off-grid spacing and sizes are a common problem in our file handoffs, so the playbook's grid practice stays in, as BR-08. |
+| CMS content is checked | Where text comes from a CMS, the file should show its longest, shortest and empty content, with its source and limit in a Content annotation (BR-27). |
+| Dev Mode annotations, not on-canvas notes | Build guidance belongs in Dev Mode annotations attached to the layer, not in notes drawn on the canvas (BR-25). A standard annotation schema is proposed in [checklist.md](checklist.md#proposed-dev-mode-annotation-schema) and checked by BR-26. |
 
 ## The folder
 
@@ -75,15 +79,16 @@ Everything lives in `skills-and-gems/merge-build-readiness/`. Only `SKILL.md` is
 
 ## What the skill checks
 
-The checklist starts from the MERGE One playbook ("MERGE One UI: Figma practices for agentic builds", version 0.1, 2026-09-29, in merge-one-related's `Figma/` folder), drops everything specific to shadcn, React or a codebase, and adds what Figma itself recommends ([research note](research/2026-10-03-figma-file-practices-for-agents.md)). It gets its own IDs, `BR-01` onward, each pointing back to its playbook practice where there is one. About 25 checks, in five groups:
+The checklist starts from the MERGE One playbook ("MERGE One UI: Figma practices for agentic builds", version 0.1, 2026-09-29, in merge-one-related's `Figma/` folder), drops everything specific to shadcn, React or a codebase, and adds what Figma itself recommends ([research note](research/2026-10-03-figma-file-practices-for-agents.md)). It gets its own IDs, `BR-01` onward, each pointing back to its playbook practice where there is one. The plan first expected about 25 checks in five groups; the draft at version 0.4 has 34 in six, after Steve's comments added the grid, CMS content, annotation and accessibility checks. [checklist.md](checklist.md) holds the full list; this table gives the shape:
 
 | Group | What it covers |
 | --- | --- |
 | Library and file | Library published (checked first, because nothing else matters to Figma's agent until it is); a cover or Start Here page; page order; status marked in the file and Ready for dev used; an Examples page; sections an agent can be pointed at; a linked-repo signal, detected and reported. |
-| Variables | Colors, spacing, radius and type bound rather than typed in; a primitive layer and a semantic layer that aliases it; no variable scoped to everything; descriptions; code syntax present and well formed; font weights as numbers; a warning that coding agents only see the default mode. |
+| Variables | Colors, spacing, radius and type bound rather than typed in; spacing and sizes on the 4 and 8px grid; a primitive layer and a semantic layer that aliases it; no variable scoped to everything; descriptions; code syntax present and well formed; font weights as numbers; a warning that coding agents only see the default mode. |
 | Styles | Text and effect styles bound to variables. |
 | Components | Reused, not detached; auto layout with deliberate hug, fill and fixed sizing; each variant property controls one thing; sets under about 30 variants; consistent property names, with `true` and `false` for booleans; the states the platform needs (pressed and focus for touch, hover for the web); descriptions; named child layers; a warning that coding agents can't see inside slots. |
-| Handoff | Build rules in annotations on the layer itself, not in placeholder copy; realistic content; unique names; no default layer names; no stray instances. |
+| Handoff | Build rules in annotations on the layer itself, not in placeholder copy; Dev Mode annotations rather than on-canvas notes, written to the proposed schema; realistic content, with long, short and empty versions of CMS content; unique names; no default layer names; no stray instances; screens drawn mobile first (proposed). |
+| Accessibility | Text contrast, non-text contrast and target size, against WCAG 2.2 AA. |
 
 Every check can come back Pass, Partly, Fail, Couldn't check or N/A, and every result carries evidence linked to the layer.
 
@@ -91,11 +96,11 @@ Every check can come back Pass, Partly, Fail, Couldn't check or N/A, and every r
 
 The structure follows `create-anatomy`, which works in Figma: an execution contract, an input contract, a copyable workflow checklist, one script per precise step, one step of judgment over the data the scripts returned, a write guard, and a final step that proves the source is unchanged.
 
-1. **Ask once, then run without stopping.** One opening message asks for the scope (a page, section or component; the whole file only if it's small), the target platform, and how to deliver findings (report only, comments, or Dev Mode annotations). Each has a default, so a reply of "go" works.
+1. **Ask once, then run without stopping.** One opening message asks for the scope (a page, section or component; the whole file only if it's small), the target platform (Web by default), and how to deliver findings (report only, comments, or Dev Mode annotations). Each has a default, so a reply of "go" works.
 2. **Read the file by script.** Low-freedom scripts, run unchanged, gather the inventory: variables with scopes, code syntax and descriptions; styles; component sets with variants, properties and descriptions; bound and literal values; layer names; annotations; publish status. Placeholders such as `__SCOPE_ID__` are the only edits.
 3. **Judge.** Score each check from the data, with no scripts in this step.
 4. **Report.** The scorecard, then the top fixes in order, each naming its check.
-5. **Deliver, if asked.** Comments go on the layer at fault and show under the runner's name. Annotations go on the layer at fault in the existing Development category, because a new category can't be renamed or deleted later.
+5. **Deliver, if asked.** Comments go on the layer at fault and show under the runner's name. Annotations go on the layer at fault in the existing Development category, because a new category can't be renamed or deleted later, and are written to the proposed annotation schema.
 6. **Prove nothing changed.** Re-read the source and confirm it's intact; if it isn't, say so and tell the person to undo before trusting anything.
 
 ## Test mode
@@ -109,7 +114,7 @@ It ends with one JSON log in the chat carrying the skill version, the date, the 
 ## Build order
 
 1. **Save the research and this plan.** Done on 2026-10-03.
-2. **Write `checklist.md`**, then stop for Steve's review. It decides everything downstream.
+2. **Write `checklist.md`**, then stop for Steve's review. It decides everything downstream. Drafted on 2026-10-03 and revised to version 0.4 from Steve's first comments; waiting for his full read.
 3. **Test each script in Claude Code** against Andrew's Abbott library (file key `0VTZx0ZXc08vCIjdzb8Xza`) through the Figma MCP before it goes into `SKILL.md`, so the first Figma run isn't the code's first run. Remember that `use_figma` forbids `loadAllPagesAsync`; use `page.loadAsync()` per page there, which worked in the 2026-09-30 audit.
 4. **Write `SKILL.md`**, including test mode. Check its frontmatter against the spec, and have a separate Opus 5.5 agent (not the author) audit it against [claude-skills-best-practices.md](../claude-skills-best-practices.md), sections A to I.
 5. **Run test mode in Figma.** Steve uploads the skill privately, runs `/merge-build-readiness test`, and pastes the log into `diagnostics/`. Adjust the skill to what the log shows.
@@ -124,7 +129,9 @@ It ends with one JSON log in the chat carrying the skill version, the date, the 
 - **TBD (Steve):** whether only Figma admins can publish a skill to the whole organization.
 - **TBD (test mode):** which reads Figma's agent supports, especially variable scopes, code syntax, annotations, prototype links and publish status.
 - **TBD (test mode):** which model runs it, if the agent can say.
-- **TBD (Steve, at step 2):** the exact form of the linked-repo signal, for example a "Linked repo:" line on the Start Here page, so the skill can detect it reliably.
+- **TBD (Steve, at step 2):** approve the linked-repo line's wording. Its place, the first page, usually named Cover, was decided on 2026-10-03.
+- **TBD (Steve, at step 2):** approve the proposed Dev Mode annotation schema in [checklist.md](checklist.md#proposed-dev-mode-annotation-schema), including replacing question categories with a `Status` line.
+- **TBD (Steve, at step 2):** keep or drop the proposed mobile-first check (BR-31) and its 320 to 430px phone-width range.
 
 ## Where this came from
 
