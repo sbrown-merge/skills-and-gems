@@ -5,3 +5,5 @@ types:
   - guide       # how-to and best-known-method documents
   - evaluation  # test cases and results for a skill or gem
   - audit       # a dated review of a skill or gem against a checklist, with fixes
+  - plan        # a build plan for a skill or gem, with the decisions behind it
+  - checklist   # the full set of checks a checking skill runs, with reasons and sources

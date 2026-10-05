@@ -10,6 +10,7 @@ Repo for Claude Skills and Gemini Gems
 | `sn-ui-checklist/` | UI design review checklist across strategy, typography, layout, color, imagery and product tactics | Claude Code skill |
 | `type-scale-generator/` | Type scale tokens, as a skill and as a Gemini Gem | Skill + Gem |
 | [`merge-build-readiness/`](merge-build-readiness/README.md) | Checks whether a Figma file is ready for a coding agent to build from, against 34 checks, and reports in the chat. Runs in Figma's agent | Figma agent skill |
+| [`merge-email-check/`](merge-email-check/PLAN.md) | Checks an email design in Figma against email best practices, for any MERGE or client email project: images off, dark mode, accessibility, layout and content. In planning; the checklist is drafted | Figma agent skill |
 | `merge-build-readiness-test/` | Test mode for merge-build-readiness: probes what Figma's agent can read and write, and returns a JSON log. Kept private to its maintainer | Figma agent skill |
 | `DESIGN.md-creation-gem/` | Gem for producing a `DESIGN.md` | Gemini Gem |
 | [`claude-skills-best-practices.md`](claude-skills-best-practices.md) | Our best known method for building Claude Skills: seven layout and verification rules, a pass/fail audit checklist tuned for Opus 5.5, and a paste-in audit prompt; section J covers skills for Figma's agent | Guideline |
