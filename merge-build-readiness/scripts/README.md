@@ -17,7 +17,7 @@ Each script is run unchanged except for its placeholders. File-wide scripts read
 
 | Script | Feeds | Reads | Placeholders | Time on Andrew's library |
 | --- | --- | --- | --- | --- |
-| [00-scope.js](00-scope.js) | Step 1: the scope, file key and page count | File | none | under 1 second |
+| [00-scope.js](00-scope.js) | Step 1: the scope, file key, page count, and `ivaHint` (a page named IVA, or an iPad-sized frame on the current page) | File | none | under 1 second |
 | [01-file-and-pages.js](01-file-and-pages.js) | BR-02, BR-04, BR-06 | File | none | under 1 second |
 | [02-variables.js](02-variables.js) | BR-01, BR-08 to BR-14 | File | `__PLATFORM__` (`WEB`, `iOS`, `ANDROID` or `ANY`) | under 1 second, 288 variables |
 | [03-styles.js](03-styles.js) | BR-01, BR-15 | File | none | under 1 second, 61 styles |
@@ -28,7 +28,7 @@ Each script is run unchanged except for its placeholders. File-wide scripts read
 | [08-text-contrast.js](08-text-contrast.js) | BR-32 | Scope | `__SCOPE_ID__` | under 1 second, 114 text layers |
 | [09-targets.js](09-targets.js) | BR-33, BR-34 | Scope | `__SCOPE_ID__`, `__INTERACTIVE__` (a JSON array of the component set IDs or names the agent judged interactive in BR-20) | about 1 second; 725 targets on 2026-10-03 and 683 on 2026-10-04, after the file changed |
 | [10-fingerprint.js](10-fingerprint.js) | Steps 2 and 6: proof the design is unchanged | Scope and file | `__SCOPE_IDS__`, `__BASELINE__`, `__ADDED__` | about 1 second over 2,350 layers on `04 / Navigation`; the second run, given the first as its baseline, returned `intact: true` |
-| [11-deliver-annotations.js](11-deliver-annotations.js) | Step 5: findings as Dev Mode annotations; writes | Listed layers inside the scope | `__SCOPE_IDS__`, `__FINDINGS__` | not run, because the tests don't write to Andrew's file; its text cleaning was tested in Node |
+| [11-deliver-annotations.js](11-deliver-annotations.js) | The annotate skill's step 3: findings as Dev Mode annotations; writes | Listed layers inside the scope | `__SCOPE_IDS__`, `__FINDINGS__` | not run, because the tests don't write to Andrew's file; its text cleaning was tested in Node |
 | [12-test-probes.js](12-test-probes.js) | Test mode: read probes | Current page and file | `__VERSION__` | under 1 second |
 | [14-test-load-all.js](14-test-load-all.js) | Test mode: the `loadAllPagesAsync` probe, kept apart in case a host refuses it | File | none | not run, because `use_figma` forbids the call |
 | [13-test-write.js](13-test-write.js) | Test mode: write probe; writes | One throwaway layer | `__STEP__`, `__LAYER_ID__` | not run, for the same reason as script 11 |
