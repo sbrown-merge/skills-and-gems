@@ -12,6 +12,8 @@ const BOOLISH = /^(yes|no|on|off|true|false)$/i;
 const INTERACTIVE_NAME = /button|link|tab|checkbox|radio|toggle|switch|input|field|select|dropdown|menu|nav|chip|pagination|arrow|accordion|slider|stepper|search|carousel|indicator|control/i;
 const MAX_VARIANTS = 30; // Figma's library skill splits a set past about 30 combinations (G3, G5)
 const MAX_CANDIDATES = 80; // about 4 KB of names and IDs; past that the list is truncated and says so
+const MAX_STATES = 40; // BR-20 judges every interactive component from these; 10 proved too few on a real file (2026-10-04)
+const state = x => { r.statePropsCount++; if (r.stateProps.length < MAX_STATES) r.stateProps.push(x); };
 const status = async o => { try { return await o.getPublishStatusAsync(); } catch (e) { return 'unavailable'; } };
 const owners = [];
 const exampleNodes = [];
@@ -28,7 +30,7 @@ for (const page of figma.root.children) {
 const publish = { hiddenByPrefix: 0 };
 const names = new Map();
 const propIndex = {};
-const r = { owners: owners.length, sets: 0, standalone: 0, overThirty: [], overThirtyCount: 0, propOverThirty: [], descEmpty: 0, descEx: [], docLinks: 0, defaultPropNames: [], boolishValues: [], unwired: [], withDefaultChildren: 0, defaultChildEx: [], slots: { components: 0, slotProps: 0, slotPropsDescribed: 0, ex: [] }, stateProps: [], untrimmed: [], interactiveCandidates: [], interactiveCandidatesCount: 0, examples: { components: 0, frames: 0, ex: [] } };
+const r = { owners: owners.length, sets: 0, standalone: 0, overThirty: [], overThirtyCount: 0, propOverThirty: [], descEmpty: 0, descEx: [], docLinks: 0, defaultPropNames: [], boolishValues: [], unwired: [], withDefaultChildren: 0, defaultChildEx: [], slots: { components: 0, slotProps: 0, slotPropsDescribed: 0, ex: [] }, stateProps: [], statePropsCount: 0, untrimmed: [], interactiveCandidates: [], interactiveCandidatesCount: 0, examples: { components: 0, frames: 0, ex: [] } };
 for (const { n } of owners) {
   if (/^[._]/.test(n.name)) publish.hiddenByPrefix++; else { const s = await status(n); publish[s] = (publish[s] || 0) + 1; }
   const key = n.name.trim().toLowerCase();
@@ -52,13 +54,13 @@ for (const { n } of owners) {
       if (def.variantOptions.length > MAX_VARIANTS) ex(r.propOverThirty, n.name + ' > ' + base + ' (' + def.variantOptions.length + ')');
       const boolish = def.variantOptions.filter(o => BOOLISH.test(o) && o !== 'true' && o !== 'false');
       if (boolish.length) ex(r.boolishValues, n.name + ' > ' + base + ': ' + boolish.join('/'));
-      if (STATE_PROP.test(base)) ex(r.stateProps, n.name + ' > ' + base + ': ' + def.variantOptions.join('/'));
+      if (STATE_PROP.test(base)) state(n.name + ' > ' + base + ': ' + def.variantOptions.join('/'));
     } else if (def.type === 'SLOT') {
       slotProps++; r.slots.slotProps++;
       if (def.description && def.description.trim()) r.slots.slotPropsDescribed++;
     } else {
       if (!referenced.has(pname)) ex(r.unwired, n.name + ' > ' + base + ' (' + def.type + ')');
-      if (def.type === 'BOOLEAN' && STATE_PROP.test(base)) ex(r.stateProps, n.name + ' > ' + base + ' (boolean)');
+      if (def.type === 'BOOLEAN' && STATE_PROP.test(base)) state(n.name + ' > ' + base + ' (boolean)');
     }
   }
   const hasStateProp = Object.entries(defs).some(([p, d]) => (d.type === 'VARIANT' || d.type === 'BOOLEAN') && STATE_PROP.test(p.split('#')[0]));

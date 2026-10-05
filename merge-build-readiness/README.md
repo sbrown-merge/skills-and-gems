@@ -28,7 +28,7 @@ Only `SKILL.md` goes to Figma for designers. The test-mode skill, [../merge-buil
 
 ## Changing the skill
 
-Change a check in `checklist.md` first, then carry the change into the compressed rule in `SKILL.md`. Change a script in `scripts/`, test it against a real file through the Figma MCP's `use_figma` tool, then copy it into both skill files with the sync tool rather than by hand. The tool minifies each script (comments and spare whitespace out, nothing renamed) and reports each skill's length against Figma's 65,536-character limit and our 61,000-character budget:
+Change a check in `checklist.md` first, then carry the change into the compressed rule in `SKILL.md`. Change a script in `scripts/`, test it against a real file through the Figma MCP's `use_figma` tool, then copy it into both skill files with the sync tool rather than by hand. The tool minifies each script (comments and spare whitespace out, nothing renamed) and reports each skill's length against Figma's 65,536-character limit and our 62,500-character budget:
 
 ```bash
 uv run --no-project --with rjsmin python scripts/sync_skill.py
@@ -64,7 +64,7 @@ Test mode ran twice in Figma's agent on 2026-10-04 ([run 1](<diagnostics/2026-10
 
 ## Version history
 
-- **0.1** (2026-10-04): first version: 34 checks, 15 scripts. Revised the same day after an independent audit against [claude-skills-best-practices.md](../claude-skills-best-practices.md), then cut from 88,746 to 60,697 characters of instructions for Figma's 65,536 limit by minifying the scripts, moving test mode into its own skill, and tightening the wording.
+- **0.1** (2026-10-04): first version: 34 checks, 15 scripts. Revised the same day after an independent audit against [claude-skills-best-practices.md](../claude-skills-best-practices.md), then cut from 88,746 to 60,697 characters of instructions for Figma's 65,536 limit by minifying the scripts, moving test mode into its own skill, and tightening the wording. After its first run in Figma (report in [diagnostics/](<diagnostics/2026-10-04 first run, 04 Navigation.md>)), the report goes in a fenced block rather than on the canvas, and a closing step offers a Markdown file and a remediation plan; it's now 61,954 characters.
 
 ## Credit
 
