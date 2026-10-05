@@ -17,7 +17,7 @@ HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parent
 SKILLS = [ROOT / "SKILL.md", ROOT.parent / "merge-build-readiness-test" / "SKILL.md"]
 FIGMA_LIMIT = 65536  # Figma's upload dialog: "Instructions must be 65536 characters or fewer" (2026-10-04)
-BUDGET = 62500  # our own ceiling: about 3,000 characters under the limit, kept free for fixes (raised from 61,000 on 2026-10-04 for step 8)
+BUDGET = 64600  # our own ceiling, kept free for fixes; raised from 61,000 on 2026-10-04 for step 8, and from 62,500 on 2026-10-05 for the contrast fixes, which leaves only about 900 characters under the limit
 # The body can never contain a fence, so a match can't run from one block into the next
 BLOCK = re.compile(r"(<!-- script: (?P<name>[\w.-]+\.js) -->\n```javascript\n)(?P<body>(?:(?!```).)*)(```)", re.S)
 

@@ -6,6 +6,9 @@ const MAX_EX = 12; // enough examples to link evidence without passing use_figma
 const scope = await figma.getNodeByIdAsync(SCOPE_ID);
 if (!scope) return { error: 'scope not found: ' + SCOPE_ID };
 if (scope.type === 'PAGE') await scope.loadAsync();
+// Layers inside instances load lazily: a page search found 234 text layers before each instance's children were
+// touched and 955 after (2026-10-05). Touch them until the instance count settles, so counts don't swing between runs.
+for (let pass = 0, last = -1; pass < 4 && 'findAllWithCriteria' in scope; pass++) { const inst = scope.findAllWithCriteria({ types: ['INSTANCE'] }); if (inst.length === last) break; last = inst.length; for (const i of inst) i.children.length; }
 const page = (() => { let n = scope; while (n.type !== 'PAGE') n = n.parent; return n; })();
 // WCAG 2.2 relative luminance and contrast ratio
 const lin = c => (c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
@@ -34,26 +37,36 @@ const paintModes = async p => {
 };
 const visibleFills = n => (Array.isArray(n.fills) ? n.fills.filter(p => p.visible !== false && (p.opacity ?? 1) > 0) : []);
 const box = n => n.absoluteBoundingBox;
-const overlaps = (a, b) => a && b && a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
-const hasNonSolid = n => {
-  if (visibleFills(n).some(f => f.type !== 'SOLID')) return true;
-  return 'findAll' in n && n.findAll(d => d.visible && visibleFills(d).some(f => f.type !== 'SOLID')).length > 0;
+const covers = (b, c) => b && c.x >= b.x && c.x <= b.x + b.width && c.y >= b.y && c.y <= b.y + b.height;
+// What a sibling layer paints under the text's center, its children first, as they're drawn above its own fill.
+// Pushes fills topmost first; returns true at an opaque one, 'complex' at an image or gradient. Text isn't a background.
+// Children count: a nav bar's dark shape inside a white frame was missed when only the frame's fill was read (2026-10-05).
+const under = (s, c, layers) => {
+  if (!s.visible || s.type === 'TEXT' || !covers(box(s), c)) return false;
+  // a boolean shape's children only define its outline; its own fill is what shows
+  if ('children' in s && s.type !== 'BOOLEAN_OPERATION') for (let i = s.children.length - 1; i >= 0; i--) { const r = under(s.children[i], c, layers); if (r) return r; }
+  const vf = visibleFills(s);
+  if (vf.some(f => f.type !== 'SOLID')) return 'complex';
+  layers.push(...vf.slice().reverse().map(f => ({ f, o: (f.opacity ?? 1) * (s.opacity ?? 1) })));
+  return layers.some(l => l.o >= 1);
 };
-// Background: the layers under the text, nearest first, at every level up to the page.
+// Background: the layers under the text's center, nearest first, at every level up to the page.
 // Stops at the first opaque solid layer; an image or gradient underneath makes it "check from a screenshot".
+// It also stops at a main component's edge: what lies outside one is the board it's shown on, not where it's used
+// (white labels in a fill-less Navigation Links component scored 1.00:1 against the board, 2026-10-05).
 const background = n => {
-  const tb = box(n);
+  const b = box(n); if (!b) return { complex: true };
+  const c = { x: b.x + b.width / 2, y: b.y + b.height / 2 };
   const layers = [];
   for (let cur = n; cur && cur.type !== 'PAGE'; cur = cur.parent) {
+    if (cur.type === 'COMPONENT' || cur.type === 'COMPONENT_SET') return { unknown: cur.type === 'COMPONENT' && cur.parent && cur.parent.type === 'COMPONENT_SET' ? cur.parent : cur };
     const parent = cur.parent;
     if (parent && 'children' in parent) {
-      const sibs = parent.children; const idx = sibs.indexOf(cur);
-      for (let i = idx - 1; i >= 0; i--) {
-        const s = sibs[i];
-        if (!s.visible || !overlaps(box(s), tb)) continue;
-        if (hasNonSolid(s)) return { complex: true };
-        const solid = visibleFills(s).filter(f => f.type === 'SOLID');
-        if (solid.length) { layers.push(...solid.map(f => ({ f, o: (f.opacity ?? 1) * (s.opacity ?? 1) }))); if (layers.some(l => l.o >= 1)) return { complex: false, base: compose(layers) }; }
+      const sibs = parent.children;
+      for (let i = sibs.indexOf(cur) - 1; i >= 0; i--) {
+        const r = under(sibs[i], c, layers);
+        if (r === 'complex') return { complex: true };
+        if (r) return { complex: false, base: compose(layers) };
       }
     }
     if (parent && parent.type !== 'PAGE') {
@@ -76,6 +89,7 @@ function compose(layers) {
 const all = ('findAllWithCriteria' in scope ? scope.findAllWithCriteria({ types: ['TEXT'] }) : []);
 const pairs = new Map();
 let complexCount = 0; const complexEx = []; let checked = 0; let textLayers = 0;
+const unknown = new Map(); let unknownCount = 0; // text with no background inside its component, by component
 for (const t of all) {
   if (!t.characters.trim()) continue;
   let hidden = !t.visible; for (let p = t.parent; !hidden && p && p.type !== 'PAGE'; p = p.parent) if (p.visible === false) hidden = true;
@@ -83,6 +97,7 @@ for (const t of all) {
   textLayers++;
   const bg = background(t);
   if (bg.complex) { complexCount++; if (complexEx.length < MAX_EX) complexEx.push(t.id); continue; }
+  if (bg.unknown) { unknownCount++; const k = bg.unknown.name + ' ' + bg.unknown.id; const e = unknown.get(k) || { count: 0, ex: t.id }; e.count++; unknown.set(k, e); continue; }
   for (const s of t.getStyledTextSegments(['fills', 'fontSize', 'fontWeight'])) {
     const fill = s.fills.find(f => f.visible !== false && f.type === 'SOLID'); if (!fill) continue;
     const alpha = (fill.opacity ?? 1) * (t.opacity ?? 1);
@@ -102,4 +117,4 @@ for (const t of all) {
   }
 }
 const failing = [...pairs.entries()].sort((a, b) => b[1].count - a[1].count).slice(0, MAX_EX).map(([k, v]) => ({ pair: k, ...v }));
-return { scope: scope.name, textLayers, segmentsChecked: checked, failingPairs: pairs.size, failing, checkFromScreenshot: complexCount, checkFromScreenshotEx: complexEx, ms: Date.now() - t0 };
+return { scope: scope.name, textLayers, segmentsChecked: checked, failingPairs: pairs.size, failing, checkFromScreenshot: complexCount, checkFromScreenshotEx: complexEx, noBackground: unknownCount, noBackgroundComponents: unknown.size, noBackgroundEx: [...unknown.entries()].sort((a, b) => b[1].count - a[1].count).slice(0, MAX_EX).map(([k, v]) => k + ' x' + v.count + ' e.g. ' + v.ex), ms: Date.now() - t0 };

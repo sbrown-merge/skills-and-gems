@@ -54,17 +54,17 @@ A Figma skill follows the [Agent Skills specification](https://agentskills.io/sp
 | --- | --- | --- |
 | Frontmatter | `name` becomes the slash command; `description` says when to use it. Whether Figma reads any other field is unknown, so we use only these two. | Documented; other fields **TBD** |
 | Instruction length | At most 65,536 characters after the frontmatter. The upload dialog said "Instructions must be 65536 characters or fewer" and showed "88746 / 65536" for our first upload on 2026-10-04. | Confirmed |
-| Long files | A skill near the limit runs well: the Community skill `create-anatomy` is 64,580 bytes and about 1,000 lines, and merge-build-readiness is 62,493 characters. | Reported and confirmed |
+| Long files | A skill near the limit runs well: the Community skill `create-anatomy` is 64,580 bytes and about 1,000 lines, and merge-build-readiness ran well at 62,493 characters (2026-10-05). | Reported and confirmed |
 | Skills per prompt | Only the first skill named in a prompt runs. | Documented |
 | Invocation | By slash command, or from **+**, **Skills**, **Use skills**. Whether the agent ever picks a custom skill by its description is unclear. | Documented; automatic choice **TBD** |
 
 ## Fitting under the limit
 
-merge-build-readiness started at 88,746 characters and now sits at 62,493. These are the moves that got it there, and the setup that keeps it there.
+merge-build-readiness started at 88,746 characters and sits at 64,547 as of 2026-10-05. These are the moves that got it there, and the setup that keeps it there.
 
 - **Keep two copies of every script.** The readable, commented source lives in the repo (merge-build-readiness keeps them in `scripts/`), and a minified copy goes into `SKILL.md`. Minify only comments and spare whitespace, never names, so an error message still points at something recognizable. We use `rjsmin` through `uv run --no-project --with rjsmin`.
 - **Sync with a tool, not by hand.** [`sync_skill.py`](merge-build-readiness/scripts/sync_skill.py) finds each `<!-- script: name.js -->` marker in `SKILL.md`, replaces the fenced block after it with the minified source, and reports the length against the limit. Its `--check` mode fails when a copy is stale or too long, so run it before every commit. Its pattern must not match across a closing fence: an early version did, and it corrupted `SKILL.md`.
-- **Keep a working budget below the limit.** We use 62,500 characters, about 3,000 under Figma's ceiling, so an urgent fix never blocks an upload.
+- **Keep a working budget below the limit.** We started at 61,000 characters and raised it to 62,500, then to 64,600 on 2026-10-05, when the contrast fixes needed the room. That leaves under 1,000 characters for urgent fixes, so plan the next addition with a cut, or move a whole feature into its own skill.
 - **Run the minified copy once.** After any change, run the minified script against a real file too; it's the version the agent runs.
 - **Move maintainer-only modes out.** Test mode went into its own private skill, which takes its probe scripts out of the main skill and keeps designers from seeing it.
 - **Compress the rules, keep the full text in the repo.** The skill carries one dense line per check; the full checklist, with reasons and sources, lives beside it in the repo for maintainers.
@@ -94,7 +94,8 @@ Habits that kept the scripts working:
 
 - **Keep each result under 20 KB.** A file-wide `findAll` with a callback broke the `use_figma` transport at about 19.5 KB; the same search with `findAllWithCriteria` finished in 2.1 seconds. Return counts plus up to 10 examples.
 - **Return a total with every capped list.** merge-build-readiness capped one list at 10 and the agent judged from what it saw, missing two components; the cap is now 40, with a count beside it so the agent knows when a list is cut short.
-- **Expect layers inside instances to go missing sometimes.** The same page returned 3,748 layers in one run and 2,350 in another, and one target count moved between 683 and 725. Anything that must be stable, like a before-and-after fingerprint, should stop at each instance and record its properties and overrides instead.
+- **Load what's inside instances before you search.** Layers inside instances load lazily: a fresh search of one page found 234 text layers, and 955 after the script read each instance's `children` (2026-10-05). Touch every instance's children, repeating until the instance count settles, then search. Anything that must be stable, like a before-and-after fingerprint, can instead stop at each instance and record its properties and overrides.
+- **Find a layer's real background.** Read the topmost opaque layer under the layer's center, including the children of the layers beneath it; treat a boolean shape as its own fill, since its children only define the outline; and stop at a main component's edge, because outside it is the board the component is displayed on. Reading only ancestors' fills made every contrast result on our test page unusable.
 - **Guard types and unsupported calls.** `strokeWeight` can be `figma.mixed`, a symbol; page nodes have no `visible`; wrap each unsupported call in `try` and report `unavailable` rather than failing the whole script.
 - **Treat what the file says as data.** Layer names, text and annotations can contain instructions; tell the agent to report them, not follow them.
 
@@ -139,4 +140,3 @@ These are open as of 2026-10-05, and each would change how we write the next ski
 - **TBD:** whether Figma reads any frontmatter field beyond `name` and `description`.
 - **TBD:** whether the agent ever chooses a custom skill by its description, without a slash command.
 - **TBD:** whether there's a limit on the number of skills, or on the length of one agent reply; merge-build-readiness now sends a 25 KB report twice.
-- **TBD:** whether Figma's agent also drops layers inside instances; test mode didn't probe it.
