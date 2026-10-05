@@ -103,10 +103,10 @@ The structure follows `create-anatomy`, which works in Figma: an execution contr
 1. **Ask once, then run without stopping.** One opening message asks for the scope (a page, section or component; the whole file only if it's small), the target platform (Web by default), and how to deliver findings (report only, comments, or Dev Mode annotations). Each has a default, so a reply of "go" works.
 2. **Read the file by script.** Low-freedom scripts, run unchanged, gather the inventory: variables with scopes, code syntax and descriptions; styles; component sets with variants, properties and descriptions; bound and literal values; layer names; annotations; publish status. Placeholders such as `__SCOPE_ID__` are the only edits.
 3. **Judge.** Score each check from the data, with no scripts in this step.
-4. **Report.** The scorecard, then the top fixes in order, each naming its check, sent in the chat as one fenced Markdown block. Figma's agent otherwise tends to draw the report on the canvas (Steve, 2026-10-04), which would also break the read-only rule.
+4. **Report.** The scorecard, then the top fixes in order, each naming its check, sent in the chat twice: as ordinary Markdown to read, then word for word in one fenced Markdown block, whose download and copy buttons give the file (Steve, 2026-10-05). Without the instruction, Figma's agent tends to draw the report on the canvas (Steve, 2026-10-04), which would also break the read-only rule.
 5. **Deliver, if asked.** Comments go on the layer at fault and show under the runner's name. Annotations go on the layer at fault in the existing Development category, because a new category can't be renamed or deleted later, and are written to the annotation schema.
 6. **Prove nothing changed.** Re-read the source and confirm it's intact; if it isn't, say so and tell the person to undo before trusting anything.
-7. **Offer next steps.** After the report, the skill offers the report as a Markdown file and a remediation plan, and makes neither unless asked; the plan lists fixes and never makes them (Steve, 2026-10-04).
+7. **Offer next steps.** After the report, the skill offers a remediation plan and makes it only if asked; the plan lists fixes and never makes them (Steve, 2026-10-04). It no longer offers the report as a file, because the fenced block already is one (Steve, 2026-10-05).
 
 ## Test mode
 
