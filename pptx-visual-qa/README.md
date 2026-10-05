@@ -10,8 +10,10 @@ Written by Steve Brown with Claude, consolidated 2026-09-09 from three projects'
 | --- | --- |
 | `SKILL.md` | The skill itself. Claude reads this when the skill triggers |
 | `scripts/render_pptx.sh deck.pptx outdir [png\|jpeg]` | Launches Keynote, exports every slide as an image, prints the paths. The launch step is the fix that made this reliable |
-| `scripts/check_pptx_package.py deck.pptx` | Read-only structural check: slide list, relationships, parts and content types agree; orphaned parts listed; comment parts and real speaker notes reported |
+| `scripts/check_pptx_package.py deck.pptx` | Structural check: slide list, relationships, parts and content types agree; orphaned parts listed; comment parts and real speaker notes reported. `--remove-orphans deck.pptx cleaned.pptx` writes a copy without the orphans; the input is never modified |
 | `references/environment.md` | What is and is not installed on the machine this was built on, with dates. **Per machine. Re-verify on yours** |
+| `EVAL.md` | Three test cases from real failures, with a results table per model. Run them after any change to the skill or when a new model ships |
+| `pptx-visual-qa.skill` | The folder packaged as a zip for installing elsewhere. Rebuild it after every change |
 
 ## Install
 

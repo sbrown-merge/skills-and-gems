@@ -34,11 +34,22 @@ case "$fmt" in
   *) echo "format must be png or jpeg" >&2; exit 1 ;;
 esac
 
-# Keynote creates the directory itself and refuses one that already exists.
+# Keynote creates the directory itself and refuses one that already exists,
+# so a previous render has to go. Refuse to delete anything that isn't one:
+# a mistyped outdir must never take a real folder with it.
+if [[ -d "$out" ]] && ls -1A "$out" | grep -qvE '\.(png|jpeg)$'; then
+  echo "refusing to delete $out: it holds files that aren't slide images; pick a new outdir" >&2
+  exit 1
+fi
+if [[ -e "$out" && ! -d "$out" ]]; then
+  echo "refusing to delete $out: it's a file, not a render folder" >&2
+  exit 1
+fi
 rm -rf "$out"
 mkdir -p "$(dirname "$out")"
 
-# The load-bearing step.
+# The load-bearing step. 3 s is the wait that ended the -600 failures
+# (2026-08-26); a shorter one wasn't tested.
 open -a Keynote
 sleep 3
 
@@ -52,7 +63,9 @@ set src to POSIX file "$src"
 set dst to POSIX file "$out"
 tell application "Keynote"
 	set doc to open src
+	-- TBD: reason for this 3 s wait isn't recorded; presumably import time.
 	delay 3
+	-- compression factor only affects JPEG. TBD: reason for 0.9 isn't recorded.
 	export doc to dst as slide images with properties {image format:$asfmt, compression factor:0.9, skipped slides:false}
 	close doc saving no
 end tell
@@ -61,9 +74,9 @@ AS
 then
   echo "scripted open failed; retrying via Finder-style open" >&2
   osascript -e 'tell application "Keynote" to quit' >/dev/null 2>&1 || true
-  sleep 2
+  sleep 2  # lets Keynote finish quitting before it's relaunched
   open -a Keynote "$src"
-  sleep 8
+  sleep 8  # the wait that worked on 2026-09-22 (launch plus import); a shorter one wasn't tested
   rm -rf "$out"
   osascript <<AS
 set dst to POSIX file "$out"

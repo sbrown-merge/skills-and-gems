@@ -2,6 +2,7 @@
 """Structural check of a .pptx package, complementary to a render.
 
     check_pptx_package.py deck.pptx
+    check_pptx_package.py --remove-orphans deck.pptx cleaned.pptx
 
 Verifies the four things that must agree after any structural edit:
   1. every <p:sldId r:id> in ppt/presentation.xml resolves in presentation.xml.rels
@@ -12,13 +13,17 @@ Verifies the four things that must agree after any structural edit:
 and lists ORPHANED PARTS: anything in ppt/ that no .rels file references.
 That last check is the one the pptx skill's clean.py does not cover for
 ppt/comments/commentN.xml, and an orphaned comment part makes the schema
-validator report the deck as corrupt. Remove the part and its override.
+validator report the deck as corrupt. --remove-orphans writes a copy with
+those parts and their [Content_Types].xml overrides removed, then checks the
+copy. The source deck is never modified.
 
 Also reports comments and non-empty speaker notes, because both are content a
 reviewer cares about and a slide-text extraction misses.
 
-Exit code 0 when clean, 1 when anything needs attention. Read-only.
+Exit code 0 when clean, 1 when anything needs attention, 2 when the input
+cannot be read as a .pptx or the arguments are wrong.
 """
+import os
 import re
 import sys
 import zipfile
@@ -38,6 +43,39 @@ def rels_targets(z, rels_path):
         tgt = attrs.get("Target", "")
         out[attrs.get("Id", "")] = posixpath.normpath(posixpath.join(base, tgt)).lstrip("/")
     return out
+
+
+def find_orphans(z, names):
+    """Parts under ppt/ that no .rels file references."""
+    referenced = set()
+    for rels in (n for n in names if n.endswith(".rels")):
+        referenced.update(rels_targets(z, rels).values())
+    return sorted(
+        n for n in names
+        if n.startswith("ppt/") and not n.endswith("/") and not n.endswith(".rels")
+        and n not in referenced and n != "ppt/presentation.xml"
+    )
+
+
+def remove_orphans(src, dst):
+    """Write dst as a copy of src without orphaned parts or their overrides."""
+    with zipfile.ZipFile(src) as z:
+        names = set(z.namelist())
+        orphans = set(find_orphans(z, names))
+        with zipfile.ZipFile(dst, "w", zipfile.ZIP_DEFLATED) as out:
+            for info in z.infolist():  # keeps the source archive's part order
+                if info.filename in orphans:
+                    continue
+                data = z.read(info.filename)
+                if info.filename == "[Content_Types].xml":
+                    ct = data.decode("utf-8")
+                    for o in orphans:
+                        ct = re.sub(r'<Override\b[^>]*PartName="/' + re.escape(o) + r'"[^>]*/>', "", ct)
+                    data = ct.encode("utf-8")
+                out.writestr(info, data)
+    for o in sorted(orphans):
+        print(f"removed {o}")
+    print(f"{len(orphans)} orphaned part(s) removed -> {dst}\n")
 
 
 def main(path):
@@ -79,15 +117,7 @@ def main(path):
             problems.append(f"{n} has neither a Content_Types override nor a default for .{ext}")
 
     # orphans: every ppt/ part must be referenced by some .rels
-    referenced = set()
-    for rels in (n for n in names if n.endswith(".rels")):
-        referenced.update(rels_targets(z, rels).values())
-    orphans = sorted(
-        n for n in names
-        if n.startswith("ppt/") and not n.endswith("/") and not n.endswith(".rels")
-        and n not in referenced and n != "ppt/presentation.xml"
-    )
-    for o in orphans:
+    for o in find_orphans(z, names):
         problems.append(f"ORPHANED PART (unreferenced by any .rels): {o}")
 
     # content a slide-text extraction misses
@@ -113,7 +143,25 @@ def main(path):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
+    args = sys.argv[1:]
+    if len(args) == 1:
+        target = args[0]
+    elif len(args) == 3 and args[0] == "--remove-orphans":
+        target = args[2]
+        if os.path.exists(target):
+            print(f"output already exists, not overwriting: {target}", file=sys.stderr)
+            sys.exit(2)
+    else:
         print(__doc__)
         sys.exit(2)
-    sys.exit(main(sys.argv[1]))
+    try:
+        if len(args) == 3:
+            remove_orphans(args[1], target)
+        sys.exit(main(target))
+    except FileNotFoundError as e:
+        print(f"no such file: {e.filename}", file=sys.stderr)
+    except zipfile.BadZipFile:
+        print(f"not a .pptx (not a zip archive): {args[-2] if len(args) == 3 else target}", file=sys.stderr)
+    except KeyError as e:
+        print(f"not a .pptx (missing part {e}): {target}", file=sys.stderr)
+    sys.exit(2)
