@@ -12,4 +12,5 @@ Repo for Claude Skills and Gemini Gems
 | `DESIGN.md-creation-gem/` | Gem for producing a `DESIGN.md` | Gemini Gem |
 | [`claude-skills-best-practices.md`](claude-skills-best-practices.md) | Our best known method for building Claude Skills: seven layout and verification rules, a pass/fail audit checklist tuned for Opus 5.5, and a paste-in audit prompt | Guideline |
 | [`audits/`](audits/) | Dated audits of our skills against the best practices checklist, with every finding, the fix applied and what's still open | Audit records |
+| [`output-styles/`](output-styles/) | Our response styles for Claude: the Claude Code output style and a short plain-text version | Output styles |
 
