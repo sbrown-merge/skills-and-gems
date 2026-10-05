@@ -7,7 +7,7 @@ version: "0.9"
 created: 2026-10-03
 maintainer: Steve Brown
 tags: [figma, figma-agent, skill, agentic-build, design-system, audit, checklist]
-state: "Draft for Steve's review at build step 2 of PLAN.md; nothing downstream starts until it's approved."
+state: "In use by SKILL.md since 2026-10-04; stays a draft until the evaluations at build step 6 of PLAN.md."
 sources:
   - {resource: "https://github.com/sbrown-merge/merge-one-related/blob/main/Figma/MERGE%20One%20UI%20%E2%80%94%20Figma%20Practices%20for%20Agentic%20Builds.md", title: "MERGE One UI: Figma practices for agentic builds, version 0.1", author: Steve Brown, last_modified: "2026-09-29"}
   - {resource: "research/2026-10-03-figma-file-practices-for-agents.md", title: "Structuring Figma files and libraries for AI coding agents", author: Steve Brown, last_modified: "2026-10-03"}

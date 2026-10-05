@@ -36,6 +36,7 @@ This is how we build Claude Skills and how we check them. It takes the rules Ant
 - G. Content hygiene
 - H. Opus 5.5 tuning
 - I. Testing and evaluation
+- J. Skills for Figma's agent
 - Audit prompt (paste into Opus 5.5)
 <!-- /toc -->
 
@@ -165,9 +166,24 @@ The checklist below is pass/fail. Run the audit at medium effort first, and rais
 - [ ] Opus 5.5 was tested at medium and at a higher effort on the same task, and the higher setting is used only where it produced a measurably better result.
 - [ ] The skill was tested by a fresh instance, not the session that wrote it, on realistic tasks.
 
+## J. Skills for Figma's agent
+
+Use this section only for a skill that runs in Figma's in-app agent. [figma-agent-skills.md](figma-agent-skills.md) explains each item.
+
+- [ ] `SKILL.md` is the only file, with nothing it needs left in another file, and its instructions after the frontmatter are at most 65,536 characters, with room to spare.
+- [ ] Scripts are kept readable in the repo and copied into `SKILL.md`, minified, by a tool that also checks the length and fails on a stale copy.
+- [ ] Every script was run through the Figma MCP's `use_figma` tool against a real file, and its minified copy was run once too.
+- [ ] Scripts avoid the calls Figma's agent can't make (`devStatus`, `figma.currentUser`, `getFileThumbnailNodeAsync`, `loadAllPagesAsync`, style publish status), or catch them and report `unavailable`.
+- [ ] Each script's result stays under 20 KB, and every capped list comes with its total count.
+- [ ] The skill tells the agent to run each script unchanged, which placeholders to fill and how, and what to do when a script fails.
+- [ ] The skill says where its output goes: in the chat as readable text, then in a fenced block to download, and never drawn on the canvas.
+- [ ] The output has a fixed template, and the skill says to add no sections to it.
+- [ ] A skill that must not change the design says so, names what it must never do, and proves the design is unchanged at the end.
+- [ ] A private test-mode skill, or an equivalent probe, has confirmed inside Figma's agent every call and tool the skill depends on.
+
 ## Audit prompt
 
-Paste the block below into Opus 5.5 at medium effort. Paste sections A to I of this checklist into the `<checklist>` tags, and the skill's files into the `<skill_files>` tags, one `<file path="...">` block per file.
+Paste the block below into Opus 5.5 at medium effort. Paste sections A to I of this checklist into the `<checklist>` tags, adding J for a skill that runs in Figma's agent, and the skill's files into the `<skill_files>` tags, one `<file path="...">` block per file.
 
 ```text
 Audit the Claude Skill in <skill_files> against the checklist in <checklist>. Do not change any files yet.
@@ -185,7 +201,7 @@ Deliver exactly these four things:
 If you can't determine an item from the files given (for example, whether it was tested on Haiku), mark it "Unknown" and say what evidence would settle it. Don't guess.
 
 <checklist>
-[paste sections A–I of this checklist]
+[paste sections A–I of this checklist, and J for a Figma skill]
 </checklist>
 
 <skill_files>

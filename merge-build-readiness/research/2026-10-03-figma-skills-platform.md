@@ -73,7 +73,7 @@ Figma documents no Admin-panel flow for uploading a skill. In the documented flo
 - **Who may publish to the organization: TBD.** Figma doesn't say whether only admins can publish a skill org-wide. For custom connectors it does say "Only organization admins can publish", but no such line exists for skills.
 - **The Admin panel's only skill control is "Recommend" (confirmed).** The path is Admin > Resources > Skills > select the skill > Recommend toggle; for skills you then click Manage to choose the whole organization or specific workspaces. Organization and workspace admins can do this. Sources: [Guide to managing a Figma organization](https://help.figma.com/hc/en-us/articles/360039829474), updated 2026-09-23; [release note "Recommend resources you want users to discover and use"](https://www.figma.com/release-notes/recommend-resources-you-want-users-to-discover-and-use/), 2026-08-17. We found no admin upload, admin disable, or admin allowlist for skills.
 - **Format (confirmed).** The upload must be "a single Markdown (.md) file that follows the Agent Skills specification", and the article links to agentskills.io/specification. In the upload dialog you review the name, description and content, and "The name defines the slash command". Manual creation asks for a name, a description and instructions in Markdown.
-- **Limits: TBD.** No size or count limit for skills is documented. The 1 MB text-file limit applies to chat attachments, not skills ([Attach files to a prompt](https://help.figma.com/hc/en-us/articles/31304529835671), updated 2026-10-02).
+- **Limits: answered for size after the research (2026-10-04).** No size or count limit for skills is documented, but the upload dialog caps instructions at 65,536 characters; see finding 4 under [Added after the research](#added-after-the-research). A count limit is still **TBD**. The 1 MB text-file limit applies to chat attachments, not skills ([Attach files to a prompt](https://help.figma.com/hc/en-us/articles/31304529835671), updated 2026-10-02).
 - **Plan and seat gating (confirmed, but the sources conflict).** The custom-skills article (2026-09-23) says "Available on paid plans"; Full seats can use the agent in Design and Make files, View, Dev and Collab seats only in Drafts, and edit access is required. [Work with the Figma agent in design files](https://help.figma.com/hc/en-us/articles/37998629035799) (2026-10-03) says "Available on all plans", that some features need a paid plan, and that View, Dev and Collab seats can chat but can't edit. Blog posts from 2026-06-24, 2026-07-01 and 2026-08-13 say "open beta for Full seat users on Professional, Organization, and Enterprise plans." The agent is free during the beta with monthly limits. An organization admin can turn off all AI features ([Manage AI settings](https://help.figma.com/hc/en-us/articles/17725942479127), 2026-09-28).
 
 ### Reference files and scripts
@@ -166,12 +166,12 @@ Steve reported these findings on 2026-10-03 and 2026-10-04, after the research a
 
 ## Open questions
 
-1. **Admin upload:** is there any Admin-panel flow for uploading a skill? None is documented. Who may publish org-wide isn't stated.
-2. **Size and count:** no documented limit, though Steve's 64,580-byte skill works.
+1. **Admin upload:** is there any Admin-panel flow for uploading a skill? None is documented. Who may publish org-wide: answered by finding 3 (anyone can).
+2. **Size and count:** size answered by finding 4 (65,536 characters of instructions); a count limit is still unknown.
 3. **Frontmatter:** which fields Figma reads beyond `name` and `description`, and what happens to a file that breaks the spec's rules.
 4. **Automatic selection:** whether custom skills are ever picked by their description.
 5. **Model:** which model runs the Figma Design agent.
-6. **Reading file data:** whether the agent can read variable scopes, code syntax, annotations, prototype reactions, or publish status. Steve's finding makes script-based reads likely; test mode will settle it.
+6. **Reading file data: answered by test mode on 2026-10-04.** The agent reads variable scopes, code syntax, annotations, prototype reactions, slots, and variable and component publish status through scripts, but not Ready for dev, style publish status or the file thumbnail. See [figma-agent-skills.md](../../figma-agent-skills.md).
 7. **Skill tools:** whether `get_figma_skill` and `read_skill_uri` exist, and whether the in-Figma agent's built-in skills match the repo's.
 8. **Plans:** the docs conflict on plan gating, and nothing says when the beta ends.
 9. **Other surfaces:** no source on skills in Dev Mode; FigJam and Slides agents are in closed beta.

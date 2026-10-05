@@ -35,7 +35,7 @@ It exists because the same file problems keep turning into code problems: hardco
 
 ## What the research settled
 
-Three research notes in [research/](research/) hold the sources. These are the findings the design depends on:
+Three research notes in [research/](research/) hold the sources, and [figma-agent-skills.md](../figma-agent-skills.md) collects what building this skill taught us for the next Figma skill. These are the findings the design depends on:
 
 - **One file only.** Figma's custom skills must be a single Markdown file following the Agent Skills spec, with no `scripts/`, `references/` or `assets/` folders ([Figma help, updated 2026-09-23](https://help.figma.com/hc/en-us/articles/40283639496599)). The checklist, procedure, scripts and report format all live in `SKILL.md`. Figma's upload dialog also caps a skill's instructions at 65,536 characters (found by Steve on 2026-10-04, when the first upload was 88,746), so the scripts go in minified and test mode lives in its own skill.
 - **Scripts run.** The Figma Community skill `create-anatomy`, which Steve tested and says performs well, embeds Plugin API JavaScript in its body and has the agent run it step by step. It even calls `figma.loadAllPagesAsync()`, which the MCP's `use_figma` tool forbids. So precise, script-based reads work inside Figma, and a single file of almost 1,000 lines still performs.
@@ -119,12 +119,12 @@ It ends with one JSON log in the chat carrying the skill version, the date, the 
 ## Build order
 
 1. **Save the research and this plan.** Done on 2026-10-03.
-2. **Write `checklist.md`**, then stop for Steve's review. It decides everything downstream. Drafted on 2026-10-03 and revised to version 0.5 from Steve's comments, which settled the linked-repo wording, the annotation schema and the mobile check; waiting for his full read.
+2. **Write `checklist.md`**, then stop for Steve's review. It decides everything downstream. Drafted on 2026-10-03 and revised to version 0.5 from Steve's comments, which settled the linked-repo wording, the annotation schema and the mobile check. Steve moved on to step 3 the same day, and the checklist reached version 0.9 through the test runs of 2026-10-04.
 3. **Test each script in Claude Code** against Andrew's Abbott library (file key `0VTZx0ZXc08vCIjdzb8Xza`) through the Figma MCP before it goes into `SKILL.md`, so the first Figma run isn't the code's first run. Remember that `use_figma` forbids `loadAllPagesAsync`; use `page.loadAsync()` per page there, which worked in the 2026-09-30 audit. Done on 2026-10-03: all nine scripts in [scripts/](scripts/README.md) ran against the library, which settled BR-05's node budget and how slots read, and showed that `use_figma` can't read `devStatus`, the file thumbnail or style publish status.
 4. **Write `SKILL.md`**, including test mode. Check its frontmatter against the spec, and have a separate Opus 5.5 agent (not the author) audit it against [claude-skills-best-practices.md](../claude-skills-best-practices.md), sections A to I. Drafted on 2026-10-04 with six new scripts (scope, fingerprint, annotation delivery and test mode) and a sync tool that copies the tested scripts in; an independent Opus 5.5 audit found 16 failing items and 18 contradictions with `checklist.md`, and the high and medium ones were fixed the same day.
 5. **Run test mode in Figma.** Steve uploads both skills privately, runs `/merge-build-readiness-test`, and pastes the log into `diagnostics/`. Adjust the skill to what the log shows. Two runs on 2026-10-04: Figma's agent reads and writes the same way `use_figma` does, screenshots work but small text in them isn't reliably readable, and nothing in the agent can read Ready for dev status.
 6. **Run the evaluations.** Three cases, each first without the skill as a baseline, then with it, in Claude Code and in Figma's agent:
-   - Andrew's Abbott library, whose expected findings come from the 2026-09-30 audit in the abbott-fs-libre-global-iva-specs repo (`captures/2026-09-30 IVA design library audit.md`).
+   - Andrew's Abbott library, whose expected findings come from the results table in [scripts/README.md](scripts/README.md) and the saved reports in [diagnostics/](diagnostics/), not the 2026-09-30 audit, because the file has changed since that audit. Delete the report frames the first run drew on `04 / Navigation` before running it.
    - A section of the MERGE One Production file.
    - A small test file with deliberate faults.
 7. **Publish.** Upload in Figma's chat, publish privately to the MERGE organization, have an admin mark it Recommended, and record the version and what it was tested on in the README.
