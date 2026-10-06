@@ -97,7 +97,7 @@ Everything lives in `skills-and-gems/merge-email-check/`. Only `SKILL.md` goes t
 | `README.md` | For maintainers: what it does, publishing, the version, what it was tested on, and credit. |
 | `checklist.md` | The full checklist, with each check's reason, rule, tier and source. Change a check here first. |
 | `PLAN.md` | This plan. |
-| `scripts/` | The readable Plugin API scripts, a README of what testing found, and a sync tool copied from merge-build-readiness. Four scripts start as copies of its scope, text-contrast, target and fingerprint scripts. |
+| `scripts/` | The readable Plugin API scripts, a README of what testing found, and a sync tool copied from merge-build-readiness. Three scripts: scope, the checks (run in two parts, layout and images) and fingerprint. The scope and fingerprint scripts and the contrast and target logic start as copies from merge-build-readiness. |
 | `diagnostics/` | Saved reports from runs in Figma. |
 | `EVAL.md` | Test cases, expected findings and results. |
 
@@ -105,8 +105,8 @@ Everything lives in `skills-and-gems/merge-email-check/`. Only `SKILL.md` goes t
 
 1. **Save this plan.** Done on 2026-10-05.
 2. **Write [checklist.md](checklist.md), then stop for Steve's review.** It decides everything downstream. Drafted and approved on 2026-10-05.
-3. **Test each script through the Figma MCP** against the TOFU file (`Dqux2GL6tXD0boEEW3QCax`), then run the minified copy too.
-4. **Write `SKILL.md`** within a working budget of 62,500 characters, and have a separate Opus 5.5 agent audit it against [claude-skills-best-practices.md](../claude-skills-best-practices.md), sections A to J.
+3. **Test each script through the Figma MCP** against the TOFU file (`Dqux2GL6tXD0boEEW3QCax`), then run the minified copy too. Done on 2026-10-05: seven scripts tested, then merged into three and cut from 60,760 to 34,855 minified characters to fit the budget, and re-tested; the Adobe rebuild's known faults and Terry's email 1 findings were all still found ([scripts/README.md](scripts/README.md)).
+4. **Write `SKILL.md`** within a working budget of 62,500 characters, and have a separate Opus 5.5 agent audit it against [claude-skills-best-practices.md](../claude-skills-best-practices.md), sections A to J. Drafted on 2026-10-06; an independent Opus 5.5 audit found its scoring rules thinner than the checklist's (the default rule, Couldn't check for a file with no notes) and some result keys described in the wrong place, all fixed the same day.
 5. **Run the evaluations**, each first without the skill and then with it, in Claude Code and in Figma's agent:
    - **The Adobe Elevate rebuild** on page "08 Reference: images off" of the TOFU file. Its callouts already list the expected faults: links shown by color alone, 11px gray footer text at about 3 to 1, CTAs as small text links, the Try it card's heading in dark mode, and the hero with no height.
    - **Terry Smith's TOFU designs**, as the real case.
@@ -115,7 +115,7 @@ Everything lives in `skills-and-gems/merge-email-check/`. Only `SKILL.md` goes t
 
 ## Open questions
 
-- **TBD:** whether a test-mode skill is needed, or whether merge-build-readiness-test's logs already cover every call this skill makes. Settle it at step 3 by listing the calls.
+- **TBD:** a probe inside Figma's agent before the first full run. Three calls this skill makes have never run in Figma's agent, only through `use_figma`: reading image bytes with `getImageByHash().getBytesAsync()`, `exportSettings`, and the `hyperlink` field of text segments (SKILL.md audit, 2026-10-06). A short private test skill, or a first run on the Adobe rebuild with its log saved in `diagnostics/`, would settle it.
 - **TBD:** which annotation categories a client file uses. The TOFU file has eight custom categories (Alt text, Decorative image, Heading level, Link or CTA, Dark mode, Dynamic content, Mobile behavior, Content model field); a client file may use Figma's presets or plain text. The checklist proposes reading either.
 
 [ledger]: https://github.com/sbrown-merge/merge-marketing-email-specs/blob/main/DECISIONS.md

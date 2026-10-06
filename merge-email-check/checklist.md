@@ -3,7 +3,7 @@ title: "merge-email-check: the checklist"
 description: "The 30 checks merge-email-check runs on an email design in Figma, EM-01 to EM-30, each with its rank, tier, how a script or the agent verifies it, and its source in the email-specs research and rulings."
 type: checklist
 status: draft
-version: "0.1"
+version: "0.3.0"
 created: 2026-10-05
 maintainer: Steve Brown
 tags: [figma, figma-agent, skill, email, crm, accessibility, dark-mode, checklist]
@@ -50,7 +50,7 @@ Each check has an ID, a rank, a tier, a way of being verified, and a source. Thi
 
 **Tiers** decide what a project can change. A **Universal** check holds for any email, because it comes from WCAG 2.2, from email law, or from how mail apps behave, and its rule isn't a setting. A **House** check uses a number or policy from the [house settings](#house-settings) below, which default to MERGE's and can be changed for a client project in the opening question.
 
-**Results** are Pass, Partly, Fail, Couldn't check or N/A. Couldn't check means a read failed or Figma doesn't expose what the check needs, and the report says which; the agent never guesses a result. N/A means the check doesn't apply, for example no images in scope. Unless a check says otherwise, a Script check passes when it finds nothing, is Partly when the problem affects fewer than half of the items it checked, and fails at half or more. Every result carries evidence: the total count and up to ten layers, of which the report links up to three.
+**Results** are Pass, Partly, Fail, Couldn't check or N/A. A check can also carry **flags**: items the designer should judge, which the report lists under their check without changing its result. Couldn't check means a read failed or Figma doesn't expose what the check needs, and the report says which; the agent never guesses a result. N/A means the check doesn't apply, for example no images in scope. Unless a check says otherwise, a Script check passes when it finds nothing, is Partly when the problem affects fewer than half of the items it checked, and fails at half or more. Every result carries evidence: the total count and up to ten layers, of which the report links up to three.
 
 **Verified by** is **Script** when a Plugin API script returns the data and the result follows from the rule with no judgment, or **Judgment** when a script or a screenshot gathers the data and the agent decides, because the call depends on what a layer is for.
 
@@ -99,8 +99,8 @@ This table is the index for tools and for `SKILL.md`. The sections after it give
 | EM-18 | Type follows the house defaults | Could | House | Script |
 | EM-19 | Text contrast meets WCAG 2.2 AA | Must | Universal | Script |
 | EM-20 | Button edges and meaningful icons meet 3 to 1 | Must | Universal | Judgment |
-| EM-21 | Tap targets meet the house size | Must | House | Script |
-| EM-22 | Links in body text are underlined | Must | Universal | Script |
+| EM-21 | Tap targets are at least 24px, and meet the house size | Must | House | Script |
+| EM-22 | Text links are underlined | Must | Universal | Script |
 | EM-23 | There's one H1, and heading levels go in order | Should | Universal | Script |
 | EM-24 | Link and button text says where it goes | Should | Universal | Judgment |
 | EM-25 | Parts that change by audience are marked | Could | Universal | Script |
@@ -120,7 +120,7 @@ These come first because every later check reads the frames they find.
 
 **Must · House · Script · [D-4][ledger], [D-7][ledger], [D-8][ledger]**
 
-An email is built as one column that shrinks on narrow screens, and classic Outlook for Windows ignores mobile styling entirely, so both layouts have to be designed and both have to hold up on their own. A desktop frame wider than the email's maximum has nowhere to go, because mail apps center the email in the reading pane. The script finds each email's top-level frames and their widths. Pass when every email has one frame in the mobile range and one in the desktop range. Fail when an email has only one, or a frame is drawn at a width no mail app shows, such as 1280px. A frame wider than 700px that only shows the email inside a mail app's window is N/A for this check, and the report says so. A desktop frame between 601 and 700px passes, with a note that MERGE's own default is 600px.
+An email is built as one column that shrinks on narrow screens, and classic Outlook for Windows ignores mobile styling entirely, so both layouts have to be designed and both have to hold up on their own. A desktop frame wider than the email's maximum has nowhere to go, because mail apps center the email in the reading pane. The script finds each email's top-level frames and their widths. Pass when every email has one frame in the mobile range and one in the desktop range. Fail when an email has only one, or a frame is drawn at a width no mail app shows, such as 1280px. A frame with no layers in it counts as missing. A frame that holds only one email-width frame of a different width, such as a 680px gray frame around a 600px email, is a presentation wrapper, and the frame inside it is the email. A frame wider than 700px that only shows the email inside a mail app's window is N/A for this check, and the report says so. A desktop frame between 601 and 700px passes, with a note that MERGE's own default is 600px.
 
 ### EM-02 The mobile frame sits to the left of the desktop frame
 
@@ -132,7 +132,7 @@ Reviews show both frames side by side, mobile on the left, so nobody judges an e
 
 **Should · Universal · Script · [D-4][ledger]**
 
-An engineer can't tell from two drawings whether a module stacks, hides, keeps its size or swaps its image, and guessing wrong is the commonest mobile bug. The script counts the modules (the direct children of each desktop frame) with a mobile-behavior note ([Notes for the scripts](#notes-for-the-scripts)). Pass when all have one.
+An engineer can't tell from two drawings whether a module stacks, hides, keeps its size or swaps its image, and guessing wrong is the commonest mobile bug. The script counts the modules (the direct children of each desktop frame) with a mobile-behavior note ([Notes for the scripts](#notes-for-the-scripts)). Pass when all have one. When the desktop frame is empty, the modules are read from the mobile frame instead. When more than half of a desktop frame's direct layers are loose text or shapes rather than frames, groups or instances, the email isn't grouped into modules, and the check fails with that reason, because there's nothing to attach a note to.
 
 ### EM-04 The main message and primary CTA sit in the preview area
 
@@ -160,13 +160,13 @@ Without alt text, a blocked image is an empty box and a screen reader says nothi
 
 **Should · Universal · Script · how images fail to load, "What a blocked image looks like"**
 
-Apple Mail, and reportedly Gmail and Yahoo, draw alt text on one line and drop it altogether when that line is wider than the image's box, even when the box is tall enough to wrap it. The reader sees an empty box. The script estimates the longest alt text that fits as the image's width divided by 8.8px, which is about 42 characters at 16px across a 375px box; the research note's estimate is 40 to 45. Partly when any alt text is up to 10% over; Fail beyond that. This is an estimate, and the report says so.
+Apple Mail, and reportedly Gmail and Yahoo, draw alt text on one line and drop it altogether when that line is wider than the image's box, even when the box is tall enough to wrap it. The reader sees an empty box. The script estimates the longest alt text that fits as the image's width divided by 8.8px, which is about 42 characters at 16px across a 375px box; the research note's estimate is 40 to 45. Alt text up to 10% over the estimate is a flag for the designer to judge, not a fault, because the estimate is deliberately cautious: the 46-character alt text in panel 2 of the TOFU file's alt text panels measures 362px at 16px and fits a 375px box. Fail beyond 10% over. This is an estimate, and the report says so (Steve, 2026-10-05). N/A when no image has an alt-text note.
 
 ### EM-08 Headlines, offers and buttons are live text
 
 **Must · Universal · Judgment · how images fail to load, the designing checklist; Jill Redo's scorecard, "bulletproof CTAs"**
 
-With images off, anything inside an image is gone, so the headline, the offer and every button have to be text the mail app draws. The script returns the text layers and the image layers in each frame; the agent checks, with a screenshot of each image, that the email's message and its buttons are text layers, not parts of an image. Fail when a button or the main headline is an image.
+With images off, anything inside an image is gone, so the headline, the offer and every button have to be text the mail app draws. The script returns the text layers and the image layers in each frame; the agent checks, from a screenshot of each frame and of any image the frame leaves in doubt, that the email's message and its buttons are text layers, not parts of an image. Fail when the main headline, the offer or a button is an image.
 
 ### EM-09 No text sits inside an image, apart from the logo
 
@@ -178,7 +178,7 @@ Text inside an image disappears with images off, can't be resized or read aloud,
 
 **Must · Universal · Script · how images fail to load; Crystal Pacheco, Marketo, 2026-10-01**
 
-Classic Outlook doesn't show background images without Outlook-only code, and Marketo's new email designer can't produce that code, so text laid over a background image sits on whatever color is behind the image. The script finds text layers whose box overlaps a layer with an image fill below them, and works out their contrast against the nearest solid fill behind the image. Pass when there's no such text, or when every one passes EM-19's contrast on that color alone. Fail otherwise.
+Classic Outlook doesn't show background images without Outlook-only code, and Marketo's new email designer can't produce that code, so text laid over a background image sits on whatever color is behind the image. The script finds text layers whose box overlaps, by a fifth or more of its area, an image painted below it at any level, including inside an instance, and works out their contrast against the nearest solid fill behind the image. Pass when there's no such text, or when every one passes EM-19's contrast on that color alone. Fail otherwise.
 
 ### EM-11 Every image has a background color behind it
 
@@ -194,13 +194,13 @@ Apple Mail and some Outlook apps show the email's own dark theme; the Gmail apps
 
 **Should · House · Script · [D-21][ledger]**
 
-The engineer needs to know, per image, whether it has a dark version and what its file is called. The script checks each image layer for a dark-mode note. Pass when every image has one.
+The engineer needs to know, per image, whether it has a dark version and what its file is called. The script checks each image layer for a dark-mode note, on the layer or on the nearest layer that holds it ([Notes for the scripts](#notes-for-the-scripts)). Pass when every image has one.
 
 ### EM-13 The logo has a reversed version, with no outline or plate
 
 **Should · House · Judgment · [D-21][ledger]**
 
-Under MERGE's policy the logo is the one image that swaps, to the brand's reversed logo, where the mail app supports it. An outline or a light plate behind the logo would make it work in the apps that don't swap, but it breaks the brand, so the policy accepts reduced contrast there instead. The agent finds the logo, checks that its dark-mode note names a reversed version, and looks at it for an outline, a glow or a plate added for dark mode. Fail when there's no reversed version; Partly when one is named but an outline or plate is also present. A client project with a different policy changes this check's rule in the opening question.
+Under MERGE's policy the logo is the one image that swaps, to the brand's reversed logo, where the mail app supports it. An outline or a light plate behind the logo would make it work in the apps that don't swap, but it breaks the brand, so the policy accepts reduced contrast there instead. The agent finds the logo, by name, then from a note that mentions the logo, then as the first image or vector in the top 120px of the frame, because a logo is often a vector with a default name. It checks that its dark-mode note names a reversed version, or that a dark-mode frame shows one, and looks at it for an outline, a glow or a plate added for dark mode. Fail when there's no reversed version; Partly when one is named but an outline or plate is also present. A client project with a different policy changes this check's rule in the opening question.
 
 ### EM-14 Icons are one color that works on light and dark
 
@@ -212,7 +212,7 @@ Icons don't swap under MERGE's policy, so each icon's color has to hold at least
 
 **Should · House · Script · [D-21][ledger], from [D-12][ledger]**
 
-Pure white (#FFFFFF) and pure black (#000000) backgrounds set off Outlook.com's own recoloring, which can turn a carefully chosen color into one nobody designed. The script lists frames and shapes in scope whose solid fill is exactly either. Pass when there are none.
+Pure white (#FFFFFF) and pure black (#000000) backgrounds set off Outlook.com's own recoloring, which can turn a carefully chosen color into one nobody designed. The script lists frames and shapes in scope whose solid fill is exactly either. Pass when there are none. N/A when a project turns this setting off.
 
 ### EM-16 Illustrations read on a dark background too
 
@@ -232,7 +232,7 @@ Custom fonts render only in Apple Mail; every other app uses the fallback, so mo
 
 **Could · House · Script · Jill Redo's workshop deck, [D-16][ledger]**
 
-These are house guidance, a guide and not law, so a design may depart from them with a reason. The script reports headline sizes outside the house range, body line heights outside 1.4 to 1.6, centered body paragraphs and all-caps text longer than a short label. The result is never worse than Partly, and the report frames each as a question for the designer.
+These are house guidance, a guide and not law, so a design may depart from them with a reason. The script reports section headings outside the house range, body line heights outside 1.4 to 1.6, centered body paragraphs and all-caps text longer than a short label. The H1 is left out of the headline range, because it may be larger. Everything this check finds is a flag for the designer, so it never lowers a result (Steve, 2026-10-05).
 
 ## Accessibility
 
@@ -242,25 +242,25 @@ The target for every project is WCAG 2.2 AA, applied to everything the email con
 
 **Must · Universal · Script · WCAG 1.4.3; [D-13][ledger]**
 
-Body text needs 4.5 to 1 against its background; large text, 24px regular or about 18.7px bold and up, needs 3 to 1. The script is merge-build-readiness's text-contrast script, which finds each text layer's real background. Logos are exempt under WCAG. Pass when every text layer passes; footer and legal text get no exemption, which is the commonest failure in marketing email.
+Body text needs 4.5 to 1 against its background; large text, 24px regular or about 18.7px bold and up, needs 3 to 1. The script is merge-build-readiness's text-contrast script, which finds each text layer's real background. Logos are exempt under WCAG. Pass when every text layer passes; footer and legal text get no exemption, which is the commonest failure in marketing email. This check has no Partly: it fails when any confirmed pair fails, because a contrast failure isn't half acceptable (Steve, 2026-10-06).
 
 ### EM-20 Button edges and meaningful icons meet 3 to 1
 
 **Must · Universal · Judgment · WCAG 1.4.11**
 
-A reader has to be able to see where a button is and what an icon means. The script returns each button's fill and edge colors against what's around it, and each icon's colors; the agent decides which icons carry meaning, because a decorative flourish is exempt.
+A reader has to be able to see where a button is and what an icon means. The script returns each button's fill and edge colors against what's around it, and each icon under 3 to 1; the agent decides which icons carry meaning, because a decorative flourish is exempt. A button whose fill contrasts with what's around it needs no contrasting edge. For icons this check uses the contrast against the background behind them; EM-14 covers the dark background.
 
-### EM-21 Tap targets meet the house size
+### EM-21 Tap targets are at least 24px, and meet the house size
 
 **Must · House · Script · WCAG 2.5.8; [D-7][ledger]; Jill Redo's scorecard says 40px**
 
-The script is merge-build-readiness's target script, applied to buttons and linked text. Fail below WCAG's 24px on any project. Partly between 24px and the house tap target. Pass at or above it.
+The script is merge-build-readiness's target script, applied to buttons and linked text. Fail below 24px on any project, even where a small target has clear space around it: WCAG 2.5.8 excuses a spaced target, but Steve finds touch targets under 24px hard to hit regardless, so 24px is a hard minimum here (Steve, 2026-10-05). Partly between 24px and the house tap target. Pass at or above it.
 
-### EM-22 Links in body text are underlined
+### EM-22 Text links are underlined
 
 **Must · Universal · Script · WCAG 1.4.1; [D-13][ledger]**
 
-A link shown by color alone can't be found by a reader who can't tell the colors apart, and many mail apps recolor links anyway. The script finds text ranges with a hyperlink, or in a different color from the rest of their paragraph, and checks their decoration. Pass when every link inside body text is underlined; buttons and a standalone nav row are exempt.
+A link shown by color alone can't be found by a reader who can't tell the colors apart, and many mail apps recolor links anyway. The script finds text ranges with a hyperlink, or in a different color from the rest of their paragraph, and checks their decoration. Pass when every link inside body text, and every standalone text link such as a "Read now" CTA, is underlined. Buttons and a nav row of three or more links are exempt.
 
 ### EM-23 There's one H1, and heading levels go in order
 
@@ -272,7 +272,7 @@ Screen reader users move through an email by its headings, so the design has to 
 
 **Should · Universal · Judgment · WCAG 2.4.4; Jill Redo's scorecard**
 
-"Click here", "this link" and "read more" say nothing on their own, which fails screen reader users and performs worse for everyone. The agent reads every link and button text and flags any that doesn't make sense out of context.
+"Click here", "this link" and "read more" say nothing on their own, which fails screen reader users and performs worse for everyone. The agent reads every link and button text and lists any that doesn't make sense out of context, and the default rule applies over all of them, so vague wording shows in the scorecard (Steve, 2026-10-06).
 
 ## Content
 
@@ -280,7 +280,7 @@ Screen reader users move through an email by its headings, so the design has to 
 
 **Could · Universal · Script · [D-11][ledger]; the TOFU build brief, §10**
 
-Where an email has versions for different audiences, the engineer needs to know which parts change and which content field each piece of text comes from. The script counts dynamic-content and content-field notes. N/A when the person says in the opening question that the email has one version only.
+Where an email has versions for different audiences, the engineer needs to know which parts change and which content field each piece of text comes from. The script counts dynamic-content and content-field notes. N/A when the person says in the opening question that the email has one version only. Otherwise Pass when the parts that change carry dynamic-content notes and their text carries content-field notes, and the report lists any merge tags it finds.
 
 ### EM-26 There's one primary CTA, as a button, repeated rather than varied
 
@@ -292,13 +292,13 @@ The same CTA, repeated where it fits, outperforms several competing ones. The ag
 
 **Should · Universal · Script · the TOFU build brief, §10**
 
-Without a written preheader the inbox shows whatever text comes first, which is often "View in browser" or the logo's alt text. The script looks for a text layer or a note named as the preheader. Pass when each email has one.
+Without a written preheader the inbox shows whatever text comes first, which is often "View in browser" or the logo's alt text. The script looks for a text layer or a note named as the preheader. Pass when each email has one. A note that only asks for a preheader doesn't count as one.
 
 ### EM-28 The footer has an unsubscribe link and the sender's address
 
 **Must · Universal · Script · the US CAN-SPAM Act; the TOFU build brief, §10**
 
-Commercial email in the US must carry a working way to opt out and the sender's physical postal address, and other countries' laws ask for at least as much. The script searches the footer's text for an unsubscribe link and an address. Pass when both are there. The report also notes a missing privacy policy or preferences link, which is house practice rather than law, without changing the result.
+Commercial email in the US must carry a working way to opt out and the sender's physical postal address, and other countries' laws ask for at least as much. The script searches the footer's text for an unsubscribe link and an address. The unsubscribe's link is stated in a Link or CTA note rather than set as a Figma hyperlink, because the real URL is usually set by the developer; where the designer knows it, the note gives it (Steve, 2026-10-06). Fail when the unsubscribe or the address is missing. Partly when both are there but the unsubscribe has no Link or CTA note. Pass when both are there and the note is. The report also notes a missing privacy policy or preferences link, which is house practice rather than law, without changing the result.
 
 ## Export
 
@@ -320,23 +320,24 @@ Some things that decide whether an email works exist only in the HTML or the sen
 
 ## Notes for the scripts
 
-**Notes on a layer** are read from Dev Mode annotations in three ways, in this order, because projects differ. First, a category whose name matches one of the TOFU file's eight (Alt text, Decorative image, Heading level, Link or CTA, Dark mode, Dynamic content, Mobile behavior, Content model field), compared without case. Second, an annotation in any category whose text starts with one of those names followed by a colon, such as "Alt text: A doctor talking with a patient". Third, Figma's preset categories, where an Accessibility annotation mentioning "alt" counts as alt text. A file that uses none of these gets Couldn't check on the annotation checks, and the report suggests the schema.
+**Notes on a layer** are read from Dev Mode annotations in three ways, in this order, because projects differ. First, a category whose name matches one of the TOFU file's eight (Alt text, Decorative image, Heading level, Link or CTA, Dark mode, Dynamic content, Mobile behavior, Content model field), compared without case. Second, an annotation in any category whose text starts with one of those names followed by a colon, such as "Alt text: A doctor talking with a patient". Third, Figma's preset categories, where an Accessibility annotation mentioning "alt" counts as alt text. A note on the nearest layer that holds a layer counts as that layer's note, because a layer inside an instance can't carry its own. A note that only suggests something, such as one starting "Suggestion", counts toward Partly at most. A file that uses none of these gets Couldn't check on the annotation checks, and the report suggests the schema.
 
 **Finding layers.** Images are layers with a visible image fill. The logo is an image or vector whose name contains "logo". Icons are vectors, or instances named "icon", no larger than 48px. Buttons are frames or instances whose name contains "button", "btn" or "cta", or that hold one short text layer on a filled, rounded shape. The preheader is a text layer or note named "preheader", and the footer is the last module in a frame, or one named "footer". The agent confirms each guess from a screenshot and says which it corrected.
 
 **Web-safe fonts** for EM-17 are Arial, Helvetica, Georgia, Times New Roman, Verdana, Tahoma, Trebuchet MS and Courier New. Segoe UI and San Francisco are system fonts that only some readers have, so they count as brand fonts here.
 
-**Reuse.** EM-19 and EM-21 start from merge-build-readiness 0.2's scripts 08 and 09, and the scope and fingerprint steps from its scripts 00 and 10. They're copied, not shared, because a Figma skill is one file.
+**Reuse.** The scope and fingerprint scripts start from merge-build-readiness 0.2's scripts 00 and 10, and EM-19's and EM-21's logic from its scripts 08 and 09, without WCAG's spacing exception; the pass over every mode of a bound color variable was cut and then put back on 2026-10-05. They're copied, not shared, because a Figma skill is one file. All 30 checks run from one script, `01-checks.js`, in two parts, layout and images, which share one copy of the helpers ([scripts/README.md](scripts/README.md)).
 
 ## Open questions
 
-- **TBD:** whether EM-10's search for text over images finds the cases designers actually draw, such as text inside an auto layout frame whose fill is an image. Settle it at build step 3 against the Adobe rebuild.
 - **TBD:** whether EM-04's preview area should also apply to the mobile frame. Jill Redo's scorecard ties it to desktop and B2B readers.
 - **TBD:** the dark reference background. #121212 is a stand-in; the real value differs by app and isn't published.
 
 ## Version history
 
-- **0.1 (2026-10-05):** First draft: 30 checks in seven groups, two tiers, and the house settings. Steve approved it the same day.
+- **0.3.0 (2026-10-06):** Steve's rulings of 2026-10-06: EM-19 has no Partly, EM-24 uses the default rule, and EM-28's unsubscribe link is stated in a Link or CTA note. Also aligned with SKILL.md after its first audit: EM-07 is N/A with no alt notes, EM-08 names the offer and how it's screenshotted, EM-13 accepts a dark-mode frame as evidence, EM-15 is N/A when the setting is off, EM-20 says a contrasting fill needs no edge, EM-25 gets a Pass rule, and the Reuse note records the color-mode pass coming back.
+- **0.2.0 (2026-10-05, text aligned with the scripts 2026-10-06):** Changes from testing the scripts at build step 3 and Steve's three rulings. Flags are defined. EM-01 treats empty frames as missing and unwraps presentation frames; EM-03 fails emails not grouped into modules; EM-07's near misses are flags; EM-10's overlap rule is set and its open question closed; EM-12 and the other note checks accept a note on the holding layer, and suggestion notes count toward Partly at most; EM-13 finds unnamed logos; EM-18 leaves out the H1 and only flags; EM-21's 24px is a hard minimum; EM-22 covers standalone text links; EM-27 doesn't count a request for a preheader.
+- **0.1.0 (2026-10-05):** First draft: 30 checks in seven groups, two tiers, and the house settings. Steve approved it the same day.
 
 [images]: https://github.com/sbrown-merge/merge-marketing-email-specs/blob/main/research/2026-10-01%20how%20images%20fail%20to%20load%20in%20email.md
 [apps]: https://github.com/sbrown-merge/merge-marketing-email-specs/blob/main/research/2026-10-02%20which%20mail%20apps%20our%20readers%20use.md
