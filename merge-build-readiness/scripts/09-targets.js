@@ -36,22 +36,23 @@ const bgOf = n => {
   for (let cur = n; cur.parent && cur.type !== 'PAGE'; cur = cur.parent) {
     if (cur.type === 'COMPONENT' || cur.type === 'COMPONENT_SET') return 'unknown';
     const p = cur.parent, sibs = p.children;
-    for (let i = sibs.indexOf(cur) - 1; i >= 0; i--) { const r = behind(sibs[i], c); if (r !== undefined) return r; }
+    // by id: a layer found inside an instance isn't the same object as its entry in children, so indexOf gave -1 (2026-10-05)
+    for (let i = sibs.findIndex(x => x.id === cur.id) - 1; i >= 0; i--) { const r = behind(sibs[i], c); if (r !== undefined) return r; }
     if (p.type === 'PAGE') break;
     const f = fillsOf(p); if (f.some(x => x.type !== 'SOLID')) return null;
     const o = opaque(p, f); if (o) return o;
   }
   return (page.backgrounds.find(p => p.visible !== false) || { color: { r: 1, g: 1, b: 1 } }).color;
 };
-const targets = [], targetSet = new Set();
+const targets = [], targetSet = new Set(); // of IDs, for the same reason
 for (const n of ('findAllWithCriteria' in scope ? scope.findAllWithCriteria({ types: ['INSTANCE'] }) : [])) {
   if (!n.visible) continue;
   const mc = await n.getMainComponentAsync(); if (!mc) continue;
   const set = mc.parent && mc.parent.type === 'COMPONENT_SET' ? mc.parent : mc;
   if (!(want.has(set.id) || want.has(set.name) || want.has(mc.id))) continue;
-  let nested = false; for (let p = n.parent; p && p !== scope; p = p.parent) if (targetSet.has(p)) { nested = true; break; } // a button inside a nav item counts once
+  let nested = false; for (let p = n.parent; p && p.id !== scope.id; p = p.parent) if (targetSet.has(p.id)) { nested = true; break; } // a button inside a nav item counts once
   if (nested) continue;
-  targetSet.add(n);
+  targetSet.add(n.id);
   targets.push({ n, set: set.name, variant: mc.name, b: n.absoluteBoundingBox });
 }
 // Layers with a prototype interaction are targets too. Text layers are left out: a link inside a run of text is an
@@ -61,10 +62,10 @@ for (const n of ('findAllWithCriteria' in scope ? scope.findAllWithCriteria({ ty
   let has = false; try { has = !!(n.reactions && n.reactions.length); } catch (e) {}
   if (!has || !n.visible) continue;
   prototypeLinks++;
-  if (targetSet.has(n)) continue;
-  let inside = false; for (let p = n.parent; p && p !== scope; p = p.parent) if (targetSet.has(p)) { inside = true; break; }
+  if (targetSet.has(n.id)) continue;
+  let inside = false; for (let p = n.parent; p && p.id !== scope.id; p = p.parent) if (targetSet.has(p.id)) { inside = true; break; }
   if (inside) continue;
-  targetSet.add(n);
+  targetSet.add(n.id);
   targets.push({ n, set: 'Layers with prototype links', variant: n.name, b: n.absoluteBoundingBox });
 }
 // BR-34: a target under 24px passes if a 24px circle centered on it overlaps no other target and no other small target's circle

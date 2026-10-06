@@ -63,7 +63,8 @@ const background = n => {
     const parent = cur.parent;
     if (parent && 'children' in parent) {
       const sibs = parent.children;
-      for (let i = sibs.indexOf(cur) - 1; i >= 0; i--) {
+      // by id: a layer found inside an instance isn't the same object as its entry in children, so indexOf gave -1 (2026-10-05)
+      for (let i = sibs.findIndex(x => x.id === cur.id) - 1; i >= 0; i--) {
         const r = under(sibs[i], c, layers);
         if (r === 'complex') return { complex: true };
         if (r) return { complex: false, base: compose(layers) };
