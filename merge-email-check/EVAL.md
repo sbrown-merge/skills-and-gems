@@ -139,7 +139,7 @@ The table gives each check's expected result on each email on page 01 and on the
 | EM-22 | Partly | Pass | Pass | Pass | Pass | "Click here" in [body with Click here][a6-11] is colored with no underline, and [Read more][a6-61] isn't underlined: 2 of 5 links. |
 | EM-23 | Fail | Pass | Pass | Pass | Pass | Two layers carry H1 notes, the [hero headline][a6-8] and the [second H1][a6-21], and [section heading H3][a6-14] comes straight after the first H1. |
 | EM-24 | Partly | Pass | Pass | Pass | Pass | "Click here" and "Read more": 2 of 8 link and button texts. |
-| EM-25 | Fail | N/A | N/A | N/A | Pass | Faults A's [greeting][a6-10] has the merge tag "[First Name]" with no dynamic-content or content-field note. The Control's `{{lead.First Name}}` has a content-field note, and its intro module has a dynamic-content note. Faults B to D have nothing that changes. |
+| EM-25 | N/A, with a note on the merge tag | N/A | N/A | N/A | N/A | Faults A's [greeting][a6-10] has the merge tag "[First Name]" with no dynamic-content or content-field note. The Control's `{{lead.First Name}}` has a content-field note, and its intro module has a dynamic-content note. Faults B to D have nothing that changes. Corrected 2026-10-06: answering "go" means one version, so EM-25 is N/A on every email, as the checklist says; Faults A's untagged merge tag is worth a note, and it scores Fail only in a run where the person says the email has audience versions. |
 | EM-26 | Fail | Pass | Pass | Pass | Pass | Three buttons with three different texts (Get started, Book a demo, Learn about pricing), and the main CTA is an image. The Control repeats "Start planning". |
 | EM-27 | Fail | Pass | Pass | Pass | Pass | Faults A has no preheader layer; the note "Suggestion: add a preheader" on [header][a6-4] is a request (found 0, total 1). |
 | EM-28 | Fail | Pass | Pass | Pass | Pass | [footer][a6-65] has [Unsubscribe][a6-68] with no Link or CTA note, and no postal address. It does have a privacy link. |
@@ -154,7 +154,7 @@ Each cell records the date, the model, and how many checks matched the expected 
 | --- | --- | --- | --- | --- |
 | 1. The Adobe Elevate rebuild | **TBD** | **TBD** | **TBD** | **TBD** |
 | 2. Terry Smith's TOFU emails | **TBD** | **TBD** | **TBD** | **TBD** |
-| 3. The deliberate-faults file, page 01 Faults | **TBD** | **TBD** | 2026-10-06, model undisclosed: on Faults A, 16 of 30 matched, 6 partly, 8 missed ([report](<diagnostics/2026-10-06 3a without Figma agent.md>)) | **TBD** |
+| 3. The deliberate-faults file, page 01 Faults | **TBD** | **TBD** | 2026-10-06, model undisclosed: on Faults A, 16 of 30 matched, 6 partly, 8 missed ([report](<diagnostics/2026-10-06 3a without Figma agent.md>)) | 2026-10-06, skill 0.2.0, model undisclosed: on Faults A, 28 of 30 matched; across Faults A to D, 113 of 120 matched once EVAL.md's EM-25 error is corrected ([report](<diagnostics/2026-10-06 3a with Figma agent, skill 0.2.0.md>)) |
 | 3. The deliberate-faults file, page 02 Control | **TBD** | **TBD** | **TBD** | **TBD** |
 
 [checks]: checklist.md#all-checks-at-a-glance

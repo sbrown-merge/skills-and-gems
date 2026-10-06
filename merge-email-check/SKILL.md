@@ -7,7 +7,7 @@ description: Checks an email design in Figma against email best practices before
 
 This skill checks an email design against what decides how it reads in real mail apps: Outlook at work with images blocked, Gmail and Apple Mail in dark mode, and screen readers.
 
-Version 0.2.0, 2026-10-06. Tested with: the scripts only, through the Figma MCP's `use_figma` from Claude Code on Opus 5.5, 2026-10-05. Figma's agent (model undisclosed): **TBD**.
+Version 0.2.1, 2026-10-06. Tested with: the scripts only, through the Figma MCP's `use_figma` from Claude Code on Opus 5.5, 2026-10-05. Figma's agent (model undisclosed): **TBD**.
 
 ## How to run this skill
 
@@ -53,7 +53,7 @@ let emails=[...groups.values()];const bySection=new Map();for(const g of emails)
 return{fileKey,scope:{id:scope.id,name:clean(scope.name),type:scope.type,page:pageOf(scope).id},emailCount:emails.length,emails:emails.slice(0,40),presentationFrames:presentation.slice(0,MAX_EX),presentationCount:presentation.length,skippedFrames:skipped.slice(0,MAX_EX),skippedCount:skipped.length,ms:Date.now()-t0,};
 ```
 
-Script 00 returns `emails`: each email's name and frames, each frame with its `id`, `role` (`mobile` or `desktop`) and `dark: true` when it shows dark mode. It skips frames too short or at a width outside both ranges (`skippedFrames`) and unwraps a presentation frame around an email (`presentationFrames`). Check its grouping against the canvas: a frame that isn't an email, such as an alt-text demo or a note panel, comes out; frames grouped wrongly get regrouped. Say what you corrected.
+Script 00 returns `emails`: each email's name and frames, each frame with its `id`, `role` (`mobile` or `desktop`) and `dark: true` when it shows dark mode. It skips frames too short or at a width outside both ranges (`skippedFrames`) and unwraps a presentation frame around an email (`presentationFrames`). Check its grouping against the canvas: a frame that isn't an email, such as an alt-text demo or a note panel, comes out; frames grouped wrongly get regrouped, and a copy of an email shown inside a mail-app frame comes out of the list, so it isn't counted twice. Say what you corrected.
 
 Then send one message with the emails you found and three choices with their defaults, saying that "go" accepts the defaults:
 
@@ -154,7 +154,7 @@ Small text in a screenshot isn't reliably readable: when you can't read it, say 
 
 Judge every check below from the data and screenshots, running no scripts, once for each email in the scope. Missing data makes a check Couldn't check, naming the read that failed.
 
-Each check is Pass, Partly, Fail, Couldn't check or N/A, with evidence: the count and up to three examples linked to their layers. A check can also carry **flags**, items for the designer to judge, which are listed without changing its result. Unless a check below says otherwise, a check judged from a count uses the **default rule**: Pass when nothing is found, Partly when the problem affects fewer than half of the items checked, Fail at half or more.
+Each check is Pass, Partly, Fail, Couldn't check or N/A, with evidence: the count and up to three examples linked to their layers. A check can also carry **flags**, items for the designer to judge, which are listed without changing its result. A check is N/A for an email that has none of what it looks at, such as no icons for EM-14, no mobile frame for EM-02, or no desktop content for EM-04. Unless a check below says otherwise, a check judged from a count uses the **default rule**: Pass when nothing is found, Partly when the problem affects fewer than half of the items checked, Fail at half or more.
 
 If the layout part's `notes.matched` is 0, the file uses none of the note kinds, so EM-03, EM-06, EM-07, EM-12, EM-23 and EM-25 are Couldn't check, and the report suggests the eight note kinds above.
 
@@ -162,7 +162,7 @@ Then rank the fixes: Must, then Should, then Could, and within a rank whatever a
 
 ### Step 5: Deliver comments, only if asked
 
-Put the ranked findings, Must first, at most 20, on each one's first example layer with your own comment action, worded "EM-10 (Must): <the problem>. Fix: <the fix>. From merge-email-check 0.2.0." More buries the ones that matter. Findings with no layer stay in the report.
+Put the ranked findings, Must first, at most 20, on each one's first example layer with your own comment action, worded "EM-10 (Must): <the problem>. Fix: <the fix>. From merge-email-check 0.2.1." More buries the ones that matter. Findings with no layer stay in the report.
 
 ### Step 6: Prove nothing changed
 
@@ -177,7 +177,7 @@ Write for a designer with a few minutes: plain words, complete sentences, US spe
 
 <Two or three sentences: ready or not, and the first thing to do.>
 
-Checked <date> with merge-email-check 0.2.0. Emails: <names>. House numbers: <MERGE's, or what changed>.
+Checked <date> with merge-email-check 0.2.1. Emails: <names>. House numbers: <MERGE's, or what changed>.
 
 ## Scorecard
 
@@ -262,9 +262,9 @@ Gmail's apps and classic Outlook recolor the email themselves and never swap an 
 WCAG 2.2 AA for every project.
 
 - **EM-19 Text contrast meets WCAG 2.2 AA (Must, Universal; I `em19` and screenshots).** No Partly. 4.5 to 1, or 3 to 1 for text at least 24px or 18.66px bold, in every mode listed. Logos are exempt; footer and legal text aren't. Name each failing pair with its ratio and mode. Fail if any confirmed pair fails.
-- **EM-20 Button edges and meaningful icons meet 3 to 1 (Must, Universal; I `em20`, `em14`).** Decide which icons carry meaning; decorative ones are exempt. A button whose fill contrasts with what's around it needs no contrasting edge. For icons, use only the ratio against the background behind them, not the dark reference. Check by screenshot when a button's label reads as 1 to 1 on its fill, because the script may have taken a card for a button.
+- **EM-20 Button edges and meaningful icons meet 3 to 1 (Must, Universal; I `em20`, `em14`).** Default rule over buttons and meaningful icons. Decide which icons carry meaning; decorative ones are exempt. A button whose fill contrasts with what's around it needs no contrasting edge. For icons, use only the ratio against the background behind them, not the dark reference. Check by screenshot when a button's label reads as 1 to 1 on its fill, because the script may have taken a card for a button.
 - **EM-21 Tap targets are at least 24px, and meet the house size (Must, House; L `em21`).** Fail for any `under24`, however much space surrounds it. Partly for any `underHouse`. Pass otherwise.
-- **EM-22 Text links are underlined (Must, Universal; L `em22`).** Links inside body text and standalone text links must be underlined; buttons and nav rows are exempt. Pass when none is bare.
+- **EM-22 Text links are underlined (Must, Universal; L `em22`).** Links inside body text and standalone text links must be underlined; buttons and nav rows are exempt. Default rule over the links.
 - **EM-23 There's one H1, and heading levels go in order (Should, Universal; L `em23`).** Pass with one H1 and no skipped level; Partly when headings carry no level note.
 - **EM-24 Link and button text says where it goes (Should, Universal; L `targets` and `em22`).** List "click here", "read more", "this link" and anything that doesn't make sense out of context; default rule over all link and button text.
 

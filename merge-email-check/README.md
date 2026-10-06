@@ -45,10 +45,11 @@ In a Figma Design file that belongs to the MERGE organization, open the agent, c
 
 ## Version and testing
 
-Version 0.2.0, 2026-10-06. The scripts were tested through `use_figma` on 2026-10-05 against the TOFU email file (`Dqux2GL6tXD0boEEW3QCax`), and the color-mode pass against Andrew's Abbott library (`0VTZx0ZXc08vCIjdzb8Xza`). **TBD:** the first run in Figma's agent, and the evaluations at step 5 of the [plan](PLAN.md).
+Version 0.2.1, 2026-10-06. The scripts were tested through `use_figma` on 2026-10-05 against the TOFU email file (`Dqux2GL6tXD0boEEW3QCax`), and the color-mode pass against Andrew's Abbott library (`0VTZx0ZXc08vCIjdzb8Xza`). **TBD:** the first run in Figma's agent, and the evaluations at step 5 of the [plan](PLAN.md).
 
 ## Version history
 
+- **0.2.1 (2026-10-06):** From the first full run in Figma's agent: a check is N/A for an email with nothing for it to look at; EM-20 and EM-22 state the default rule; a copy of an email inside a mail-app frame comes out of the list, so it isn't counted twice.
 - **0.2.0 (2026-10-06):** The scorecard gives each email in the scope its own result column. The remediation plan moves into the companion skill `merge-email-check-plan`, which step 8 now offers. The checks script is split into a layout script and an images script, and the fingerprint becomes script 03, because Figma's agent rejects any script over 20,000 characters; the first run in Figma's agent failed on the 30,292-character checks script. Step 3 now passes only the fields the scripts read in `__EMAILS__`.
 - **0.1.1 (2026-10-06):** The skill takes the node in a pasted link as its scope, as the evaluation prompts expect.
 - **0.1.0 (2026-10-06):** First version of `SKILL.md`, from checklist 0.3.0 and the tested scripts.
