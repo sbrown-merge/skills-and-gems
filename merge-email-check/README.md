@@ -23,6 +23,8 @@ Only `SKILL.md` goes to Figma, because Figma's custom skills must be a single Ma
 | [checklist.md](checklist.md) | The full checklist, EM-01 to EM-30, with each check's reason, rule, tier and source. `SKILL.md` carries a compressed form. |
 | [scripts/](scripts/README.md) | The three read-only Plugin API scripts, what testing found, and `sync_skill.py`, which copies them into `SKILL.md`. |
 | [PLAN.md](PLAN.md) | The build plan and the decisions behind it. |
+| [EVAL.md](EVAL.md) | The three test cases, what each run should find, and the results. |
+| [eval-prompts.md](eval-prompts.md) | The exact prompts and links for each evaluation run. |
 
 ## Changing the skill
 
