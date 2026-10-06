@@ -1,4 +1,4 @@
-// merge-email-check script 02: fingerprint the scope and the file, and compare with a baseline (read-only).
+// merge-email-check script 03: fingerprint the scope and the file, and compare with a baseline (read-only).
 // Copied from merge-build-readiness script 10 on 2026-10-05, not shared, because a Figma skill is one file; only this
 // header differs. Run it first with __BASELINE__ null, and again at the end with the first result as the baseline.
 // Placeholders: __SCOPE_IDS__, a JSON array of the scope's node or page IDs; __BASELINE__, null on the first run and

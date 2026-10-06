@@ -3,7 +3,7 @@ title: "merge-email-check: the checklist"
 description: "The 30 checks merge-email-check runs on an email design in Figma, EM-01 to EM-30, each with its rank, tier, how a script or the agent verifies it, and its source in the email-specs research and rulings."
 type: checklist
 status: draft
-version: "0.3.0"
+version: "0.3.1"
 created: 2026-10-05
 maintainer: Steve Brown
 tags: [figma, figma-agent, skill, email, crm, accessibility, dark-mode, checklist]
@@ -326,7 +326,7 @@ Some things that decide whether an email works exist only in the HTML or the sen
 
 **Web-safe fonts** for EM-17 are Arial, Helvetica, Georgia, Times New Roman, Verdana, Tahoma, Trebuchet MS and Courier New. Segoe UI and San Francisco are system fonts that only some readers have, so they count as brand fonts here.
 
-**Reuse.** The scope and fingerprint scripts start from merge-build-readiness 0.2's scripts 00 and 10, and EM-19's and EM-21's logic from its scripts 08 and 09, without WCAG's spacing exception; the pass over every mode of a bound color variable was cut and then put back on 2026-10-05. They're copied, not shared, because a Figma skill is one file. All 30 checks run from one script, `01-checks.js`, in two parts, layout and images, which share one copy of the helpers ([scripts/README.md](scripts/README.md)).
+**Reuse.** The scope and fingerprint scripts start from merge-build-readiness 0.2's scripts 00 and 10, and EM-19's and EM-21's logic from its scripts 08 and 09, without WCAG's spacing exception; the pass over every mode of a bound color variable was cut and then put back on 2026-10-05. They're copied, not shared, because a Figma skill is one file. The checks run from two scripts, `01-layout.js` and `02-images.js`, each carrying its own copy of the shared helpers, because Figma's agent rejects any script over 20,000 characters ([scripts/README.md](scripts/README.md)).md](scripts/README.md)).
 
 ## Open questions
 
@@ -335,6 +335,7 @@ Some things that decide whether an email works exist only in the HTML or the sen
 
 ## Version history
 
+- **0.3.1 (2026-10-06):** The Reuse note describes the split into a layout script and an images script. No check changed.
 - **0.3.0 (2026-10-06):** Steve's rulings of 2026-10-06: EM-19 has no Partly, EM-24 uses the default rule, and EM-28's unsubscribe link is stated in a Link or CTA note. Also aligned with SKILL.md after its first audit: EM-07 is N/A with no alt notes, EM-08 names the offer and how it's screenshotted, EM-13 accepts a dark-mode frame as evidence, EM-15 is N/A when the setting is off, EM-20 says a contrasting fill needs no edge, EM-25 gets a Pass rule, and the Reuse note records the color-mode pass coming back.
 - **0.2.0 (2026-10-05, text aligned with the scripts 2026-10-06):** Changes from testing the scripts at build step 3 and Steve's three rulings. Flags are defined. EM-01 treats empty frames as missing and unwraps presentation frames; EM-03 fails emails not grouped into modules; EM-07's near misses are flags; EM-10's overlap rule is set and its open question closed; EM-12 and the other note checks accept a note on the holding layer, and suggestion notes count toward Partly at most; EM-13 finds unnamed logos; EM-18 leaves out the H1 and only flags; EM-21's 24px is a hard minimum; EM-22 covers standalone text links; EM-27 doesn't count a request for a preheader.
 - **0.1.0 (2026-10-05):** First draft: 30 checks in seven groups, two tiers, and the house settings. Steve approved it the same day.

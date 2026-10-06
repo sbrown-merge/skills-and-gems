@@ -1,7 +1,7 @@
 // merge-email-check script 00: resolve the scope, the file, and which frames are emails (read-only).
 // Adapted from merge-build-readiness script 00. Placeholders: '__SCOPE_ID__' (plain text: a page, section or frame ID;
 // leave it as '' to use the current selection) and __SETTINGS__ (JSON: the house settings, or null for MERGE's).
-// Returns `emails`, which both parts of script 01 take as __EMAILS__ once the agent has confirmed or corrected it.
+// Returns `emails`, which scripts 01 and 02 take as __EMAILS__ once the agent has confirmed or corrected it.
 const SCOPE_ID = '__SCOPE_ID__';
 const SETTINGS = __SETTINGS__;
 const t0 = Date.now();

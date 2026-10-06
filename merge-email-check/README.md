@@ -15,13 +15,14 @@
 
 ## What's in this folder
 
-Only `SKILL.md` goes to Figma, because Figma's custom skills must be a single Markdown file with at most 65,536 characters of instructions. Everything else is here to maintain it.
+Only `SKILL.md`, and the companion skill's `SKILL.md`, go to Figma, because Figma's custom skills must be a single Markdown file with at most 65,536 characters of instructions. Everything else is here to maintain it.
 
 | File | What it's for |
 | --- | --- |
 | [SKILL.md](SKILL.md) | The skill, and the one file uploaded to Figma. Its scripts are minified copies of the ones in `scripts/`. |
+| [../merge-email-check-plan/SKILL.md](../merge-email-check-plan/SKILL.md) | The companion skill that turns a report into a remediation plan, uploaded to Figma alongside. It has no scripts. |
 | [checklist.md](checklist.md) | The full checklist, EM-01 to EM-30, with each check's reason, rule, tier and source. `SKILL.md` carries a compressed form. |
-| [scripts/](scripts/README.md) | The three read-only Plugin API scripts, what testing found, and `sync_skill.py`, which copies them into `SKILL.md`. |
+| [scripts/](scripts/README.md) | The four read-only Plugin API scripts, what testing found, and `sync_skill.py`, which copies them into `SKILL.md`. |
 | [PLAN.md](PLAN.md) | The build plan and the decisions behind it. |
 | [EVAL.md](EVAL.md) | The three test cases, what each run should find, and the results. |
 | [eval-prompts.md](eval-prompts.md) | The exact prompts and links for each evaluation run. |
@@ -34,7 +35,7 @@ Change a check in [checklist.md](checklist.md) first, then its line in `SKILL.md
 uv run --no-project --with rjsmin python scripts/sync_skill.py
 ```
 
-Run it with `--check` before every commit; it fails when a copy is stale or `SKILL.md` is over the 62,500-character working budget.
+Run it with `--check` before every commit; it fails when a copy is stale or `SKILL.md` is over the 63,500-character working budget, which Steve raised from 62,500 on 2026-10-06.
 
 The rules come from research and rulings in `merge-marketing-email-specs`, and every check cites its source there. When one of those rulings changes, the matching check here changes too.
 
@@ -44,10 +45,11 @@ In a Figma Design file that belongs to the MERGE organization, open the agent, c
 
 ## Version and testing
 
-Version 0.1.1, 2026-10-06. The scripts were tested through `use_figma` on 2026-10-05 against the TOFU email file (`Dqux2GL6tXD0boEEW3QCax`), and the color-mode pass against Andrew's Abbott library (`0VTZx0ZXc08vCIjdzb8Xza`). **TBD:** the first run in Figma's agent, and the evaluations at step 5 of the [plan](PLAN.md).
+Version 0.2.0, 2026-10-06. The scripts were tested through `use_figma` on 2026-10-05 against the TOFU email file (`Dqux2GL6tXD0boEEW3QCax`), and the color-mode pass against Andrew's Abbott library (`0VTZx0ZXc08vCIjdzb8Xza`). **TBD:** the first run in Figma's agent, and the evaluations at step 5 of the [plan](PLAN.md).
 
 ## Version history
 
+- **0.2.0 (2026-10-06):** The scorecard gives each email in the scope its own result column. The remediation plan moves into the companion skill `merge-email-check-plan`, which step 8 now offers. The checks script is split into a layout script and an images script, and the fingerprint becomes script 03, because Figma's agent rejects any script over 20,000 characters; the first run in Figma's agent failed on the 30,292-character checks script. Step 3 now passes only the fields the scripts read in `__EMAILS__`.
 - **0.1.1 (2026-10-06):** The skill takes the node in a pasted link as its scope, as the evaluation prompts expect.
 - **0.1.0 (2026-10-06):** First version of `SKILL.md`, from checklist 0.3.0 and the tested scripts.
 

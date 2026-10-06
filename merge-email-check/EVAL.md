@@ -25,7 +25,7 @@ This file holds the test cases for `merge-email-check` at step 5 of the [build p
 
 ## How we run each case
 
-Steve agreed this method on 2026-10-06. The prompts and links to paste are in [eval-prompts.md](eval-prompts.md). Each run starts in a fresh session. Without the skill, the prompt is "Check this email design against email best practices" with the scope's link; with the skill, it's `/merge-email-check` and the same link, answering "go" to the opening question so the defaults apply. A run passes a case when its report gives every check the expected result below, links the layer that causes each Fail and Partly, and ends with the fingerprint unchanged. A result that differs from the expected one is a finding about either the skill or this file, and we decide which before changing anything.
+Steve agreed this method on 2026-10-06. The prompts and links to paste are in [eval-prompts.md](eval-prompts.md). Each run starts in a fresh session. Without the skill, the prompt is "Check this email design against email best practices" with the scope's link; with the skill, it's `/merge-email-check` and the same link, answering "go" to the opening question so the defaults apply. From version 0.2.0 the report gives each email its own result column, so its results compare directly with the table below. A run passes a case when its report gives every check the expected result below, links the layer that causes each Fail and Partly, and ends with the fingerprint unchanged. A result that differs from the expected one is a finding about either the skill or this file, and we decide which before changing anything.
 
 ## Case 1: the Adobe Elevate rebuild
 
@@ -148,13 +148,13 @@ The table gives each check's expected result on each email on page 01 and on the
 
 ## Results
 
-Each cell records the date, the model, and how many checks matched the expected result, with a link to the saved report in `diagnostics/`. Nothing has been run yet.
+Each cell records the date, the model, and how many checks matched the expected result, with a link to the saved report in `diagnostics/`.
 
 | Case | Claude Code, without the skill | Claude Code, with the skill | Figma's agent, without the skill | Figma's agent, with the skill |
 | --- | --- | --- | --- | --- |
 | 1. The Adobe Elevate rebuild | **TBD** | **TBD** | **TBD** | **TBD** |
 | 2. Terry Smith's TOFU emails | **TBD** | **TBD** | **TBD** | **TBD** |
-| 3. The deliberate-faults file, page 01 Faults | **TBD** | **TBD** | **TBD** | **TBD** |
+| 3. The deliberate-faults file, page 01 Faults | **TBD** | **TBD** | 2026-10-06, model undisclosed: on Faults A, 16 of 30 matched, 6 partly, 8 missed ([report](<diagnostics/2026-10-06 3a without Figma agent.md>)) | **TBD** |
 | 3. The deliberate-faults file, page 02 Control | **TBD** | **TBD** | **TBD** | **TBD** |
 
 [checks]: checklist.md#all-checks-at-a-glance
