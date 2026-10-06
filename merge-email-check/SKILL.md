@@ -7,7 +7,7 @@ description: Checks an email design in Figma against email best practices before
 
 This skill checks an email design against the practices that decide how it reads in the mail apps people actually use: Outlook at work with images blocked, Gmail and Apple Mail in dark mode, and screen readers. Those faults are cheap to fix in Figma and expensive once the email is built.
 
-Version 0.1.0, 2026-10-06. Tested with: the scripts only, through the Figma MCP's `use_figma` from Claude Code on Opus 5.5, 2026-10-05. Figma's agent (model undisclosed): **TBD**.
+Version 0.1.1, 2026-10-06. Tested with: the scripts only, through the Figma MCP's `use_figma` from Claude Code on Opus 5.5, 2026-10-05. Figma's agent (model undisclosed): **TBD**.
 
 ## How to run this skill
 
@@ -154,7 +154,7 @@ Then rank the fixes: Must, then Should, then Could, and within a rank whatever a
 
 ### Step 5: Deliver comments, only if asked
 
-Put the ranked findings, Must first, at most 20, on each one's first example layer with your own comment action, worded "EM-10 (Must): <the problem>. Fix: <the fix>. From merge-email-check 0.1.0." More buries the ones that matter. Findings with no layer stay in the report.
+Put the ranked findings, Must first, at most 20, on each one's first example layer with your own comment action, worded "EM-10 (Must): <the problem>. Fix: <the fix>. From merge-email-check 0.1.1." More buries the ones that matter. Findings with no layer stay in the report.
 
 ### Step 6: Prove nothing changed
 
@@ -169,7 +169,7 @@ Write for a designer with a few minutes: plain words, complete sentences, US spe
 
 <Two or three sentences: ready or not, and the first thing to do.>
 
-Checked <date> with merge-email-check 0.1.0. Emails: <names>. House numbers: <MERGE's, or what changed>.
+Checked <date> with merge-email-check 0.1.1. Emails: <names>. House numbers: <MERGE's, or what changed>.
 
 ## Scorecard
 
