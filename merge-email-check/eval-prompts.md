@@ -28,7 +28,9 @@ With the skill, paste this, then reply `go` to the opening question so MERGE's d
 /merge-email-check <link>
 ```
 
-In Claude Code, the skill has to be installed first, by copying `SKILL.md` into `~/.claude/skills/merge-email-check/`. In Figma's agent, upload `SKILL.md` privately first, as the [README](README.md#publishing-it-in-figma) describes, and open the link in Figma before pasting, so the agent is in the right file.
+In Figma's agent, give the scope the way a designer would rather than pasting a link. For a section, select it on the canvas, so Figma puts its link chip in the prompt, and send the prompt with the chip in place of `<link>`. For a page, open the page with nothing selected and write "this page" in place of `<link>`. In Claude Code, paste the link from the table below.
+
+In Claude Code, the skill has to be installed first, by copying `SKILL.md` into `~/.claude/skills/merge-email-check/`. In Figma's agent, upload `SKILL.md` privately first, as the [README](README.md#publishing-it-in-figma) describes, and open the case's file first, so the agent is in the right file.
 
 ## The test cases
 
