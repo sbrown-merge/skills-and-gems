@@ -3,7 +3,7 @@ title: "merge-build-readiness: the checklist"
 description: "The 34 checks merge-build-readiness runs on a Figma file, BR-01 to BR-34, each with its rank, reason, how a Plugin API script or the agent verifies it, the platforms it applies to, and the MERGE One playbook practice it came from."
 type: checklist
 status: draft
-version: "0.11"
+version: "0.11.0"
 created: 2026-10-03
 maintainer: Steve Brown
 tags: [figma, figma-agent, skill, agentic-build, design-system, audit, checklist]
@@ -502,17 +502,17 @@ These need an answer before or during the next build steps.
 
 ## Version history
 
-- **0.11** (2026-10-05): From the fourth run, where screenshots of single layers had no background and left BR-32 and BR-33 as Couldn't check: the agent screenshots the layer with its background, and the script's ratio decides when a screenshot can't. **Decided (Steve, 2026-10-05).**
-- **0.10** (2026-10-05): From the third run in Figma. BR-32 and BR-33 find the background under a layer's center, including the children of the layers beneath it, and stop at a main component's edge, listing what has no background of its own under Verify in Figma. BR-20 names the IVA as touch. BR-08's off-grid list goes in its Fix these first item.
-- **0.9** (2026-10-04): BR-03 and BR-16 top out at Partly, because Ready for dev can't be read in Figma's agent; the report gains a Verify in Figma section asking the designer to confirm it.
-- **0.8** (2026-10-04): Recorded the first test-mode run in Figma's agent: annotation line breaks survive, and Ready for dev status, the file thumbnail and style publish status can't be read there either.
-- **0.7** (2026-10-04): Matched to `SKILL.md` and the revised scripts after the step 4 audit. The component checks BR-18 to BR-23 read the whole file; BR-01 takes product-file instances from script 05; BR-04, BR-11, BR-14, BR-16 and BR-27 say which script returns their data; BR-32 and BR-33 say what's confirmed by screenshot; BR-33 no longer claims to measure icons or modes, and BR-32 no longer suggests a passing variable.
-- **0.6** (2026-10-04): Results of build step 3, the script tests on the Abbott library. BR-05's node budget is set at 500 layers from a measurement. BR-23 checks slot descriptions now that slots are readable. BR-01, BR-02 and BR-03 say what `use_figma` can't read. BR-33 checks only targets that draw a boundary, confirmed against a screenshot. The platform section names the IVA format, and BR-02 records the prototype-password convention.
-- **0.5** (2026-10-03): Steve approved the linked-repo wording and the annotation schema. The schema now allows custom annotation categories, such as Design or Agent feedback, which BR-26 lists for the build brief but never scores. BR-31 now checks that every desktop view has a mobile view, with tablet views optional, and stays a Should.
-- **0.4** (2026-10-03): BR-34, WCAG 2.2's AA minimum target size, joins the Accessibility group.
-- **0.3** (2026-10-03): Steve's second comments. BR-25 (Dev Mode annotations rather than on-canvas notes) and BR-26 (the annotation schema) are new, so 0.2's BR-25 to BR-29 are now BR-27 to BR-31. A proposed Dev Mode annotation schema is added. BR-27 now covers CMS-driven content. A new Accessibility group adds BR-32 and BR-33, contrast checks against WCAG 2.2 AA.
-- **0.2** (2026-10-03): Steve's first comments. The 4 and 8px grid check is back as BR-08, so the 0.1 checks BR-08 to BR-27 became BR-09 to BR-28. Web is the default platform, and its states cover touch because our web work is mobile first. The linked-repo signal goes on the first page, usually named Cover. A mobile-first check was proposed as BR-29.
-- **0.1** (2026-10-03): first draft, for Steve's review at build step 2.
+- **0.11.0** (2026-10-05): From the fourth run, where screenshots of single layers had no background and left BR-32 and BR-33 as Couldn't check: the agent screenshots the layer with its background, and the script's ratio decides when a screenshot can't. **Decided (Steve, 2026-10-05).**
+- **0.10.0** (2026-10-05): From the third run in Figma. BR-32 and BR-33 find the background under a layer's center, including the children of the layers beneath it, and stop at a main component's edge, listing what has no background of its own under Verify in Figma. BR-20 names the IVA as touch. BR-08's off-grid list goes in its Fix these first item.
+- **0.9.0** (2026-10-04): BR-03 and BR-16 top out at Partly, because Ready for dev can't be read in Figma's agent; the report gains a Verify in Figma section asking the designer to confirm it.
+- **0.8.0** (2026-10-04): Recorded the first test-mode run in Figma's agent: annotation line breaks survive, and Ready for dev status, the file thumbnail and style publish status can't be read there either.
+- **0.7.0** (2026-10-04): Matched to `SKILL.md` and the revised scripts after the step 4 audit. The component checks BR-18 to BR-23 read the whole file; BR-01 takes product-file instances from script 05; BR-04, BR-11, BR-14, BR-16 and BR-27 say which script returns their data; BR-32 and BR-33 say what's confirmed by screenshot; BR-33 no longer claims to measure icons or modes, and BR-32 no longer suggests a passing variable.
+- **0.6.0** (2026-10-04): Results of build step 3, the script tests on the Abbott library. BR-05's node budget is set at 500 layers from a measurement. BR-23 checks slot descriptions now that slots are readable. BR-01, BR-02 and BR-03 say what `use_figma` can't read. BR-33 checks only targets that draw a boundary, confirmed against a screenshot. The platform section names the IVA format, and BR-02 records the prototype-password convention.
+- **0.5.0** (2026-10-03): Steve approved the linked-repo wording and the annotation schema. The schema now allows custom annotation categories, such as Design or Agent feedback, which BR-26 lists for the build brief but never scores. BR-31 now checks that every desktop view has a mobile view, with tablet views optional, and stays a Should.
+- **0.4.0** (2026-10-03): BR-34, WCAG 2.2's AA minimum target size, joins the Accessibility group.
+- **0.3.0** (2026-10-03): Steve's second comments. BR-25 (Dev Mode annotations rather than on-canvas notes) and BR-26 (the annotation schema) are new, so 0.2's BR-25 to BR-29 are now BR-27 to BR-31. A proposed Dev Mode annotation schema is added. BR-27 now covers CMS-driven content. A new Accessibility group adds BR-32 and BR-33, contrast checks against WCAG 2.2 AA.
+- **0.2.0** (2026-10-03): Steve's first comments. The 4 and 8px grid check is back as BR-08, so the 0.1 checks BR-08 to BR-27 became BR-09 to BR-28. Web is the default platform, and its states cover touch because our web work is mobile first. The linked-repo signal goes on the first page, usually named Cover. A mobile-first check was proposed as BR-29.
+- **0.1.0** (2026-10-03): first draft, for Steve's review at build step 2.
 
 [playbook]: https://github.com/sbrown-merge/merge-one-related/blob/main/Figma/MERGE%20One%20UI%20%E2%80%94%20Figma%20Practices%20for%20Agentic%20Builds.md
 [must]: https://github.com/sbrown-merge/merge-one-related/blob/main/Figma/MERGE%20One%20UI%20%E2%80%94%20Figma%20Practices%20for%20Agentic%20Builds.md#must

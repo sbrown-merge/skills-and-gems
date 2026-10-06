@@ -1,5 +1,5 @@
 ---
-version: 0.5.0
+version: "0.5.0"
 name: re-fresh
 description: |
   Start a clean Claude session with only the context the next task needs, instead of /compact.
