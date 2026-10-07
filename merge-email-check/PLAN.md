@@ -57,7 +57,7 @@ The rules were researched and ruled on in `merge-marketing-email-specs` between 
 
 ## What the skill checks
 
-There are about 30 checks in seven groups, with IDs `EM-01` onward. [checklist.md](checklist.md) holds each one's rank, tier, reason, rule and source; this table gives the shape.
+There are about 30 checks (31 since 2026-10-07) in seven groups, with IDs `EM-01` onward. [checklist.md](checklist.md) holds each one's rank, tier, reason, rule and source; this table gives the shape.
 
 | Group | What it covers |
 | --- | --- |

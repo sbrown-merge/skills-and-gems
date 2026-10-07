@@ -145,6 +145,7 @@ The table gives each check's expected result on each email on page 01 and on the
 | EM-28 | Fail | Pass | Pass | Pass | Pass | [footer][a6-65] has [Unsubscribe][a6-68] with no Link or CTA note, and no postal address. It does have a privacy link. |
 | EM-29 | Fail | Pass | Pass | Pass | Pass | [photo 5][a6-52] is set to export as SVG, and [photo 6][a6-53] has no export setting. |
 | EM-30 | Partly | Pass | Pass | Pass | Pass | [image slice][a6-64] is 1,700px tall in the desktop frame, over the 1,500px house height; its mobile copy is 1,062px. |
+| EM-31 | Pass, with flags | Pass | Pass | Pass | Pass, with a flag | Added 2026-10-07. Faults A's photos are abstract placeholders whose alt notes describe real scenes, and the Control's hero alt text names "a planner open beside a cup of coffee" over abstract artwork; each is plainly placeholder art, so it's a flag to confirm once the final image is in. Faults B, C and D carry only the logo, whose alt text matches. |
 
 ## Results
 
@@ -155,7 +156,7 @@ Each cell records the date, the model, and how many checks matched the expected 
 | 1. The Adobe Elevate rebuild | **TBD** | **TBD** | **TBD** | **TBD** |
 | 2. Terry Smith's TOFU emails | **TBD** | **TBD** | **TBD** | **TBD** |
 | 3. The deliberate-faults file, page 01 Faults | **TBD** | **TBD** | 2026-10-06, model undisclosed: on Faults A, 16 of 30 matched, 6 partly, 8 missed ([report](<diagnostics/2026-10-06 3a without Figma agent.md>)) | 2026-10-06, skill 0.2.0, model undisclosed: on Faults A, 28 of 30 matched; across Faults A to D, 113 of 120 matched once EVAL.md's EM-25 error is corrected ([report](<diagnostics/2026-10-06 3a with Figma agent, skill 0.2.0.md>)) |
-| 3. The deliberate-faults file, page 02 Control | **TBD** | **TBD** | **TBD** | **TBD** |
+| 3. The deliberate-faults file, page 02 Control | **TBD** | **TBD** | **TBD** | 2026-10-06, skill 0.2.1, model undisclosed: 30 of 30 matched, no false alarms; 10 min 58 s ([report](<diagnostics/2026-10-06 3b with Figma agent, skill 0.2.1.md>)) |
 
 [checks]: checklist.md#all-checks-at-a-glance
 [s106-6]: https://www.figma.com/design/Dqux2GL6tXD0boEEW3QCax/MERGE-TOFU-Marketing-Emails---Q4-2026?node-id=106-6

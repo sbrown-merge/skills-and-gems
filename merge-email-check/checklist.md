@@ -1,9 +1,9 @@
 ---
 title: "merge-email-check: the checklist"
-description: "The 30 checks merge-email-check runs on an email design in Figma, EM-01 to EM-30, each with its rank, tier, how a script or the agent verifies it, and its source in the email-specs research and rulings."
+description: "The 31 checks merge-email-check runs on an email design in Figma, EM-01 to EM-31, each with its rank, tier, how a script or the agent verifies it, and its source in the email-specs research and rulings."
 type: checklist
 status: draft
-version: "0.3.1"
+version: "0.4.0"
 created: 2026-10-05
 maintainer: Steve Brown
 tags: [figma, figma-agent, skill, email, crm, accessibility, dark-mode, checklist]
@@ -109,8 +109,9 @@ This table is the index for tools and for `SKILL.md`. The sections after it give
 | EM-28 | The footer has an unsubscribe link and the sender's address | Must | Universal | Script |
 | EM-29 | Images export as JPG or PNG | Should | Universal | Script |
 | EM-30 | Image slices stay under the house height | Could | House | Script |
+| EM-31 | Alt text describes the image it's on | Should | Universal | Judgment |
 
-Twenty-two checks are Script and eight are Judgment. Nine are Must.
+Twenty-two checks are Script and nine are Judgment. Nine are Must.
 
 ## Layout
 
@@ -185,6 +186,12 @@ Classic Outlook doesn't show background images without Outlook-only code, and Ma
 **Should · Universal · Script · how images fail to load, the designing checklist**
 
 A blocked image shows its box, and a box with a color in it reads as a deliberate shape where an empty one reads as a hole. The script checks that each image layer, or the frame that holds it, has a solid fill. Pass when all do.
+
+### EM-31 Alt text describes the image it's on
+
+**Should · Universal · Judgment · WCAG 1.1.1; Steve, 2026-10-07**
+
+Alt text is what a screen reader reads aloud and what Outlook shows when it blocks images, so words that describe a different picture mislead both. EM-06 checks that alt text exists and EM-07 that it fits; this check is whether it's right. The agent compares each image's screenshot with its alt-text note and lists the ones whose words don't describe what's shown. Images marked decorative are left out. Default rule over the images it looked at, topping out at Partly when some weren't looked at closely. Where the image is plainly a placeholder, such as an abstract gradient standing in for a photo, the mismatch is a flag to confirm once the final image is in, not a fault. Added after two runs raised it unprompted on 2026-10-06: the run without the skill on the faults file, and the skill's run on the Control.
 
 ## Dark mode
 
@@ -335,6 +342,7 @@ Some things that decide whether an email works exist only in the HTML or the sen
 
 ## Version history
 
+- **0.4.0 (2026-10-07):** EM-31, alt text describes the image it's on, added at Steve's request, as a Should and Judgment check in the images-off group.
 - **0.3.1 (2026-10-06):** The Reuse note describes the split into a layout script and an images script. No check changed.
 - **0.3.0 (2026-10-06):** Steve's rulings of 2026-10-06: EM-19 has no Partly, EM-24 uses the default rule, and EM-28's unsubscribe link is stated in a Link or CTA note. Also aligned with SKILL.md after its first audit: EM-07 is N/A with no alt notes, EM-08 names the offer and how it's screenshotted, EM-13 accepts a dark-mode frame as evidence, EM-15 is N/A when the setting is off, EM-20 says a contrasting fill needs no edge, EM-25 gets a Pass rule, and the Reuse note records the color-mode pass coming back.
 - **0.2.0 (2026-10-05, text aligned with the scripts 2026-10-06):** Changes from testing the scripts at build step 3 and Steve's three rulings. Flags are defined. EM-01 treats empty frames as missing and unwraps presentation frames; EM-03 fails emails not grouped into modules; EM-07's near misses are flags; EM-10's overlap rule is set and its open question closed; EM-12 and the other note checks accept a note on the holding layer, and suggestion notes count toward Partly at most; EM-13 finds unnamed logos; EM-18 leaves out the H1 and only flags; EM-21's 24px is a hard minimum; EM-22 covers standalone text links; EM-27 doesn't count a request for a preheader.

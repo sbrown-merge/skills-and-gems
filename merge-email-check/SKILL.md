@@ -1,13 +1,13 @@
 ---
 name: merge-email-check
-description: Checks an email design in Figma against email best practices before it's built, for any MERGE or client email project. Runs 30 checks on the chosen emails' mobile and desktop frames (layout and widths, images off and alt text, dark mode, fonts and fallbacks, WCAG 2.2 AA contrast, links and tap targets, headings, CTAs, preheader, footer and export settings) and reports a scorecard with evidence linked to each layer, then the fixes to make first. Use it whenever someone asks whether an email design is ready, wants it reviewed or QA'd before build, or asks how it will look with images off, in dark mode or in Outlook. Read-only; it changes nothing except comments the person asks for.
+description: Checks an email design in Figma against email best practices before it's built, for any MERGE or client email project. Runs 31 checks on the chosen emails' mobile and desktop frames (layout and widths, images off and alt text, dark mode, fonts and fallbacks, WCAG 2.2 AA contrast, links and tap targets, headings, CTAs, preheader, footer and export settings) and reports a scorecard with evidence linked to each layer, then the fixes to make first. Use it whenever someone asks whether an email design is ready, wants it reviewed or QA'd before build, or asks how it will look with images off, in dark mode or in Outlook. Read-only; it changes nothing except comments the person asks for.
 ---
 
 # merge-email-check
 
 This skill checks an email design against what decides how it reads in real mail apps: Outlook at work with images blocked, Gmail and Apple Mail in dark mode, and screen readers.
 
-Version 0.2.1, 2026-10-06. Tested with: the scripts only, through the Figma MCP's `use_figma` from Claude Code on Opus 5.5, 2026-10-05. Figma's agent (model undisclosed): **TBD**.
+Version 0.3.0, 2026-10-07. Tested with: the scripts only, through the Figma MCP's `use_figma` from Claude Code on Opus 5.5, 2026-10-05. Figma's agent (model undisclosed): **TBD**.
 
 ## How to run this skill
 
@@ -33,11 +33,11 @@ Copy this checklist into your reply and tick it off.
 - [ ] 1. Find the emails (script 00) and send the one opening message
 - [ ] 2. Fingerprint (script 03)
 - [ ] 3. Read: scripts 01 and 02, then the screenshots
-- [ ] 4. Judge all 30 checks from the data, with no scripts
+- [ ] 4. Judge all 31 checks from the data, with no scripts
 - [ ] 5. Deliver comments, only if asked
 - [ ] 6. Fingerprint again (script 03); if anything changed, say so first
 - [ ] 7. Write the report, check it, send it as text, then as a fenced block
-- [ ] 8. Offer the remediation plan skill
+- [ ] 8. Offer the plan and annotate skills
 ```
 
 ### Step 1: Find the emails and send the opening message
@@ -141,7 +141,7 @@ Each check's data sits under its own key. Per email: `em03`, `em27` and `illustr
 Then look, taking screenshots of the smallest layer that shows what you need, at 2x or more if you can:
 
 - each email's frames, for EM-04, EM-08, EM-24 and EM-26;
-- each image layer that might hold words, for EM-09 (start with `imagesNamedLikeText`), at most 15, listing the rest as not checked;
+- each image layer that might hold words, for EM-09 (start with `imagesNamedLikeText`), and each image with an alt note, for EM-31, at most 15 in all, listing the rest as not checked;
 - each logo in `logos`, for EM-13, and in a dark frame if there is one;
 - each item in `illustrations`, for EM-16: in the dark frame where `inDarkFrame` is given, otherwise judge it against the dark reference background;
 - the text layers in `em19.checkFromScreenshotEx` and the `em10` entries marked for a screenshot (text over an image or gradient), at most 10, and any icon in EM-14's list with more than one color.
@@ -162,7 +162,7 @@ Then rank the fixes: Must, then Should, then Could, and within a rank whatever a
 
 ### Step 5: Deliver comments, only if asked
 
-Put the ranked findings, Must first, at most 20, on each one's first example layer with your own comment action, worded "EM-10 (Must): <the problem>. Fix: <the fix>. From merge-email-check 0.2.1." More buries the ones that matter. Findings with no layer stay in the report.
+Put the ranked findings, Must first, at most 20, on each one's first example layer with your own comment action, worded "EM-10 (Must): <the problem>. Fix: <the fix>. From merge-email-check 0.3.0." More buries the ones that matter. Findings with no layer stay in the report.
 
 ### Step 6: Prove nothing changed
 
@@ -177,7 +177,7 @@ Write for a designer with a few minutes: plain words, complete sentences, US spe
 
 <Two or three sentences: ready or not, and the first thing to do.>
 
-Checked <date> with merge-email-check 0.2.1. Emails: <names>. House numbers: <MERGE's, or what changed>.
+Checked <date> with merge-email-check 0.3.0. Scope: <scope ID>. Emails: <names>. House numbers: <MERGE's, or what changed>.
 
 ## Scorecard
 
@@ -208,16 +208,16 @@ This design check can't see the HTML or the send: its weight against Gmail's cli
 <Each Couldn't check, with the read that failed.>
 ```
 
-Before sending, check: 30 checks in EM order; each Fail and Partly has a count and a link; each Couldn't check names its read; each failed Must is in Fix these first; every flag is listed. Fix gaps and recheck: for a missing count or link, go back to step 3's data; for a missing result, rank or flag, go back to step 4. Then send the report in the chat twice, and never on the canvas:
+Before sending, check: 31 checks in EM order; each Fail and Partly has a count and a link; each Couldn't check names its read; each failed Must is in Fix these first, which holds only checks that failed or partly passed, so a proposed new check goes under Problems no check covers; every flag is listed. Fix gaps and recheck: for a missing count or link, go back to step 3's data; for a missing result, rank or flag, go back to step 4. Then send the report in the chat twice, and never on the canvas:
 
 1. **To read:** the report as ordinary Markdown, so the chat shows its headings, table and links.
 2. **To save:** the line "To save the report, download or copy this block as `<YYYY-MM-DD> email check <email name>.md`.", then the same report, word for word apart from links, in one fenced code block marked `markdown` and opened and closed with four backticks, so its own formatting survives.
 
 The workflow checklist stays in your working replies, not in the report.
 
-### Step 8: Offer a remediation plan
+### Step 8: Offer the companions
 
-After the fenced block, offer in one short line `/merge-email-check-plan`, which turns this report into a remediation plan. Don't write the plan here.
+After the fenced block, offer in one short line `/merge-email-check-plan`, for a remediation plan, and `/merge-email-check-annotate`, to put the findings on the layers as Dev Mode annotations. Don't do either here.
 
 ## The checks
 
@@ -241,6 +241,7 @@ Classic Outlook, new Outlook and Outlook on the web block images by default for 
 - **EM-09 No text sits inside an image, apart from the logo (Should, Universal; image screenshots).** List images with words in them. When you can't read a screenshot well enough to tell, or an image wasn't screenshotted, report "possible text" or "not checked" and top out at Partly.
 - **EM-10 Text over an image still reads on the color behind it (Must, Universal; I `em10`).** Each entry gives the text's contrast on the color behind the image with images off. Pass when there's none or every one meets EM-19's ratio; Fail otherwise.
 - **EM-11 Every image has a background color behind it (Should, Universal; I `counts.background`).** Default rule over images without one.
+- **EM-31 Alt text describes the image it's on (Should, Universal; I `images` alt notes and image screenshots).** List images whose alt text doesn't describe what the screenshot shows; decorative images are left out. Default rule over the images looked at, topping out at Partly when some weren't. On plainly placeholder art, a mismatch is a flag to confirm once the final image is in.
 
 ### Dark mode
 

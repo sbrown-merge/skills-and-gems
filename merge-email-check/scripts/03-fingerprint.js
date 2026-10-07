@@ -4,7 +4,7 @@
 // Placeholders: __SCOPE_IDS__, a JSON array of the scope's node or page IDs; __BASELINE__, null on the first run and
 // the first run's result on the second; __ADDED__, the number of annotations a delivery script added (0 if none).
 // On the second run it returns intact: true only when everything matches except annotations, which must have risen
-// by exactly __ADDED__. merge-email-check has no delivery script yet (2026-10-05), so pass 0.
+// by exactly __ADDED__. In merge-email-check, pass 0 except after script 04, when it's script 04's annotatedCount.
 const SCOPE_IDS = __SCOPE_IDS__;
 const BASELINE = __BASELINE__;
 const ADDED = __ADDED__;

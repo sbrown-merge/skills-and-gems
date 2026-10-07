@@ -15,7 +15,7 @@ import rjsmin
 
 HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parent
-SKILLS = [ROOT / "SKILL.md"]
+SKILLS = [ROOT / "SKILL.md", ROOT.parent / "merge-email-check-annotate" / "SKILL.md"]
 FIGMA_LIMIT = 65536  # Figma's upload dialog: "Instructions must be 65536 characters or fewer" (2026-10-04)
 BUDGET = 63500  # our own ceiling, about 2,000 characters under Figma's limit, kept free for fixes. Raised from 62,500 on 2026-10-06 (Steve) to fit a scorecard per email after the scripts split in two
 # The body can never contain a fence, so a match can't run from one block into the next
