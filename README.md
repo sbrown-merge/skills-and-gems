@@ -18,6 +18,7 @@ Repo for Claude Skills and Gemini Gems
 | `DESIGN.md-creation-gem/` | Gem for producing a `DESIGN.md` | Gemini Gem |
 | [`claude-skills-best-practices.md`](claude-skills-best-practices.md) | Our best known method for building Claude Skills: seven layout and verification rules, a pass/fail audit checklist tuned for Opus 5.5, a paste-in audit prompt, and the README banner for a skill that fails its audit; section J covers skills for Figma's agent | Guideline |
 | [`figma-agent-skills.md`](figma-agent-skills.md) | What we learned building a skill for Figma's in-app agent: format and size limits, running Plugin API code, how the agent behaves, testing and publishing | Guideline |
+| [`references/`](references/) | Dated summaries of outside sources we refer to often, starting with Figma's guide to [creating skills for the Figma MCP server](<references/2026-10-08 figma-mcp-server-create-skills.md>) and how it applies to skills for Figma's agent | Reference notes |
 | [`audits/`](audits/) | Dated audits of our skills against the best practices checklist, with every finding, the fix applied and what's still open | Audit records |
 | [`output-styles/`](output-styles/) | Our response styles for Claude: the Claude Code output style and a short plain-text version | Output styles |
 

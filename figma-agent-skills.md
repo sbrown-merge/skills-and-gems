@@ -16,7 +16,7 @@ sources:
 
 # Building skills for Figma's agent
 
-This is what we learned building [merge-build-readiness](merge-build-readiness/README.md), a skill that runs inside Figma's in-app agent, between 2026-10-03 and 2026-10-05. Read it before you write the next skill for Figma, and use section J of [claude-skills-best-practices.md](claude-skills-best-practices.md) to audit one. Each fact is marked: **confirmed** means we tested it ourselves, **documented** means Figma's help center says it, **reported** means Steve found it in use, and **TBD** means nobody knows yet. Figma's agent is in beta and changes often, so recheck anything here that's older than a few months.
+This is what we learned building [merge-build-readiness](merge-build-readiness/README.md), a skill that runs inside Figma's in-app agent, between 2026-10-03 and 2026-10-05. Read it before you write the next skill for Figma, and use section J of [claude-skills-best-practices.md](claude-skills-best-practices.md) to audit one. Each fact is marked: **confirmed** means we tested it ourselves, **documented** means Figma's help center says it, **reported** means Steve found it in use, and **TBD** means nobody knows yet. Figma's agent is in beta and changes often, so recheck anything here that's older than a few months. For a skill that also runs, or is tested, through the Figma MCP server from Claude Code, read our [summary of Figma's guide to MCP skills](<references/2026-10-08 figma-mcp-server-create-skills.md>) too; it says which of Figma's recommendations carry over to the agent and which don't.
 
 ## Contents
 

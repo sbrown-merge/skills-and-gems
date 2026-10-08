@@ -184,7 +184,7 @@ The rule applies to audits from 2026-10-08 onward. A skill audited earlier gets 
 
 ## J. Skills for Figma's agent
 
-Use this section only for a skill that runs in Figma's in-app agent. [figma-agent-skills.md](figma-agent-skills.md) explains each item.
+Use this section only for a skill that runs in Figma's in-app agent. [figma-agent-skills.md](figma-agent-skills.md) explains each item. For a skill that also runs through the Figma MCP server, our [summary of Figma's guide to MCP skills](<references/2026-10-08 figma-mcp-server-create-skills.md>) adds what Figma recommends for MCP clients and how it differs from the agent.
 
 - [ ] `SKILL.md` is the only file, with nothing it needs left in another file, and its instructions after the frontmatter are at most 65,536 characters, with room to spare.
 - [ ] Scripts are kept readable in the repo and copied into `SKILL.md`, minified, by a tool that also checks the length and fails on a stale copy.
