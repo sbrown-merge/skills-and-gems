@@ -17,6 +17,8 @@ Checked <date> with merge-email-check {{version}}. Scope: <scope ID>. Emails: <n
 
 1. **<The fix>** (EM-10, Must). <Why it matters to readers.> Examples: [layer](link).
 
+<If nothing failed or partly passed, only: Nothing failed or partly passed, so there's nothing to fix first.>
+
 ## For the designer to judge
 
 <Every flag, with its check: alt text just over the estimate (EM-07), type departures (EM-18). Omit if none.>

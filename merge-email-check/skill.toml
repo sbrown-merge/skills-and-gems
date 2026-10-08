@@ -4,7 +4,7 @@
 # TOML rather than YAML because Python reads it with no extra package (tomllib).
 
 name = "merge-email-check"
-version = "0.4.0"
+version = "0.5.0"
 
 # Every check, in report order. --check compares this with checklist.md and shared/checks.md.
 checks = [

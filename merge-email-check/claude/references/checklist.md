@@ -3,7 +3,7 @@ title: "merge-email-check: the checklist"
 description: "The 31 checks merge-email-check runs on an email design in Figma, EM-01 to EM-31, each with its rank, tier, how a script or the agent verifies it, and its source in the email-specs research and rulings."
 type: checklist
 status: draft
-version: "0.4.2"
+version: "0.5.0"
 created: 2026-10-05
 maintainer: Steve Brown
 tags: [figma, figma-agent, skill, email, crm, accessibility, dark-mode, checklist]
@@ -173,7 +173,7 @@ With images off, anything inside an image is gone, so the headline, the offer an
 
 **Should · Universal · Judgment · WCAG 1.4.5; [D-13][ledger]**
 
-Text inside an image disappears with images off, can't be resized or read aloud, and isn't translated. The agent looks at a screenshot of each image layer and lists any that contain words, other than the logo. Small text in a screenshot isn't reliably readable, so the agent reports "possible text" rather than guessing, and the check tops out at Partly when it can't tell.
+Text inside an image disappears with images off, can't be resized or read aloud, and isn't translated. The agent looks at each image layer, in its own screenshot or clearly enough in a frame's screenshot, and lists any that contain words, other than the logo. Small text in a screenshot isn't reliably readable, so the agent reports "possible text" rather than guessing, and the check tops out at Partly when it can't tell.
 
 ### EM-10 Text over an image still reads on the color behind it
 
@@ -191,7 +191,7 @@ A blocked image shows its box, and a box with a color in it reads as a deliberat
 
 **Should · Universal · Judgment · WCAG 1.1.1; Steve, 2026-10-07**
 
-Alt text is what a screen reader reads aloud and what Outlook shows when it blocks images, so words that describe a different picture mislead both. EM-06 checks that alt text exists and EM-07 that it fits; this check is whether it's right. The agent compares each image's screenshot with its alt-text note and lists the ones whose words don't describe what's shown. Images marked decorative are left out, and the check is N/A when no image has an alt note. Default rule over the images it looked at, topping out at Partly when some weren't looked at closely. Where the image is plainly a placeholder, such as an abstract gradient standing in for a photo, the mismatch is a flag to confirm once the final image is in, not a fault. Added after two runs raised it unprompted on 2026-10-06: the run without the skill on the faults file, and the skill's run on the Control.
+Alt text is what a screen reader reads aloud and what Outlook shows when it blocks images, so words that describe a different picture mislead both. EM-06 checks that alt text exists and EM-07 that it fits; this check is whether it's right. The agent compares each image's screenshot with its alt-text note and lists the ones whose words don't describe what's shown. Images marked decorative are left out, and the check is N/A when no image has an alt note. Default rule over the images it looked at, topping out at Partly when some weren't looked at closely; an image seen clearly in a frame's screenshot counts as looked at, as for EM-09 (Steve, 2026-10-08). Where the image is plainly a placeholder, such as an abstract gradient standing in for a photo, the mismatch is a flag to confirm once the final image is in, not a fault. Added after two runs raised it unprompted on 2026-10-06: the run without the skill on the faults file, and the skill's run on the Control.
 
 ## Dark mode
 
@@ -255,7 +255,7 @@ Body text needs 4.5 to 1 against its background; large text, 24px regular or abo
 
 **Must · Universal · Judgment · WCAG 1.4.11**
 
-A reader has to be able to see where a button is and what an icon means. The script returns each button's fill and edge colors against what's around it, and each icon under 3 to 1; the agent decides which icons carry meaning, because a decorative flourish is exempt. A button whose fill contrasts with what's around it needs no contrasting edge. For icons this check uses the contrast against the background behind them; EM-14 covers the dark background.
+A reader has to be able to see where a button is and what an icon means. The script returns each button's fill and edge colors against what's around it, and each icon under 3 to 1; an icon carries meaning when it alone tells the reader something or what an action does, such as a social link, a play button or an icon-only button, and an icon beside text that says the same thing is decorative and exempt (Steve, 2026-10-08). A button whose fill contrasts with what's around it needs no contrasting edge. For icons this check uses the contrast against the background behind them; EM-14 covers the dark background.
 
 ### EM-21 Tap targets are at least 24px, and meet the house size
 
@@ -287,7 +287,7 @@ Screen reader users move through an email by its headings, so the design has to 
 
 **Could · Universal · Script · [D-11][ledger]; the TOFU build brief, §10**
 
-Where an email has versions for different audiences, the engineer needs to know which parts change and which content field each piece of text comes from. The script counts dynamic-content and content-field notes. N/A when the person says in the opening question that the email has one version only. Otherwise Pass when the parts that change carry dynamic-content notes and their text carries content-field notes, and the report lists any merge tags it finds.
+Where an email has versions for different audiences, the engineer needs to know which parts change and which content field each piece of text comes from. The script counts dynamic-content and content-field notes. N/A when the person says in the opening question that the email has one version only, though the report still lists any merge tags and whether each has a content-field note, without changing the result (Steve, 2026-10-08). Otherwise Pass when the parts that change carry dynamic-content notes and their text carries content-field notes, and the report lists any merge tags it finds.
 
 ### EM-26 There's one primary CTA, as a button, repeated rather than varied
 
@@ -342,6 +342,7 @@ Some things that decide whether an email works exist only in the HTML or the sen
 
 ## Version history
 
+- **0.5.0 (2026-10-08):** Steve's rulings on the questions from the Claude Code version's first run: EM-20 gains a test for which icons carry meaning; EM-25 is still N/A with one version but lists merge tags and their content-field notes; EM-09 and EM-31 count an image seen clearly in a frame's screenshot as looked at.
 - **0.4.2 (2026-10-08):** A link to the scripts README that had been pasted twice is repaired, with no change in meaning.
 - **0.4.1 (2026-10-08):** Clarifications from the Claude Code runs of cases 1 and 2, with no check changed in meaning: an empty email is N/A on everything but EM-01, EM-17 doesn't take a canvas caption as a note, and EM-31 is N/A with no alt notes.
 - **0.4.0 (2026-10-07):** EM-31, alt text describes the image it's on, added at Steve's request, as a Should and Judgment check in the images-off group.
