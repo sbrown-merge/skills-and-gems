@@ -194,7 +194,7 @@ Use this section only for a skill that runs in Figma's in-app agent. [figma-agen
 - [ ] The skill tells the agent to run each script unchanged, which placeholders to fill and how, and what to do when a script fails.
 - [ ] The skill says where its output goes: in the chat as readable text, then in a fenced block to download, and never drawn on the canvas.
 - [ ] The output has a fixed template, and the skill says to add no sections to it.
-- [ ] A skill that must not change the design says so, names what it must never do, and proves the design is unchanged at the end.
+- [ ] A skill that must not change the design says so, names what it must never do, and proves the design is unchanged at the end. A skill that runs no code on the file needs no proof, so the last part is N/A for it (Steve, 2026-10-08).
 - [ ] A private test-mode skill, or an equivalent probe, has confirmed inside Figma's agent every call and tool the skill depends on.
 
 ## Audit prompt
