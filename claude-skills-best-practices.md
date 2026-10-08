@@ -38,6 +38,7 @@ This is how we build Claude Skills and how we check them. It takes the rules Ant
 - H. Opus 5.5 tuning
 - I. Testing and evaluation
 - J. Skills for Figma's agent
+- Skills built for both Figma's agent and Claude Code
 - Audit prompt (paste into Opus 5.5)
 <!-- /toc -->
 
@@ -106,7 +107,7 @@ The rule applies to audits from 2026-10-08 onward. A skill audited earlier gets 
 - [ ] `name` is descriptive, ideally a gerund (`designing-isi-trays`), not a vague noun (`helper`, `utils`, `tools`).
 - [ ] `description` is 1,024 characters or fewer, written in the third person, and contains no XML tags.
 - [ ] `description` states both what the skill does and when to use it, including the terms a user would actually type.
-- [ ] The models the skill was tested on are recorded where they will survive (see section I). If the platform drops custom frontmatter keys, put a "Tested with:" line near the top of the body instead.
+- [ ] The models the skill was tested on are recorded where they will survive (see section I). If the platform drops custom frontmatter keys, put a "Tested with:" line near the top of the body instead. For a skill that runs in Figma's agent, record it in the skill's README, so it costs nothing under Figma's character limit.
 
 ## B. File structure and progressive disclosure
 
@@ -196,6 +197,22 @@ Use this section only for a skill that runs in Figma's in-app agent. [figma-agen
 - [ ] The output has a fixed template, and the skill says to add no sections to it.
 - [ ] A skill that must not change the design says so, names what it must never do, and proves the design is unchanged at the end. A skill that runs no code on the file needs no proof, so the last part is N/A for it (Steve, 2026-10-08).
 - [ ] A private test-mode skill, or an equivalent probe, has confirmed inside Figma's agent every call and tool the skill depends on.
+
+## Skills built for both Figma's agent and Claude Code
+
+A skill that's meant to run both in Figma's agent and in Claude Code through the Figma MCP server is built as two versions from one source, rather than one file that serves both. Figma's version has to be a single file under 65,536 characters, while Claude Code allows separate scripts, reference files and the frontmatter fields Figma's MCP guide recommends, so one shared file ends up worse in both places. [merge-email-check](merge-email-check/README.md) is the worked example, from version 0.4.0 (2026-10-08). Only pair a skill we actually run in both places; a Figma-only skill stays a single file.
+
+The rule that keeps the pair honest is to share everything that decides a result and separate only the plumbing:
+
+| Kind | Examples | Where it lives |
+| --- | --- | --- |
+| Decides the result | Scripts, check rules, scoring and ranking, the report template | Once, in the parent folder (`scripts/`, `shared/`, the checklist); both versions are built from it |
+| Plumbing for one environment | Which tool runs a script, how screenshots are taken, where the report goes, minifying | In that version's template |
+| Notes for maintainers | Test records, version history, build plan | The parent folder's README and records, never in either `SKILL.md` |
+
+The scripts stay shared even though Claude Code could take longer ones, because different scripts give different results. A manifest (`skill.toml`) lists the version, the check IDs and the scripts, and a build tool fills each template, minifies scripts for Figma, copies readable scripts and reference files into the Claude folder, and with `--check` fails a commit when a built file is stale, the two versions disagree on checks or version, or Figma's file is over budget. Built files are never edited by hand. The pair shares one version number, so two reports can be compared only when they name the same version.
+
+Audit the Figma version against sections A to J and the Claude version against A to I; the banner for a failed audit goes in the shared README. Before the Claude version relies on readable scripts, run them through `use_figma`, comments included, and confirm their results match the minified copies. Don't name a template or any other file `claude.md`: on a Mac, file names ignore case, so it loads as a `CLAUDE.md` instructions file for any agent working in that folder.
 
 ## Audit prompt
 
