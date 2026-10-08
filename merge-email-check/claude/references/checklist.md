@@ -21,7 +21,7 @@ sources:
 
 # merge-email-check: the checklist
 
-This is the full checklist that `merge-email-check` runs on an email design in Figma, written at step 2 of the [build plan](PLAN.md) on 2026-10-05. Its knowledge comes from the research and rulings in `merge-marketing-email-specs` ([where the rules come from](PLAN.md#where-the-rules-come-from)), generalized so it works for any email project, MERGE's or a client's. Every check looks only at what's drawn in the Figma file; what lives only in the HTML or the send is listed at the end instead. `SKILL.md` will carry a compressed form of these checks, so change a check here first.
+This is the full checklist that `merge-email-check` runs on an email design in Figma, written at step 2 of the build plan on 2026-10-05. Its knowledge comes from the research and rulings in `merge-marketing-email-specs` (where the rules come from), generalized so it works for any email project, MERGE's or a client's. Every check looks only at what's drawn in the Figma file; what lives only in the HTML or the send is listed at the end instead. `SKILL.md` will carry a compressed form of these checks, so change a check here first.
 
 ## Contents
 
@@ -333,7 +333,7 @@ Some things that decide whether an email works exist only in the HTML or the sen
 
 **Web-safe fonts** for EM-17 are Arial, Helvetica, Georgia, Times New Roman, Verdana, Tahoma, Trebuchet MS and Courier New. Segoe UI and San Francisco are system fonts that only some readers have, so they count as brand fonts here.
 
-**Reuse.** The scope and fingerprint scripts start from merge-build-readiness 0.2's scripts 00 and 10, and EM-19's and EM-21's logic from its scripts 08 and 09, without WCAG's spacing exception; the pass over every mode of a bound color variable was cut and then put back on 2026-10-05. They're copied, not shared, because a Figma skill is one file. The checks run from two scripts, `01-layout.js` and `02-images.js`, each carrying its own copy of the shared helpers, because Figma's agent rejects any script over 20,000 characters ([scripts/README.md](scripts/README.md))).
+**Reuse.** The scope and fingerprint scripts start from merge-build-readiness 0.2's scripts 00 and 10, and EM-19's and EM-21's logic from its scripts 08 and 09, without WCAG's spacing exception; the pass over every mode of a bound color variable was cut and then put back on 2026-10-05. They're copied, not shared, because a Figma skill is one file. The checks run from two scripts, `01-layout.js` and `02-images.js`, each carrying its own copy of the shared helpers, because Figma's agent rejects any script over 20,000 characters (scripts/README.md)).
 
 ## Open questions
 

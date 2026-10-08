@@ -7,13 +7,13 @@ description: Checks an email design in Figma against email best practices before
 
 This skill checks an email design against what decides how it reads in real mail apps: Outlook at work with images blocked, Gmail and Apple Mail in dark mode, and screen readers.
 
-Version 0.3.2, 2026-10-08. Tested with: 0.3.0 in Claude Code on Opus 5.5 and Sonnet 5.5, 2026-10-08; 0.2.0 and 0.2.1 in Figma's agent (model undisclosed), 2026-10-06. 0.3.x in Figma's agent: **TBD**.
+Version 0.4.0.
 
 ## How to run this skill
 
 Run these instructions; don't edit them. Send one opening message, then work through to the report without stopping, treating the answers as settled.
 
-It runs in Figma's agent or in Claude Code through the Figma MCP. You need three abilities: running Plugin API JavaScript (Figma's agent does; in Claude Code use the Figma MCP server's `use_figma` tool, named with the server's prefix, such as `Figma:use_figma`), taking a screenshot of a layer (in Claude Code, the same server's `get_screenshot`), and adding a comment. Without code, say so and stop. Without screenshots, EM-04, EM-08, EM-09, EM-13, EM-16 and EM-26 are Couldn't check, and EM-19's and EM-20's screenshot items stay unconfirmed. Without comments, keep the findings in the report and say why.
+You need three abilities: running Plugin API JavaScript, taking a screenshot of a layer, and adding a comment. Without code, say so and stop. Without screenshots, EM-04, EM-08, EM-09, EM-13, EM-16 and EM-26 are Couldn't check, and EM-19's and EM-20's screenshot items stay unconfirmed. Without comments, keep the findings in the report and say why.
 
 Run each script exactly as written, changing only its placeholders, the words in double underscores, every copy of each. A placeholder in quotes, such as `'__SCOPE_ID__'`, takes plain text; a bare one, such as `__EMAILS__`, takes JSON, so an array keeps its brackets and isn't quoted. If a script returns an error about a placeholder or a scope not found, correct the value and rerun it. Any other error: don't rewrite the script; mark the checks it feeds Couldn't check, quote the error in the report, and carry on. If a result says a list was cut short (a `…Total` or count larger than its list), judge from what's there and say so.
 
@@ -44,7 +44,6 @@ Copy this checklist into your reply and tick it off.
 
 Run script 00 with `'__SCOPE_ID__'` set to the node in the person's link, if they gave one (`node-id=106-6` is `106:6`), or else to `''` (it uses the one selected layer) and `__SETTINGS__` set to `null`. If nothing usable is selected, it returns `currentPage` and the page list; rerun it with `currentPage`.
 
-<!-- script: 00-scope.js -->
 ```javascript
 const SCOPE_ID='__SCOPE_ID__';const SETTINGS=__SETTINGS__;const t0=Date.now();const S=Object.assign({mobileWidth:[320,480],desktopWidth:[600,700],},SETTINGS||{});const MAX_EX=10;const MIN_EMAIL_HEIGHT=400;const MAX_DEPTH=3;const LS=String.fromCharCode(0x2028),PS=String.fromCharCode(0x2029);const NEWLINES=/\s*\n\s*/g;const clean=s=>String(s).split(LS).join(' / ').split(PS).join(' / ').replace(NEWLINES,' / ').trim();const short=(s,n)=>clean(s).slice(0,n);let fileKey=null;try{fileKey=figma.fileKey||null;}catch(e){}
 const given=SCOPE_ID&&!SCOPE_ID.startsWith('__');const sel=figma.currentPage.selection;const scope=given?await figma.getNodeByIdAsync(SCOPE_ID):sel.length===1?sel[0]:null;if(!scope)return{fileKey,scope:null,note:given?'not found':sel.length+' layers selected',currentPage:figma.currentPage.id,pageCount:figma.root.children.length,pages:figma.root.children.slice(0,100).map(p=>p.id+' '+clean(p.name))};const pageOf=n=>{while(n&&n.type!=='PAGE')n=n.parent;return n;};await pageOf(scope).loadAsync();const w=n=>Math.round(n.width);const roleOf=n=>(w(n)>=S.mobileWidth[0]&&w(n)<=S.mobileWidth[1]?'mobile':w(n)>=S.desktopWidth[0]&&w(n)<=S.desktopWidth[1]?'desktop':null);const FRAMES=['FRAME','COMPONENT','INSTANCE'];const shown=n=>n.visible!==false;const found=[],presentation=[],skipped=[];const consider=(c,depth)=>{const role=roleOf(c);if(role&&c.height>=MIN_EMAIL_HEIGHT){const kids='children'in c?c.children.filter(shown):[];const inner=kids.length===1&&FRAMES.includes(kids[0].type)&&roleOf(kids[0])&&w(kids[0])!==w(c)&&kids[0].height>=MIN_EMAIL_HEIGHT?kids[0]:null;found.push({node:inner||c,wrapper:inner?c:null});}else if(w(c)>S.desktopWidth[1]&&'children'in c&&depth<MAX_DEPTH){presentation.push(c.id+' '+short(c.name,50)+' '+w(c)+'px');visit(c,depth+1);}else if(w(c)>=S.mobileWidth[0])skipped.push(c.id+' '+short(c.name,50)+' '+w(c)+'x'+Math.round(c.height)+(role?' too short':' width outside both ranges'));};function visit(n,depth){for(const c of n.children){if(!shown(c))continue;if(FRAMES.includes(c.type))consider(c,depth);else if((c.type==='SECTION'||c.type==='GROUP')&&depth<MAX_DEPTH)visit(c,depth+1);}}
@@ -67,7 +66,6 @@ Turn a changed house number into `__SETTINGS__` JSON with only the keys that cha
 
 Run script 03 with `__SCOPE_IDS__` set to a JSON array of the scope's ID, `__BASELINE__` to `null` and `__ADDED__` to `0`. Keep the result for step 6.
 
-<!-- script: 03-fingerprint.js -->
 ```javascript
 const SCOPE_IDS=__SCOPE_IDS__;const BASELINE=__BASELINE__;const ADDED=__ADDED__;if(!Array.isArray(SCOPE_IDS))return{error:'__SCOPE_IDS__ must be a JSON array of IDs'};const fnv=s=>{let x=0x811c9dc5;for(let i=0;i<s.length;i++){x^=s.charCodeAt(i);x=Math.imul(x,0x01000193)>>>0;}return x;};const num=v=>(typeof v==='number'?Math.round(v*100)/100:String(typeof v));const json=v=>{try{return v===figma.mixed?'mixed':JSON.stringify(v);}catch(e){return'unavailable';}};const has=(n,k)=>k in n;const sig=n=>[n.id,n.type,n.name,has(n,'visible')?n.visible:'',num(n.x),num(n.y),num(n.width),num(n.height),has(n,'opacity')?num(n.opacity):'',has(n,'fills')?json(n.fills):'',has(n,'strokes')?json(n.strokes):'',has(n,'effects')?json(n.effects):'',has(n,'strokeWeight')?json(n.strokeWeight):'',has(n,'layoutMode')?[n.layoutMode,n.paddingLeft,n.paddingRight,n.paddingTop,n.paddingBottom,n.itemSpacing].join(','):'',has(n,'layoutSizingHorizontal')?n.layoutSizingHorizontal+','+n.layoutSizingVertical:'',has(n,'topLeftRadius')?[n.topLeftRadius,n.topRightRadius,n.bottomLeftRadius,n.bottomRightRadius].join(','):'',n.type==='TEXT'?n.characters+json(n.textStyleId)+json(n.fontSize)+json(n.fontName)+json(n.lineHeight)+json(n.letterSpacing):'',has(n,'rotation')?num(n.rotation):'',has(n,'constraints')?json(n.constraints):'',has(n,'explicitVariableModes')?json(n.explicitVariableModes):'',has(n,'boundVariables')?json(n.boundVariables):'',n.type==='INSTANCE'?json(n.componentProperties)+json(n.overrides):'',(n.type==='COMPONENT_SET'||(n.type==='COMPONENT'&&!(n.parent&&n.parent.type==='COMPONENT_SET')))?json(Object.keys(n.componentPropertyDefinitions||{}).sort())+(n.description||''):'',].join('|');let hash=0,nodes=0,annotations=0;for(const id of SCOPE_IDS){const s=await figma.getNodeByIdAsync(id);if(!s)return{error:'scope not found: '+id};if(s.type==='PAGE')await s.loadAsync();const visit=n=>{nodes++;hash=(hash+fnv(sig(n)))>>>0;try{annotations+=(n.annotations||[]).length;}catch(e){}
 if(n.type!=='INSTANCE'&&'children'in n)for(const c of n.children)visit(c);};visit(s);}
@@ -80,7 +78,6 @@ return{intact:changed.length===0,changed,now};
 
 Run script 01 (layout), then script 02 (images). In script 01, `'__SCOPE_ID__'` is the scope script 00 returned. In both, `__EMAILS__` is the corrected `emails` array, keeping only each email's `name` and each frame's `id`, `role` and `dark`, and `__SETTINGS__` is step 1's value. Figma's agent rejects script code over 20,000 characters, so if a filled script is refused as too big, or a result is cut off, run it again for half the emails at a time.
 
-<!-- script: 01-layout.js -->
 ```javascript
 const SCOPE_ID='__SCOPE_ID__';const EMAILS=__EMAILS__;const SETTINGS=__SETTINGS__;const t0=Date.now();const S=Object.assign({previewArea:300,headline:[20,22],bodyLineHeight:[1.4,1.6],capsMaxChars:25,tapTarget:44,},SETTINGS||{});const MAX_EX=10;const MAX_LIST=40;if(!Array.isArray(EMAILS))return{error:'EMAILS must be the JSON array script 00 returns as `emails`'};const LS=String.fromCharCode(0x2028),PS=String.fromCharCode(0x2029);const NEWLINES=/\s*\n\s*/g;const clean=s=>String(s).split(LS).join(' / ').split(PS).join(' / ').replace(NEWLINES,' / ').trim();const short=(s,n)=>clean(s).slice(0,n);const hex=c=>'#'+[c.r,c.g,c.b].map(v=>Math.round(v*255).toString(16).padStart(2,'0')).join('');const findAll=(n,types)=>('findAllWithCriteria'in n?n.findAllWithCriteria({types}):[]);const box=n=>n.absoluteBoundingBox;const size=n=>Math.round(n.width)+'x'+Math.round(n.height);const fillsOf=n=>(Array.isArray(n.fills)?n.fills.filter(p=>p.visible!==false&&(p.opacity??1)>0):[]);const solidOf=n=>fillsOf(n).find(p=>p.type==='SOLID');const hasImage=n=>fillsOf(n).some(p=>p.type==='IMAGE');const colorOf=fills=>{const f=solidOf({fills});return f?hex(f.color):'none';};const visibleIn=(n,frame)=>{for(let p=n;p&&p.id!==frame.id;p=p.parent)if(p.visible===false)return false;return true;};const insideAny=(n,ids,frame)=>{for(let p=n.parent;p&&p.id!==frame.id;p=p.parent)if(ids.has(p.id))return true;return false;};const KINDS=['alt text','decorative image','heading level','link or cta','dark mode','dynamic content','mobile behavior','content model field'];const NOTE_PREFIX=/^\s*([A-Za-z ]+?)\s*:\s*([\s\S]*)$/;const BOLD=/\*\*/g,ALT=/\balt\b/i,SUGGESTION=/^\W*suggest(ion|ed)?\b/i;const catById=new Map();try{for(const c of await figma.annotations.getAnnotationCategoriesAsync())catById.set(c.id,c);}catch(e){}
 const notesOf=n=>{let list=[];try{list=n.annotations||[];}catch(e){}
@@ -106,7 +103,6 @@ if((n.type==='FRAME'||n.type==='SECTION')&&FALLBACK_FRAME.test(n.name))fallbackF
 Object.assign(out.em17,{fallbackNotes:fallback.slice(0,MAX_EX),fallbackNotesTotal:fallback.length,framesShowingFallback:fallbackFrames.slice(0,MAX_EX),framesShowingFallbackTotal:fallbackFrames.length});for(const o of info)o.er.em27={found:o.pre.filter(s=>!s.startsWith('request')).length,total:o.pre.length,ex:o.pre.slice(0,MAX_EX)};out.em27={unattributed:pre.slice(0,MAX_EX),unattributedTotal:pre.length};out.em25={dynamicNotes:dynamic,fieldNotes:fields,mergeTags:tags.length,tagsEx:tags.slice(0,MAX_EX)};out.notes={read,matched};out.ms=Date.now()-t0;return out;
 ```
 
-<!-- script: 02-images.js -->
 ```javascript
 const EMAILS=__EMAILS__;const SETTINGS=__SETTINGS__;const t0=Date.now();const S=Object.assign({maxSlice:1500,altCharPx:8.8,darkReference:'#121212',},SETTINGS||{});const MAX_EX=10;const few=a=>a.slice(0,MAX_EX);if(!Array.isArray(EMAILS))return{error:'EMAILS must be the JSON array script 00 returns as `emails`'};const LS=String.fromCharCode(0x2028),PS=String.fromCharCode(0x2029);const NEWLINES=/\s*\n\s*/g;const clean=s=>String(s).split(LS).join(' / ').split(PS).join(' / ').replace(NEWLINES,' / ').trim();const short=(s,n)=>clean(s).slice(0,n);const hex=c=>'#'+[c.r,c.g,c.b].map(v=>Math.round(v*255).toString(16).padStart(2,'0')).join('');const findAll=(n,types)=>('findAllWithCriteria'in n?n.findAllWithCriteria({types}):[]);const box=n=>n.absoluteBoundingBox;const size=n=>Math.round(n.width)+'x'+Math.round(n.height);const shown=p=>p.visible!==false;const fillsOf=n=>(Array.isArray(n.fills)?n.fills.filter(p=>shown(p)&&(p.opacity??1)>0):[]);const isSolid=p=>p.type==='SOLID';const solidOf=n=>fillsOf(n).find(isSolid);const opaqueSolid=paints=>paints.find(p=>isSolid(p)&&(p.opacity??1)>=1);const strokesOf=n=>(Array.isArray(n.strokes)?n.strokes.filter(shown):[]);const weightOf=n=>(typeof n.strokeWeight==='number'?n.strokeWeight:1);const hasImage=n=>fillsOf(n).some(p=>p.type==='IMAGE');const visibleIn=(n,frame)=>{for(let p=n;p&&p.id!==frame.id;p=p.parent)if(p.visible===false)return false;return true;};const insideAny=(n,ids,frame)=>{for(let p=n.parent;p&&p.id!==frame.id;p=p.parent)if(ids.has(p.id))return true;return false;};const KINDS=['alt text','decorative image','heading level','link or cta','dark mode','dynamic content','mobile behavior','content model field'];const NOTE_PREFIX=/^\s*([A-Za-z ]+?)\s*:\s*([\s\S]*)$/;const BOLD=/\*\*/g,ALT=/\balt\b/i,SUGGESTION=/^\W*suggest(ion|ed)?\b/i;const catById=new Map();try{for(const c of await figma.annotations.getAnnotationCategoriesAsync())catById.set(c.id,c);}catch(e){}
 const notesOf=n=>{let list=[];try{list=n.annotations||[];}catch(e){}
@@ -162,7 +158,7 @@ Then rank the fixes: Must, then Should, then Could, and within a rank whatever a
 
 ### Step 5: Deliver comments, only if asked
 
-Put the ranked findings, Must first, at most 20, on each one's first example layer with your own comment action, worded "EM-10 (Must): <the problem>. Fix: <the fix>. From merge-email-check 0.3.2." More buries the ones that matter. Findings with no layer stay in the report.
+Put the ranked findings, Must first, at most 20, on each one's first example layer with your own comment action, worded "EM-10 (Must): <the problem>. Fix: <the fix>. From merge-email-check 0.4.0." More buries the ones that matter. Findings with no layer stay in the report.
 
 ### Step 6: Prove nothing changed
 
@@ -177,7 +173,7 @@ Write for a designer with a few minutes: plain words, complete sentences, US spe
 
 <Two or three sentences: ready or not, and the first thing to do.>
 
-Checked <date> with merge-email-check 0.3.2. Scope: <scope ID>. Emails: <names>. House numbers: <MERGE's, or what changed>.
+Checked <date> with merge-email-check 0.4.0. Scope: <scope ID>. Emails: <names>. House numbers: <MERGE's, or what changed>.
 
 ## Scorecard
 
@@ -280,4 +276,3 @@ WCAG 2.2 AA for every project.
 
 - **EM-29 Images export as JPG or PNG (Should, Universal; I `counts.exportSvgPdf`, `counts.exportNone`).** Fail for any SVG or PDF; Partly when some images have no export setting.
 - **EM-30 Image slices stay under the house height (Could, House; I `counts.tall`).** Default rule over the images.
-

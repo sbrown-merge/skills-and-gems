@@ -1,0 +1,35 @@
+# merge-email-check: one skill, built for two environments.
+# scripts/sync_skill.py reads this file, builds figma/SKILL.md and claude/ from templates/ and shared/,
+# and with --check fails a commit when a built file is stale or the two versions disagree.
+# TOML rather than YAML because Python reads it with no extra package (tomllib).
+
+name = "merge-email-check"
+version = "0.4.0"
+
+# Every check, in report order. --check compares this with checklist.md and shared/checks.md.
+checks = [
+  "EM-01", "EM-02", "EM-03", "EM-04", "EM-05", "EM-06", "EM-07", "EM-08", "EM-09", "EM-10",
+  "EM-11", "EM-31", "EM-12", "EM-13", "EM-14", "EM-15", "EM-16", "EM-17", "EM-18", "EM-19",
+  "EM-20", "EM-21", "EM-22", "EM-23", "EM-24", "EM-25", "EM-26", "EM-27", "EM-28", "EM-29",
+  "EM-30",
+]
+
+# The read-only scripts both versions run. The readable source in scripts/ is the only copy anyone edits.
+scripts = ["00-scope.js", "01-layout.js", "02-images.js", "03-fingerprint.js"]
+
+[figma]
+template = "templates/figma.md"
+output = "figma/SKILL.md"
+limit = 65536   # Figma's upload dialog: "Instructions must be 65536 characters or fewer" (2026-10-04)
+budget = 63500  # our ceiling, kept under the limit for fixes; raised from 62,500 on 2026-10-06 (Steve)
+
+[claude]
+template = "templates/claude-code.md"  # not claude.md: on a Mac that name loads as a CLAUDE.md instructions file
+output = "claude/SKILL.md"
+references = ["checklist.md"]  # copied into claude/references/
+max_lines = 500                 # Anthropic's guidance for a SKILL.md body
+install = "~/.claude/skills/merge-email-check"
+
+# Skills that keep their scripts in marked blocks, synced in place rather than built from a template.
+[[inplace]]
+skill = "../merge-email-check-annotate/SKILL.md"

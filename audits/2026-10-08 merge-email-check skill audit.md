@@ -18,7 +18,7 @@ sources:
 
 # merge-email-check skill audit, 2026-10-08
 
-This records the first audit of the [merge-email-check](../merge-email-check/SKILL.md) skill, version 0.3.0, against sections A to J of our [Claude Skills best practices](../claude-skills-best-practices.md). Section J applies because the skill runs in Figma's agent. Steve asked for the audit on 2026-10-08, and no fixes have been applied yet. The skill is in good shape: it passes 53 items and fails 2, and both fails are about what's been tested and how that's recorded, not about how the skill works. Under the [rule for failed audits](../claude-skills-best-practices.md#when-a-skill-fails-its-audit), its [README](../merge-email-check/README.md) now carries the not-ready banner until those two are fixed.
+This records the first audit of the [merge-email-check](../merge-email-check/figma/SKILL.md) skill, version 0.3.0, against sections A to J of our [Claude Skills best practices](../claude-skills-best-practices.md). Section J applies because the skill runs in Figma's agent. Steve asked for the audit on 2026-10-08, and no fixes have been applied yet. The skill is in good shape: it passes 53 items and fails 2, and both fails are about what's been tested and how that's recorded, not about how the skill works. Under the [rule for failed audits](../claude-skills-best-practices.md#when-a-skill-fails-its-audit), its [README](../merge-email-check/README.md) now carries the not-ready banner until those two are fixed.
 
 ## Contents
 

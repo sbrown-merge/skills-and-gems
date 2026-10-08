@@ -83,7 +83,7 @@ The images row disagrees with what we saw, and the page may mean importing image
 
 ## How it applies to our skills
 
-The page is about MCP clients, and Figma's agent differs in ways that matter. The table says, for each point, what to do in a skill for Figma's agent, a skill for Claude Code through the MCP server, or one like [merge-email-check](../merge-email-check/SKILL.md) that runs in both.
+The page is about MCP clients, and Figma's agent differs in ways that matter. The table says, for each point, what to do in a skill for Figma's agent, a skill for Claude Code through the MCP server, or one like [merge-email-check](../merge-email-check/README.md) that runs in both. From version 0.4.0 that skill is built as two versions from one source, a single file for Figma's agent and a Claude Code skill with separate scripts, which is how a skill can follow both columns.
 
 | Point | Figma's agent | Claude Code through the MCP server | Status |
 | --- | --- | --- | --- |
@@ -101,8 +101,8 @@ The page is about MCP clients, and Figma's agent differs in ways that matter. Th
 
 ## Follow-ups
 
-None of these have been made. Each needs Steve's go-ahead, and some would change a skill's size or behavior.
+The first of these was done on 2026-10-08; the others each need Steve's go-ahead, and some would change a skill's size or behavior.
 
-- [merge-email-check](../merge-email-check/SKILL.md) line 16 tells Claude Code to use `use_figma` but not to load `figma-use` first. The skill has 127 characters of budget left, so the line would need trimming elsewhere.
+- Done in merge-email-check 0.4.0: its [Claude Code version](../merge-email-check/claude/SKILL.md) loads `figma-use` before `use_figma`, passes `skillNames`, says in its description when not to use it, and declares the MCP server in `compatibility`, all outside the Figma version's character budget.
 - Section J of the [best practices checklist](../claude-skills-best-practices.md#j-skills-for-figmas-agent) could gain items for routing-rule descriptions, loading `figma-use` on the Claude Code path, and error recovery in skills that write.
 - The annotate companions, [merge-build-readiness-annotate](../merge-build-readiness-annotate/SKILL.md) and [merge-email-check-annotate](../merge-email-check-annotate/SKILL.md), write to the file, so they're the first candidates for `disable-model-invocation` and the error-recovery pattern when installed in Claude Code.
