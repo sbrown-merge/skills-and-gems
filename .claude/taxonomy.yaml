@@ -7,3 +7,4 @@ types:
   - audit       # a dated review of a skill or gem against a checklist, with fixes
   - plan        # a build plan for a skill or gem, with the decisions behind it
   - checklist   # the full set of checks a checking skill runs, with reasons and sources
+  - research-note  # findings from research or a summary of an outside source, with dates and sources
