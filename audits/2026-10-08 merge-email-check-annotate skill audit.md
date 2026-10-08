@@ -82,3 +82,5 @@ H3 (whether any step is over-prescriptive for Opus), I4 (whether Haiku skips a s
 ## Verdict
 
 Not ready for production: 9 items failed (E1, F6, H8, I1, I2, I3, I7, J8 and J9). The banner belongs in a new `merge-email-check-annotate/README.md`, with the matching note on the skill's row in the root README; neither has been added yet. Take both out in the same commit that fixes the last failed item, and add a line here saying which commit that was. Because four of the fails need new evaluation runs, re-run this audit before removing the banner.
+
+**Fixes applied, 2026-10-08.** E1, F6, H8, J8 and J9 are fixed in merge-email-check-annotate 0.2.0, along with four of the findings above: the reason a finding moved is explained, a report with no Scope line gets a fallback, the annotation keys are named, and the comment wording carries the report's version. Still open: I1, I2, I3 and I7, which need runs. The banner stays until those are done.

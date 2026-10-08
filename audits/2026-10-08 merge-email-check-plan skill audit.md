@@ -90,3 +90,5 @@ The plan skill and the report agree on the basics. Both rank Must, then Should, 
 ## Verdict
 
 Not ready for production: 10 items failed (J10, E1, E2, I1, I2, I3, I7, J9, H8 and E4). The skill has no README to carry the banner and the root README doesn't say it yet; the last finding above proposes both. When the last failed item is fixed, add a line here saying which commit cleared it and on what date. Because the testing items need new runs, re-run this audit before removing the banner rather than ticking items off by hand.
+
+**Fixes applied, 2026-10-08.** E1, E2, E4 and H8 are fixed in merge-email-check-plan 0.2.0, along with every disagreement with the report listed above: links come from the fenced copy, "Fix these first" sets the first steps, the Scope line is used, each report section has a rule, flags become Judge steps that close nothing, the template carries ranks and layer counts, and a report with nothing to fix gets one sentence. Still open: J10, I1, I2, I3 and I7, which need runs, and J9, which waits on Steve's call on whether a skill that runs no code on the file needs a fingerprint. The banner stays until those are done.

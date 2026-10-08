@@ -23,7 +23,7 @@ Only `SKILL.md` and the two companion skills' `SKILL.md` files go to Figma, beca
 | [../merge-email-check-plan/SKILL.md](../merge-email-check-plan/SKILL.md) | The companion skill that turns a report into a remediation plan, uploaded to Figma alongside. It has no scripts. |
 | [../merge-email-check-annotate/SKILL.md](../merge-email-check-annotate/SKILL.md) | The companion skill that writes a report's findings onto the layers as Dev Mode annotations. It carries scripts 03 and 04, synced from `scripts/`. |
 | [checklist.md](checklist.md) | The full checklist, EM-01 to EM-31, with each check's reason, rule, tier and source. `SKILL.md` carries a compressed form. |
-| [scripts/](scripts/README.md) | The four read-only Plugin API scripts, what testing found, and `sync_skill.py`, which copies them into `SKILL.md`. |
+| [scripts/](scripts/README.md) | The Plugin API scripts: four read-only ones for this skill and the annotation writer for merge-email-check-annotate, what testing found, and `sync_skill.py`, which copies them into `SKILL.md`. |
 | [PLAN.md](PLAN.md) | The build plan and the decisions behind it. |
 | [EVAL.md](EVAL.md) | The three test cases, what each run should find, and the results. |
 | [eval-prompts.md](eval-prompts.md) | The exact prompts and links for each evaluation run. |
@@ -46,10 +46,11 @@ In a Figma Design file that belongs to the MERGE organization, open the agent, c
 
 ## Version and testing
 
-Version 0.3.1, 2026-10-08. The scripts were tested through `use_figma` on 2026-10-05 and 2026-10-06 against the TOFU email file (`Dqux2GL6tXD0boEEW3QCax`) and the deliberate-faults file (`pgpRQNF2ey2fXl3lMS9D2O`), and the color-mode pass against Andrew's Abbott library (`0VTZx0ZXc08vCIjdzb8Xza`). In Figma's agent, version 0.2.0 matched 113 of 120 expected results on the Faults page and 0.2.1 matched 30 of 30 on the Control, on 2026-10-06. In Claude Code, version 0.3.0 matched 123 or 124 of 124 on the Faults page and 31 of 31 on the Control, on both Opus 5.5 and Sonnet 5.5, on 2026-10-08. [EVAL.md](EVAL.md#results) holds every run. **TBD:** version 0.3.x in Figma's agent, cases 1, 2 and 4, and a run that delivers comments.
+Version 0.3.2, 2026-10-08. The scripts were tested through `use_figma` on 2026-10-05 and 2026-10-06 against the TOFU email file (`Dqux2GL6tXD0boEEW3QCax`) and the deliberate-faults file (`pgpRQNF2ey2fXl3lMS9D2O`), and the color-mode pass against Andrew's Abbott library (`0VTZx0ZXc08vCIjdzb8Xza`). In Figma's agent, version 0.2.0 matched 113 of 120 expected results on the Faults page and 0.2.1 matched 30 of 30 on the Control, on 2026-10-06. In Claude Code, version 0.3.0 matched 123 or 124 of 124 on the Faults page and 31 of 31 on the Control, on both Opus 5.5 and Sonnet 5.5, on 2026-10-08. [EVAL.md](EVAL.md#results) holds every run. **TBD:** version 0.3.x in Figma's agent, cases 1, 2 and 4, and a run that delivers comments.
 
 ## Version history
 
+- **0.3.2 (2026-10-08):** From the Claude Code runs of cases 1 and 2: a mail-app copy comes out only when its original is also in the scope, and the skill never changes the scope itself; an email with nothing drawn is N/A on every check but EM-01; EM-25 no longer turns Couldn't check when the file has no notes; EM-09 states its rule over the images screenshotted; EM-31 is N/A with no alt notes; EM-17 doesn't take a canvas caption as a fallback note.
 - **0.3.1 (2026-10-08):** From the 2026-10-08 audit and the first Claude Code runs: EM-30 names the default rule, the "Tested with" line is current, and the credit line moves to this README to save room.
 - **0.3.0 (2026-10-07):** EM-31 checks that alt text describes its image. The report gives its scope's ID, and step 8 also offers the new companion `merge-email-check-annotate`, which writes the findings as Dev Mode annotations.
 - **0.2.2 (2026-10-06):** "Fix these first" holds only checks that failed or partly passed; a proposed new check goes under "Problems no check covers". From the Control run, which put a proposal first, ranked Must.

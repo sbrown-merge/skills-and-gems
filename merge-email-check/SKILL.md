@@ -7,7 +7,7 @@ description: Checks an email design in Figma against email best practices before
 
 This skill checks an email design against what decides how it reads in real mail apps: Outlook at work with images blocked, Gmail and Apple Mail in dark mode, and screen readers.
 
-Version 0.3.1, 2026-10-08. Tested with: 0.3.0 in Claude Code on Opus 5.5 and Sonnet 5.5, 2026-10-08; 0.2.0 and 0.2.1 in Figma's agent (model undisclosed), 2026-10-06. 0.3.x in Figma's agent: **TBD**.
+Version 0.3.2, 2026-10-08. Tested with: 0.3.0 in Claude Code on Opus 5.5 and Sonnet 5.5, 2026-10-08; 0.2.0 and 0.2.1 in Figma's agent (model undisclosed), 2026-10-06. 0.3.x in Figma's agent: **TBD**.
 
 ## How to run this skill
 
@@ -53,7 +53,7 @@ let emails=[...groups.values()];const bySection=new Map();for(const g of emails)
 return{fileKey,scope:{id:scope.id,name:clean(scope.name),type:scope.type,page:pageOf(scope).id},emailCount:emails.length,emails:emails.slice(0,40),presentationFrames:presentation.slice(0,MAX_EX),presentationCount:presentation.length,skippedFrames:skipped.slice(0,MAX_EX),skippedCount:skipped.length,ms:Date.now()-t0,};
 ```
 
-Script 00 returns `emails`: each email's name and frames, each frame with its `id`, `role` (`mobile` or `desktop`) and `dark: true` when it shows dark mode. It skips frames too short or at a width outside both ranges (`skippedFrames`) and unwraps a presentation frame around an email (`presentationFrames`). Check its grouping against the canvas: a frame that isn't an email, such as an alt-text demo or a note panel, comes out; frames grouped wrongly get regrouped, and a copy of an email shown inside a mail-app frame comes out of the list, so it isn't counted twice. Say what you corrected.
+Script 00 returns `emails`: each email's name and frames, each frame with its `id`, `role` (`mobile` or `desktop`) and `dark: true` when it shows dark mode. It skips frames too short or at a width outside both ranges (`skippedFrames`) and unwraps a presentation frame around an email (`presentationFrames`). Check its grouping against the canvas: a frame that isn't an email, such as an alt-text demo or a note panel, comes out; frames grouped wrongly get regrouped, and a copy of an email shown inside a mail-app frame comes out when its original is also in the scope. Never change the scope yourself; offer another one in the opening message. Say what you corrected.
 
 Then send one message with the emails you found and three choices with their defaults, saying that "go" accepts the defaults:
 
@@ -154,15 +154,15 @@ Small text in a screenshot isn't reliably readable: when you can't read it, say 
 
 Judge every check below from the data and screenshots, running no scripts, once for each email in the scope. Missing data makes a check Couldn't check, naming the read that failed.
 
-Each check is Pass, Partly, Fail, Couldn't check or N/A, with evidence: the count and up to three examples linked to their layers. A check can also carry **flags**, items for the designer to judge, which are listed without changing its result. A check is N/A for an email that has none of what it looks at, such as no icons for EM-14, no mobile frame for EM-02, or no desktop content for EM-04. Unless a check below says otherwise, a check judged from a count uses the **default rule**: Pass when nothing is found, Partly when the problem affects fewer than half of the items checked, Fail at half or more.
+Each check is Pass, Partly, Fail, Couldn't check or N/A, with evidence: the count and up to three examples linked to their layers. A check can also carry **flags**, items for the designer to judge, which are listed without changing its result. A check is N/A for an email that has none of what it looks at, such as no icons for EM-14, no mobile frame for EM-02, or no desktop content for EM-04, and an email with nothing drawn is N/A on every check but EM-01. Unless a check below says otherwise, a check judged from a count uses the **default rule**: Pass when nothing is found, Partly when the problem affects fewer than half of the items checked, Fail at half or more.
 
-If the layout part's `notes.matched` is 0, the file uses none of the note kinds, so EM-03, EM-06, EM-07, EM-12, EM-23 and EM-25 are Couldn't check, and the report suggests the eight note kinds above.
+If the layout part's `notes.matched` is 0, the file uses none of the note kinds, so EM-03, EM-06, EM-07, EM-12 and EM-23 are Couldn't check, and the report suggests the eight note kinds above.
 
 Then rank the fixes: Must, then Should, then Could, and within a rank whatever affects the most readers. Must means the email breaks for a real group of readers, or it's a standard every project is held to (WCAG 2.2 AA, email law). Should measurably improves how the email reads or performs, or saves a build correction. Could is worth doing while someone is in that area. Then post the second progress line.
 
 ### Step 5: Deliver comments, only if asked
 
-Put the ranked findings, Must first, at most 20, on each one's first example layer with your own comment action, worded "EM-10 (Must): <the problem>. Fix: <the fix>. From merge-email-check 0.3.1." More buries the ones that matter. Findings with no layer stay in the report.
+Put the ranked findings, Must first, at most 20, on each one's first example layer with your own comment action, worded "EM-10 (Must): <the problem>. Fix: <the fix>. From merge-email-check 0.3.2." More buries the ones that matter. Findings with no layer stay in the report.
 
 ### Step 6: Prove nothing changed
 
@@ -177,7 +177,7 @@ Write for a designer with a few minutes: plain words, complete sentences, US spe
 
 <Two or three sentences: ready or not, and the first thing to do.>
 
-Checked <date> with merge-email-check 0.3.1. Scope: <scope ID>. Emails: <names>. House numbers: <MERGE's, or what changed>.
+Checked <date> with merge-email-check 0.3.2. Scope: <scope ID>. Emails: <names>. House numbers: <MERGE's, or what changed>.
 
 ## Scorecard
 
@@ -238,10 +238,10 @@ Classic Outlook, new Outlook and Outlook on the web block images by default for 
 - **EM-06 Every image has alt text or is marked decorative (Must, Universal; I `images` and `counts.alt`).** Default rule over images without an alt or decorative note; a suggestion-only note counts toward Partly at most.
 - **EM-07 Alt text fits on one line across its image (Should, Universal; I `counts.altFail`, `counts.altFlag`, each row's `fit`).** Apple Mail and others drop alt text wider than its box. Fail for any `altFail` (over 10% beyond the estimate); each `altFlag` is a flag, not a fault. Say it's an estimate. N/A with no alt notes.
 - **EM-08 Headlines, offers and buttons are live text (Must, Universal; L `em23.headings` and `targets`, frame screenshots).** Fail when the main headline, the offer or a button is part of an image; screenshot each image the frame screenshots leave in doubt.
-- **EM-09 No text sits inside an image, apart from the logo (Should, Universal; image screenshots).** List images with words in them. When you can't read a screenshot well enough to tell, or an image wasn't screenshotted, report "possible text" or "not checked" and top out at Partly.
+- **EM-09 No text sits inside an image, apart from the logo (Should, Universal; image screenshots).** Default rule over the images screenshotted, listing those with words. Report "possible text" for an unreadable one, and top out at Partly when some weren't screenshotted.
 - **EM-10 Text over an image still reads on the color behind it (Must, Universal; I `em10`).** Each entry gives the text's contrast on the color behind the image with images off. Pass when there's none or every one meets EM-19's ratio; Fail otherwise.
 - **EM-11 Every image has a background color behind it (Should, Universal; I `counts.background`).** Default rule over images without one.
-- **EM-31 Alt text describes the image it's on (Should, Universal; I `images` alt notes and image screenshots).** List images whose alt text doesn't describe what the screenshot shows; decorative images are left out. Default rule over the images looked at, topping out at Partly when some weren't. On plainly placeholder art, a mismatch is a flag to confirm once the final image is in.
+- **EM-31 Alt text describes the image it's on (Should, Universal; I `images` alt notes and image screenshots).** List images whose alt text doesn't describe what the screenshot shows; decorative images are left out. N/A with no alt notes. Default rule over the images looked at, topping out at Partly when some weren't. On plainly placeholder art, a mismatch is a flag to confirm once the final image is in.
 
 ### Dark mode
 
@@ -255,7 +255,7 @@ Gmail's apps and classic Outlook recolor the email themselves and never swap an 
 
 ### Type
 
-- **EM-17 A brand font names its fallback (Should, Universal; L `em17`).** Pass when every family is web-safe, or each brand font has a fallback note; Partly when fallbacks are named but no frame shows the email in them.
+- **EM-17 A brand font names its fallback (Should, Universal; L `em17`).** Pass when every family is web-safe, or each brand font has a fallback note (a caption on the canvas isn't one); Partly when fallbacks are named but no frame shows the email in them.
 - **EM-18 Type follows the house defaults (Could, House; L `em18`).** Everything here is a flag, never a lower result: section headings outside the range (the H1, `h1Left`, is left out and may be larger), body line height, centered body text, long all-caps text.
 
 ### Accessibility

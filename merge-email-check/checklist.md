@@ -3,7 +3,7 @@ title: "merge-email-check: the checklist"
 description: "The 31 checks merge-email-check runs on an email design in Figma, EM-01 to EM-31, each with its rank, tier, how a script or the agent verifies it, and its source in the email-specs research and rulings."
 type: checklist
 status: draft
-version: "0.4.0"
+version: "0.4.1"
 created: 2026-10-05
 maintainer: Steve Brown
 tags: [figma, figma-agent, skill, email, crm, accessibility, dark-mode, checklist]
@@ -50,7 +50,7 @@ Each check has an ID, a rank, a tier, a way of being verified, and a source. Thi
 
 **Tiers** decide what a project can change. A **Universal** check holds for any email, because it comes from WCAG 2.2, from email law, or from how mail apps behave, and its rule isn't a setting. A **House** check uses a number or policy from the [house settings](#house-settings) below, which default to MERGE's and can be changed for a client project in the opening question.
 
-**Results** are Pass, Partly, Fail, Couldn't check or N/A. A check can also carry **flags**: items the designer should judge, which the report lists under their check without changing its result. Couldn't check means a read failed or Figma doesn't expose what the check needs, and the report says which; the agent never guesses a result. N/A means the check doesn't apply, for example no images in scope. Unless a check says otherwise, a Script check passes when it finds nothing, is Partly when the problem affects fewer than half of the items it checked, and fails at half or more. Every result carries evidence: the total count and up to ten layers, of which the report links up to three.
+**Results** are Pass, Partly, Fail, Couldn't check or N/A. A check can also carry **flags**: items the designer should judge, which the report lists under their check without changing its result. Couldn't check means a read failed or Figma doesn't expose what the check needs, and the report says which; the agent never guesses a result. N/A means the check doesn't apply, for example no images in scope; an email with nothing drawn in it is N/A on every check except EM-01. Unless a check says otherwise, a Script check passes when it finds nothing, is Partly when the problem affects fewer than half of the items it checked, and fails at half or more. Every result carries evidence: the total count and up to ten layers, of which the report links up to three.
 
 **Verified by** is **Script** when a Plugin API script returns the data and the result follows from the rule with no judgment, or **Judgment** when a script or a screenshot gathers the data and the agent decides, because the call depends on what a layer is for.
 
@@ -191,7 +191,7 @@ A blocked image shows its box, and a box with a color in it reads as a deliberat
 
 **Should · Universal · Judgment · WCAG 1.1.1; Steve, 2026-10-07**
 
-Alt text is what a screen reader reads aloud and what Outlook shows when it blocks images, so words that describe a different picture mislead both. EM-06 checks that alt text exists and EM-07 that it fits; this check is whether it's right. The agent compares each image's screenshot with its alt-text note and lists the ones whose words don't describe what's shown. Images marked decorative are left out. Default rule over the images it looked at, topping out at Partly when some weren't looked at closely. Where the image is plainly a placeholder, such as an abstract gradient standing in for a photo, the mismatch is a flag to confirm once the final image is in, not a fault. Added after two runs raised it unprompted on 2026-10-06: the run without the skill on the faults file, and the skill's run on the Control.
+Alt text is what a screen reader reads aloud and what Outlook shows when it blocks images, so words that describe a different picture mislead both. EM-06 checks that alt text exists and EM-07 that it fits; this check is whether it's right. The agent compares each image's screenshot with its alt-text note and lists the ones whose words don't describe what's shown. Images marked decorative are left out, and the check is N/A when no image has an alt note. Default rule over the images it looked at, topping out at Partly when some weren't looked at closely. Where the image is plainly a placeholder, such as an abstract gradient standing in for a photo, the mismatch is a flag to confirm once the final image is in, not a fault. Added after two runs raised it unprompted on 2026-10-06: the run without the skill on the faults file, and the skill's run on the Control.
 
 ## Dark mode
 
@@ -233,7 +233,7 @@ A transparent illustration works in both modes only if it's bright enough to rea
 
 **Should · Universal · Script · how images fail to load, "The other ways images and their surroundings fail"**
 
-Custom fonts render only in Apple Mail; every other app uses the fallback, so most readers see the fallback and the layout has to work in it. The script lists the font families in use. Pass when every family is web-safe ([Notes for the scripts](#notes-for-the-scripts)), or each brand font has a note naming its fallback. Partly when fallbacks are named but nothing in the file shows the email in them.
+Custom fonts render only in Apple Mail; every other app uses the fallback, so most readers see the fallback and the layout has to work in it. The script lists the font families in use. Pass when every family is web-safe ([Notes for the scripts](#notes-for-the-scripts)), or each brand font has a note naming its fallback; a caption drawn on the canvas isn't a note. Partly when fallbacks are named but nothing in the file shows the email in them.
 
 ### EM-18 Type follows the house defaults
 
@@ -342,6 +342,7 @@ Some things that decide whether an email works exist only in the HTML or the sen
 
 ## Version history
 
+- **0.4.1 (2026-10-08):** Clarifications from the Claude Code runs of cases 1 and 2, with no check changed in meaning: an empty email is N/A on everything but EM-01, EM-17 doesn't take a canvas caption as a note, and EM-31 is N/A with no alt notes.
 - **0.4.0 (2026-10-07):** EM-31, alt text describes the image it's on, added at Steve's request, as a Should and Judgment check in the images-off group.
 - **0.3.1 (2026-10-06):** The Reuse note describes the split into a layout script and an images script. No check changed.
 - **0.3.0 (2026-10-06):** Steve's rulings of 2026-10-06: EM-19 has no Partly, EM-24 uses the default rule, and EM-28's unsubscribe link is stated in a Link or CTA note. Also aligned with SKILL.md after its first audit: EM-07 is N/A with no alt notes, EM-08 names the offer and how it's screenshotted, EM-13 accepts a dark-mode frame as evidence, EM-15 is N/A when the setting is off, EM-20 says a contrasting fill needs no edge, EM-25 gets a Pass rule, and the Reuse note records the color-mode pass coming back.
