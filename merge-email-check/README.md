@@ -1,5 +1,8 @@
 # merge-email-check
 
+> [!WARNING]
+> **Not ready for production.** This skill failed 2 items in its [2026-10-08 audit](<../audits/2026-10-08 merge-email-check skill audit.md>), and they haven't been fixed yet. Use it with care until they are.
+
 `merge-email-check` is a skill for Figma's own agent that checks an email design against email best practices before it's built. A designer runs `/merge-email-check` on an email's mobile and desktop frames, answers one question, and gets a scorecard of 31 checks with evidence linked to each layer, then the fixes to make first. It works for any email project, MERGE's or a client's: universal checks come from WCAG 2.2, email law and how mail apps behave, and house checks use MERGE's numbers as defaults that a project can change. It also runs from Claude Code through the Figma MCP. It never changes the design apart from comments the designer asks for. This README is for whoever maintains and publishes it.
 
 ## Contents
