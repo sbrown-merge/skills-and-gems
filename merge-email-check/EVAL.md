@@ -21,6 +21,7 @@ This file holds the test cases for `merge-email-check` at step 5 of the [build p
 - Case 3: the deliberate-faults file
 - Case 4: a realistic sample email
 - Expected results on the deliberate-faults file
+- The companion skills
 - Results
 <!-- /toc -->
 
@@ -158,6 +159,18 @@ The table gives each check's expected result on each email on page 01 and on the
 | EM-29 | Fail | Pass | Pass | Pass | Pass | [photo 5][a6-52] is set to export as SVG, and [photo 6][a6-53] has no export setting. |
 | EM-30 | Partly | Pass | Pass | Pass | Pass | [image slice][a6-64] is 1,700px tall in the desktop frame, over the 1,500px house height; its mobile copy is 1,062px. |
 | EM-31 | Pass with flags, or Partly when not every image was looked at closely | Pass | Pass | Pass | Pass, with a flag | Added 2026-10-07. Faults A's photos are abstract placeholders whose alt notes describe real scenes, and the Control's hero alt text names "a planner open beside a cup of coffee" over abstract artwork; each is plainly placeholder art, so it's a flag to confirm once the final image is in. Faults B, C and D carry only the logo, whose alt text matches. |
+
+## The companion skills
+
+The plan and annotate companions are evaluated on reports the main skill produced, so their cases start from a report rather than a file. Both 2026-10-08 audits asked for these cases ([plan](<../audits/2026-10-08 merge-email-check-plan skill audit.md>), [annotate](<../audits/2026-10-08 merge-email-check-annotate skill audit.md>)).
+
+| Case | What a correct run does | Claude Code, without the skill | Claude Code, with the skill |
+| --- | --- | --- | --- |
+| Plan, from the Faults page report | Covers every Fail and Partly for every email (28 checks), puts flags in Judge steps that close nothing, links each layer, and follows the report's "Fix these first" order | 2026-10-08: Opus 5.5 and Sonnet 5.5 both covered all 28 checks, but linked no layers and planned flags as fixes ([Opus](<diagnostics/2026-10-08 plan Faults without Claude Code Opus.md>), [Sonnet](<diagnostics/2026-10-08 plan Faults without Claude Code Sonnet.md>)) | 2026-10-08, plan 0.2.0: Opus 5.5 covered all 28 with 74 links and 7 Judge steps in 9 sittings ([report](<diagnostics/2026-10-08 plan Faults with Claude Code Opus, plan 0.2.0.md>)); Sonnet 5.5 all 28 with 75 links and 4 Judge steps ([report](<diagnostics/2026-10-08 plan Faults with Claude Code Sonnet, plan 0.2.0.md>)) |
+| Plan, from the Control report | Plans no fixes, because nothing failed, and turns the report's flags into Judge steps | **TBD** | 2026-10-08, plan 0.2.0: Opus 5.5 and Sonnet 5.5 both gave two Judge steps on the placeholder hero and no fixes ([Opus](<diagnostics/2026-10-08 plan Control with Claude Code Opus, plan 0.2.0.md>), [Sonnet](<diagnostics/2026-10-08 plan Control with Claude Code Sonnet, plan 0.2.0.md>)) |
+| Annotate, on a throwaway copy of Faults A, after the main skill's report in the same session | Writes up to 20 findings in the Development category, changes no existing note, and proves the rest of the file unchanged | 2026-10-08: Opus 5.5 wrote 34 annotations for 17 findings on both frames, added after the existing notes, and changed none of the 46 noted layers, which hold no ampersands or quotes ([report](<diagnostics/2026-10-08 annotate without Claude Code Opus.md>)) | 2026-10-08, annotate 0.2.0: Opus 5.5 wrote 13 of 20 and skipped 7 for want of a free holding layer ([report](<diagnostics/2026-10-08 annotate with Claude Code Opus, annotate 0.2.0.md>)); Sonnet 5.5 wrote 14 and skipped 6, and skipped the "go" confirmation ([report](<diagnostics/2026-10-08 annotate with Claude Code Sonnet, annotate 0.2.0.md>)); both left all 46 noted layers unchanged |
+
+The annotate runs show the holding-layer rule costs coverage: a note-heavy email runs out of free holding layers. **Proposed:** add a finding after a layer's existing notes when none holds an ampersand or quote, read them back to confirm they're unchanged, and fall back to a holding layer only otherwise; and annotate a finding on each frame where it appears.
 
 ## Results
 
