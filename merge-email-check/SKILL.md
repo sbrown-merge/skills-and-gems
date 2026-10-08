@@ -7,7 +7,7 @@ description: Checks an email design in Figma against email best practices before
 
 This skill checks an email design against what decides how it reads in real mail apps: Outlook at work with images blocked, Gmail and Apple Mail in dark mode, and screen readers.
 
-Version 0.3.0, 2026-10-07. Tested with: the scripts only, through the Figma MCP's `use_figma` from Claude Code on Opus 5.5, 2026-10-05. Figma's agent (model undisclosed): **TBD**.
+Version 0.3.1, 2026-10-08. Tested with: 0.3.0 in Claude Code on Opus 5.5 and Sonnet 5.5, 2026-10-08; 0.2.0 and 0.2.1 in Figma's agent (model undisclosed), 2026-10-06. 0.3.x in Figma's agent: **TBD**.
 
 ## How to run this skill
 
@@ -162,7 +162,7 @@ Then rank the fixes: Must, then Should, then Could, and within a rank whatever a
 
 ### Step 5: Deliver comments, only if asked
 
-Put the ranked findings, Must first, at most 20, on each one's first example layer with your own comment action, worded "EM-10 (Must): <the problem>. Fix: <the fix>. From merge-email-check 0.3.0." More buries the ones that matter. Findings with no layer stay in the report.
+Put the ranked findings, Must first, at most 20, on each one's first example layer with your own comment action, worded "EM-10 (Must): <the problem>. Fix: <the fix>. From merge-email-check 0.3.1." More buries the ones that matter. Findings with no layer stay in the report.
 
 ### Step 6: Prove nothing changed
 
@@ -177,7 +177,7 @@ Write for a designer with a few minutes: plain words, complete sentences, US spe
 
 <Two or three sentences: ready or not, and the first thing to do.>
 
-Checked <date> with merge-email-check 0.3.0. Scope: <scope ID>. Emails: <names>. House numbers: <MERGE's, or what changed>.
+Checked <date> with merge-email-check 0.3.1. Scope: <scope ID>. Emails: <names>. House numbers: <MERGE's, or what changed>.
 
 ## Scorecard
 
@@ -279,8 +279,5 @@ WCAG 2.2 AA for every project.
 ### Export
 
 - **EM-29 Images export as JPG or PNG (Should, Universal; I `counts.exportSvgPdf`, `counts.exportNone`).** Fail for any SVG or PDF; Partly when some images have no export setting.
-- **EM-30 Image slices stay under the house height (Could, House; I `counts.tall`).** Pass when none is taller.
+- **EM-30 Image slices stay under the house height (Could, House; I `counts.tall`).** Default rule over the images.
 
----
-
-Structure adapted from merge-build-readiness, which adapted it from the Figma Community skill create-anatomy, from uSpec (https://github.com/redongreen/uSpec) by Ian Guisard, MIT license.

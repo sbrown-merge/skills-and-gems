@@ -63,3 +63,5 @@ H3 (whether any step is over-prescriptive for Opus), I4 (whether Haiku skips a s
 ## Verdict
 
 Not ready for production: 2 items failed (A5 and I3). The README and the repo's root README carry the banner. Take both out in the same commit that fixes the last of the two, and add a line here saying which commit that was.
+
+**Cleared 2026-10-08.** Both failed items are fixed in merge-email-check 0.3.1. A5: the "Tested with" line and the README's testing section are current. I3: case 3 ran in Claude Code on Opus 5.5 and Sonnet 5.5, with and without the skill, and the eight results are in [EVAL.md](../merge-email-check/EVAL.md#results). The banners came out in the same commit. The audit's three other findings are handled too: the credit line moved to the README, which freed 193 characters; the scripts README's stale line is fixed; and a run that delivers comments is still to do, listed in the README's testing section.

@@ -44,7 +44,7 @@ The cut-down set came to 34,855 characters minified, under a target of 35,000; S
 
 Most of the saving came from merging. The five check scripts each carried their own copy of the note reader, the button finder, the loading and layer helpers, and two of them the contrast math and the background walk; scripts 01 and 02 now hold one copy each, and one background walk in script 02 serves both the images-off check and text contrast. The rest came from returning compact strings in place of objects with many keys, leaving out values the agent can work out from what's returned (EM-01's width notes, EM-02's comparison, EM-05's overage), dropping fields no check used (the current user, the selection list, the settings echo, the image pixel size and file type), and dropping the parts of merge-build-readiness's scripts that the checklist no longer needs: EM-21's spacing exception, and the prototype-interaction targets. Two pieces of real reading were cut as well: script 08's pass over every mode of a bound color variable, which Steve asked to have back and is back, and the full PNG transparency scan, which stays out.
 
-There's no script for delivering annotations yet, so `__ADDED__` is always 0.
+In this skill `__ADDED__` is always 0, because it writes no annotations; script 04, which does, runs in the companion skill merge-email-check-annotate, where `__ADDED__` is script 04's `annotatedCount`.
 
 ## Placeholders and house settings
 

@@ -1,8 +1,5 @@
 # merge-email-check
 
-> [!WARNING]
-> **Not ready for production.** This skill failed 2 items in its [2026-10-08 audit](<../audits/2026-10-08 merge-email-check skill audit.md>), and they haven't been fixed yet. Use it with care until they are.
-
 `merge-email-check` is a skill for Figma's own agent that checks an email design against email best practices before it's built. A designer runs `/merge-email-check` on an email's mobile and desktop frames, answers one question, and gets a scorecard of 31 checks with evidence linked to each layer, then the fixes to make first. It works for any email project, MERGE's or a client's: universal checks come from WCAG 2.2, email law and how mail apps behave, and house checks use MERGE's numbers as defaults that a project can change. It also runs from Claude Code through the Figma MCP. It never changes the design apart from comments the designer asks for. This README is for whoever maintains and publishes it.
 
 ## Contents
@@ -49,10 +46,11 @@ In a Figma Design file that belongs to the MERGE organization, open the agent, c
 
 ## Version and testing
 
-Version 0.3.0, 2026-10-07. The scripts were tested through `use_figma` on 2026-10-05 against the TOFU email file (`Dqux2GL6tXD0boEEW3QCax`), and the color-mode pass against Andrew's Abbott library (`0VTZx0ZXc08vCIjdzb8Xza`). **TBD:** the first run in Figma's agent, and the evaluations at step 5 of the [plan](PLAN.md).
+Version 0.3.1, 2026-10-08. The scripts were tested through `use_figma` on 2026-10-05 and 2026-10-06 against the TOFU email file (`Dqux2GL6tXD0boEEW3QCax`) and the deliberate-faults file (`pgpRQNF2ey2fXl3lMS9D2O`), and the color-mode pass against Andrew's Abbott library (`0VTZx0ZXc08vCIjdzb8Xza`). In Figma's agent, version 0.2.0 matched 113 of 120 expected results on the Faults page and 0.2.1 matched 30 of 30 on the Control, on 2026-10-06. In Claude Code, version 0.3.0 matched 123 or 124 of 124 on the Faults page and 31 of 31 on the Control, on both Opus 5.5 and Sonnet 5.5, on 2026-10-08. [EVAL.md](EVAL.md#results) holds every run. **TBD:** version 0.3.x in Figma's agent, cases 1, 2 and 4, and a run that delivers comments.
 
 ## Version history
 
+- **0.3.1 (2026-10-08):** From the 2026-10-08 audit and the first Claude Code runs: EM-30 names the default rule, the "Tested with" line is current, and the credit line moves to this README to save room.
 - **0.3.0 (2026-10-07):** EM-31 checks that alt text describes its image. The report gives its scope's ID, and step 8 also offers the new companion `merge-email-check-annotate`, which writes the findings as Dev Mode annotations.
 - **0.2.2 (2026-10-06):** "Fix these first" holds only checks that failed or partly passed; a proposed new check goes under "Problems no check covers". From the Control run, which put a proposal first, ranked Must.
 - **0.2.1 (2026-10-06):** From the first full run in Figma's agent: a check is N/A for an email with nothing for it to look at; EM-20 and EM-22 state the default rule; a copy of an email inside a mail-app frame comes out of the list, so it isn't counted twice.

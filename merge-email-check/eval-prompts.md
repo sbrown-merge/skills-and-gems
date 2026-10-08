@@ -43,3 +43,4 @@ This table gives the link to paste for each case. EVAL.md holds what each run sh
 | 2 | Terry Smith's TOFU emails, page 04 | https://www.figma.com/design/Dqux2GL6tXD0boEEW3QCax/?node-id=2-5 |
 | 3a | The deliberate-faults file, page 01 Faults | https://www.figma.com/design/pgpRQNF2ey2fXl3lMS9D2O/?node-id=2-2 |
 | 3b | The deliberate-faults file, page 02 Control | https://www.figma.com/design/pgpRQNF2ey2fXl3lMS9D2O/?node-id=2-3 |
+| 4 | The sample email, page 03 Sample | https://www.figma.com/design/pgpRQNF2ey2fXl3lMS9D2O/?node-id=60-2 |

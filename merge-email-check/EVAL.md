@@ -19,6 +19,7 @@ This file holds the test cases for `merge-email-check` at step 5 of the [build p
 - Case 1: the Adobe Elevate rebuild
 - Case 2: Terry Smith's TOFU emails
 - Case 3: the deliberate-faults file
+- Case 4: a realistic sample email
 - Expected results on the deliberate-faults file
 - Results
 <!-- /toc -->
@@ -109,6 +110,17 @@ Four things came out differently from the brief, and the table below allows for 
 
 The build was checked with read-only scripts of our own on 2026-10-06: frame widths, heights and positions, the notes on every image and module and their categories, export settings, fills under images, the layers in the first 300px of each desktop frame, button and link sizes, and stray text that the scripts' word patterns would pick up. The skill's own scripts weren't run, so the first run with the skill is also the first test of this file against them. Screenshots of each page are in `merge-marketing-email-specs/.scratch/2026-10-06 faults file/`, which isn't committed.
 
+## Case 4: a realistic sample email
+
+Page 03 Sample of the deliberate-faults file, [section 60:3](https://www.figma.com/design/pgpRQNF2ey2fXl3lMS9D2O/?node-id=60-3), added on 2026-10-08, holds one email built to look like real work: a Northwind Analytics webinar invitation in Arial, with a mobile frame (62:2) left of a desktop frame (62:57), notes on most layers and two unlabeled mistakes of the kind a designer really makes. Nothing in its layer names gives the mistakes away, so it tests whether the skill finds faults it wasn't told about without raising false alarms. Expected: every check passes or is N/A except these two, and EM-31 may flag the drawn placeholder portrait.
+
+| Check | Expected | What causes it |
+| --- | --- | --- |
+| EM-11 | Partly | "speaker photo" has only an image fill and its holding row has none, in both frames ([62:37](https://www.figma.com/design/pgpRQNF2ey2fXl3lMS9D2O/?node-id=62-37), [62:92](https://www.figma.com/design/pgpRQNF2ey2fXl3lMS9D2O/?node-id=62-92)); the logo and the chart have a color behind them |
+| EM-21 | Partly | "Add to calendar" is 40px tall, under the 44px house size, in both frames ([62:48](https://www.figma.com/design/pgpRQNF2ey2fXl3lMS9D2O/?node-id=62-48), [62:103](https://www.figma.com/design/pgpRQNF2ey2fXl3lMS9D2O/?node-id=62-103)) |
+| EM-25 | N/A | One version, with no merge tags |
+| EM-31 | Pass, possibly with a flag | The speaker photo's alt text names the host over a drawn placeholder portrait |
+
 ## Expected results on the deliberate-faults file
 
 The table gives each check's expected result on each email on page 01 and on the Control, and the layers that cause it. Faults A's layers are linked in its desktop frame; its mobile frame carries the same faults on layers of the same names. Results follow the checklist's default rule where a check gives no rule of its own: Pass when nothing is found, Partly when the problem affects fewer than half the items checked, Fail at half or more.
@@ -119,7 +131,7 @@ The table gives each check's expected result on each email on page 01 and on the
 | EM-02 | Fail | N/A | Pass | Pass | Pass | Faults A's mobile frame sits at x 760, right of the desktop frame at x 80. Faults B has one frame. |
 | EM-03 | Fail | Pass | Pass | Fail | Pass | Faults A has 11 modules: 5 with a mobile-behavior note, [features][a6-13] with only a "Suggestion:" note, and [hero][a6-6], [banner][a6-18], [illustration][a6-27], [gallery][a6-45] and [slice][a6-63] with none, so 6 of 11 lack a firm note. Faults C is read from its mobile frame. Faults D's desktop frame isn't grouped into modules. |
 | EM-04 | Fail | Pass | N/A | Pass | Pass | Faults A's first 300px holds only the [logo][a6-5] at y 24 and the [hero image][a6-7] at y 90; the hero headline starts at y 326. Faults C has no desktop content. |
-| EM-05 | Partly | Pass | Pass | Pass | Pass | Faults A's desktop frame is 5,189px tall, over the 4,500px house length. |
+| EM-05 | Partly | Pass | N/A | Pass | Pass | Faults A's desktop frame is 5,189px tall, over the 4,500px house length. Faults C's desktop frame is empty, so EM-05 has nothing to measure there (corrected 2026-10-08, after skill 0.2.1's N/A rule). |
 | EM-06 | Partly | Pass | Pass | Pass | Pass | [photo 1][a6-47] has no alt or decorative note, and [photo 2][a6-48] has only a suggestion: 2 of 16 images in each frame. |
 | EM-07 | Fail, 1 flag | Pass | Pass | Pass | Pass | At 335px the estimate is 38 characters: [image alt too long][a6-17] is 74 (Fail), [image alt near miss][a6-16] is 40 (a flag) and [image alt fits][a6-15] is 22. |
 | EM-08 | Fail | Pass | Pass | Pass | Pass | The primary CTA, [primary button][a6-26], is a picture of a "Shop now" button. |
@@ -145,9 +157,11 @@ The table gives each check's expected result on each email on page 01 and on the
 | EM-28 | Fail | Pass | Pass | Pass | Pass | [footer][a6-65] has [Unsubscribe][a6-68] with no Link or CTA note, and no postal address. It does have a privacy link. |
 | EM-29 | Fail | Pass | Pass | Pass | Pass | [photo 5][a6-52] is set to export as SVG, and [photo 6][a6-53] has no export setting. |
 | EM-30 | Partly | Pass | Pass | Pass | Pass | [image slice][a6-64] is 1,700px tall in the desktop frame, over the 1,500px house height; its mobile copy is 1,062px. |
-| EM-31 | Pass, with flags | Pass | Pass | Pass | Pass, with a flag | Added 2026-10-07. Faults A's photos are abstract placeholders whose alt notes describe real scenes, and the Control's hero alt text names "a planner open beside a cup of coffee" over abstract artwork; each is plainly placeholder art, so it's a flag to confirm once the final image is in. Faults B, C and D carry only the logo, whose alt text matches. |
+| EM-31 | Pass with flags, or Partly when not every image was looked at closely | Pass | Pass | Pass | Pass, with a flag | Added 2026-10-07. Faults A's photos are abstract placeholders whose alt notes describe real scenes, and the Control's hero alt text names "a planner open beside a cup of coffee" over abstract artwork; each is plainly placeholder art, so it's a flag to confirm once the final image is in. Faults B, C and D carry only the logo, whose alt text matches. |
 
 ## Results
+
+**A caveat on case 3's baselines.** Faults A's layer names carry the check IDs they test, such as "photo 1 (EM-06)", so a run without the skill gets a hint. The Sonnet run on 2026-10-08 said it used them. Case 4's sample has no IDs in its names, so it's the fairer test of a run without the skill.
 
 Each cell records the date, the model, and how many checks matched the expected result, with a link to the saved report in `diagnostics/`.
 
@@ -155,8 +169,9 @@ Each cell records the date, the model, and how many checks matched the expected 
 | --- | --- | --- | --- | --- |
 | 1. The Adobe Elevate rebuild | **TBD** | **TBD** | **TBD** | **TBD** |
 | 2. Terry Smith's TOFU emails | **TBD** | **TBD** | **TBD** | **TBD** |
-| 3. The deliberate-faults file, page 01 Faults | **TBD** | **TBD** | 2026-10-06, model undisclosed: on Faults A, 16 of 30 matched, 6 partly, 8 missed ([report](<diagnostics/2026-10-06 3a without Figma agent.md>)) | 2026-10-06, skill 0.2.0, model undisclosed: on Faults A, 28 of 30 matched; across Faults A to D, 113 of 120 matched once EVAL.md's EM-25 error is corrected ([report](<diagnostics/2026-10-06 3a with Figma agent, skill 0.2.0.md>)) |
-| 3. The deliberate-faults file, page 02 Control | **TBD** | **TBD** | **TBD** | 2026-10-06, skill 0.2.1, model undisclosed: 30 of 30 matched, no false alarms; 10 min 58 s ([report](<diagnostics/2026-10-06 3b with Figma agent, skill 0.2.1.md>)) |
+| 3. The deliberate-faults file, page 01 Faults | 2026-10-08, on Faults A of 31: Opus 5.5 25 matched, 3 partly, 3 missed ([report](<diagnostics/2026-10-08 3a without Claude Code Opus.md>)); Sonnet 5.5 21, 3, 7, and it used the check IDs in the layer names as hints ([report](<diagnostics/2026-10-08 3a without Claude Code Sonnet.md>)). Both found Faults B, C and D | 2026-10-08, skill 0.3.0: Opus 5.5 123 of 124 ([report](<diagnostics/2026-10-08 3a with Claude Code Opus, skill 0.3.0.md>)); Sonnet 5.5 124 of 124 once EM-31 accepts Partly ([report](<diagnostics/2026-10-08 3a with Claude Code Sonnet, skill 0.3.0.md>)) | 2026-10-06, model undisclosed: on Faults A, 16 of 30 matched, 6 partly, 8 missed ([report](<diagnostics/2026-10-06 3a without Figma agent.md>)) | 2026-10-06, skill 0.2.0, model undisclosed: on Faults A, 28 of 30 matched; across Faults A to D, 113 of 120 matched once EVAL.md's EM-25 error is corrected ([report](<diagnostics/2026-10-06 3a with Figma agent, skill 0.2.0.md>)) |
+| 3. The deliberate-faults file, page 02 Control | 2026-10-08: Opus 5.5 1 false alarm, the icons' missing alt notes, which EM-06 doesn't cover ([report](<diagnostics/2026-10-08 3b without Claude Code Opus.md>)); Sonnet 5.5 2 false alarms, export settings it didn't read and an outlined logo against D-21 ([report](<diagnostics/2026-10-08 3b without Claude Code Sonnet.md>)) | 2026-10-08, skill 0.3.0: Opus 5.5 31 of 31, about 5 minutes ([report](<diagnostics/2026-10-08 3b with Claude Code Opus, skill 0.3.0.md>)); Sonnet 5.5 31 of 31, about 3 minutes ([report](<diagnostics/2026-10-08 3b with Claude Code Sonnet, skill 0.3.0.md>)) | **TBD** | 2026-10-06, skill 0.2.1, model undisclosed: 30 of 30 matched, no false alarms; 10 min 58 s ([report](<diagnostics/2026-10-06 3b with Figma agent, skill 0.2.1.md>)) |
+| 4. The sample email, page 03 Sample | **TBD** | **TBD** | **TBD** | **TBD** |
 
 [checks]: checklist.md#all-checks-at-a-glance
 [s106-6]: https://www.figma.com/design/Dqux2GL6tXD0boEEW3QCax/MERGE-TOFU-Marketing-Emails---Q4-2026?node-id=106-6
