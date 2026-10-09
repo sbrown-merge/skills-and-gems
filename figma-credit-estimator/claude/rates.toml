@@ -1,0 +1,49 @@
+# Figma credit estimator: the rates sheet.
+#
+# The single source of every figure the estimator uses. The Claude skill reads this file,
+# and the build writes the human-readable rates sheet (claude/references/rates.md, and later
+# the gem and MERGE One knowledge files) from it. Change a figure here, then run
+# `uv run scripts/build.py` from the figma-credit-estimator folder.
+#
+# Every decision below is Steve Brown's, 2026-10-09, recorded with its evidence in
+# CCE-AI-strategy/budget/2026-10-09 figma-credit-estimator-plan.md (decisions E1 to E8).
+
+version = "0.1.0"
+calibrated = "2026-10-09"
+calibration_note = "It's the average of their busiest Figma credit periods between 2026-02-07 and 2026-10-07, counting Figma Make and Figma's agent together and leaving out one design-system spike. Most of the agent use in that window was during its free beta."
+recalibrate_after = "2026-11-07"
+
+[rates]
+# E1: one rate for every designer, rounded up from the heavy users' average to allow for
+# agent-heavy work. The average is kept so the rates sheet can show it.
+heavy_user_average = 1745
+credits_per_day = 2000
+# E2: design hours in a working day, so meetings and overhead don't dilute the rate.
+design_hours_per_day = 6
+# Working days in a week, for estimates given in weeks. Holidays aren't taken out,
+# which keeps the estimate high.
+days_per_week = 5
+# E3: every credit priced at pay-as-you-go, with no seat grant. Figma's price since 2026-08-25.
+price_per_credit = 0.0188
+# E4: padding on the net figure. Also covers occasional users the calculation doesn't
+# count, such as a content strategist editing copy with the agent.
+padding = 0.30
+# E7: spike work, priced by the designer-day: Andrew Bokermann's average on Abbott in the
+# 2026-09-07 credit period (7,601 credits a working day), rounded.
+spike_credits_per_day = 7600
+# The busiest single spike day on record, 2026-10-02, for the report's warning.
+spike_peak_day_credits = 40592
+
+[output]
+# E6: where the recommended amount goes.
+line_item = "Experience out-of-pocket"
+
+# E8: the roles whose time counts. The skill shows this list when it asks for hours, so the
+# person only enters these roles' time. TBD (Steve): confirm against the staffing sheet's
+# exact role titles.
+[roles]
+counted = [
+  "Experience: any UX designer, UI designer or experience designer, at any level up to and including VP",
+  "Studio: Studio Designer, Studio UX Designer, Studio Manager and Studio Production",
+]
+not_counted = "Roles above VP, strategy, content, research, project management and development. The padding covers their occasional use of Figma."

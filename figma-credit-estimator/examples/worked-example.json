@@ -1,0 +1,5 @@
+{
+  "about": "The plan's worked example: 540 design hours and one designer on two weeks of spike work. build.py --check runs these arguments and compares the recommended figure.",
+  "args": ["--hours", "540", "--spike", "2:1"],
+  "recommended": 6257
+}
