@@ -7,7 +7,7 @@ description: Checks an email design in Figma against email best practices before
 
 This skill checks an email design against what decides how it reads in real mail apps: Outlook at work with images blocked, Gmail and Apple Mail in dark mode, and screen readers.
 
-Version 0.5.0.
+Version 0.5.1.
 
 ## How to run this skill
 
@@ -150,7 +150,7 @@ Small text in a screenshot isn't reliably readable: when you can't read it, say 
 
 Judge every check below from the data and screenshots, running no scripts, once for each email in the scope. Missing data makes a check Couldn't check, naming the read that failed.
 
-Each check is Pass, Partly, Fail, Couldn't check or N/A, with evidence: the count and up to three examples linked to their layers. A check can also carry **flags**, items for the designer to judge, which are listed without changing its result. A check is N/A for an email that has none of what it looks at, such as no icons for EM-14, no mobile frame for EM-02, or no desktop content for EM-04, and an email with nothing drawn is N/A on every check but EM-01. Unless a check below says otherwise, a check judged from a count uses the **default rule**: Pass when nothing is found, Partly when the problem affects fewer than half of the items checked, Fail at half or more.
+Each check is Pass, Partly, Fail, Couldn't check or N/A, with evidence: the count and up to three examples linked to their layers. A check can also carry **flags**, items for the designer to judge, which are listed without changing its result. A check is N/A for an email that has none of what it looks at, such as no icons for EM-14, no mobile frame for EM-02, or no desktop content for EM-04 or EM-02 (an empty frame counts as missing), or only the logo for EM-09, and an email with nothing drawn is N/A on every check but EM-01. Unless a check below says otherwise, a check judged from a count uses the **default rule**: Pass when nothing is found, Partly when the problem affects fewer than half of the items checked, Fail at half or more.
 
 If the layout part's `notes.matched` is 0, the file uses none of the note kinds, so EM-03, EM-06, EM-07, EM-12 and EM-23 are Couldn't check, and the report suggests the eight note kinds above.
 
@@ -158,7 +158,7 @@ Then rank the fixes: Must, then Should, then Could, and within a rank whatever a
 
 ### Step 5: Deliver comments, only if asked
 
-Put the ranked findings, Must first, at most 20, on each one's first example layer with your own comment action, worded "EM-10 (Must): <the problem>. Fix: <the fix>. From merge-email-check 0.5.0." More buries the ones that matter. Findings with no layer stay in the report.
+Put the ranked findings, Must first, at most 20, on each one's first example layer with your own comment action, worded "EM-10 (Must): <the problem>. Fix: <the fix>. From merge-email-check 0.5.1." More buries the ones that matter. Findings with no layer stay in the report.
 
 ### Step 6: Prove nothing changed
 
@@ -173,7 +173,7 @@ Write for a designer with a few minutes: plain words, complete sentences, US spe
 
 <Two or three sentences: ready or not, and the first thing to do.>
 
-Checked <date> with merge-email-check 0.5.0. Scope: <scope ID>. Emails: <names>. House numbers: <MERGE's, or what changed>.
+Checked <date> with merge-email-check 0.5.1. Scope: <scope ID>. Emails: <names>. House numbers: <MERGE's, or what changed>.
 
 ## Scorecard
 

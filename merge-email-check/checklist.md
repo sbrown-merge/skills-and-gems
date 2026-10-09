@@ -3,7 +3,7 @@ title: "merge-email-check: the checklist"
 description: "The 31 checks merge-email-check runs on an email design in Figma, EM-01 to EM-31, each with its rank, tier, how a script or the agent verifies it, and its source in the email-specs research and rulings."
 type: checklist
 status: draft
-version: "0.5.0"
+version: "0.5.1"
 created: 2026-10-05
 maintainer: Steve Brown
 tags: [figma, figma-agent, skill, email, crm, accessibility, dark-mode, checklist]
@@ -50,7 +50,7 @@ Each check has an ID, a rank, a tier, a way of being verified, and a source. Thi
 
 **Tiers** decide what a project can change. A **Universal** check holds for any email, because it comes from WCAG 2.2, from email law, or from how mail apps behave, and its rule isn't a setting. A **House** check uses a number or policy from the [house settings](#house-settings) below, which default to MERGE's and can be changed for a client project in the opening question.
 
-**Results** are Pass, Partly, Fail, Couldn't check or N/A. A check can also carry **flags**: items the designer should judge, which the report lists under their check without changing its result. Couldn't check means a read failed or Figma doesn't expose what the check needs, and the report says which; the agent never guesses a result. N/A means the check doesn't apply, for example no images in scope; an email with nothing drawn in it is N/A on every check except EM-01. Unless a check says otherwise, a Script check passes when it finds nothing, is Partly when the problem affects fewer than half of the items it checked, and fails at half or more. Every result carries evidence: the total count and up to ten layers, of which the report links up to three.
+**Results** are Pass, Partly, Fail, Couldn't check or N/A. A check can also carry **flags**: items the designer should judge, which the report lists under their check without changing its result. Couldn't check means a read failed or Figma doesn't expose what the check needs, and the report says which; the agent never guesses a result. N/A means the check doesn't apply, for example no images in scope; an email with nothing drawn in it is N/A on every check except EM-01. An empty frame counts as missing, so an email whose desktop frame is empty is N/A on EM-02, EM-04 and EM-05, and one whose only image is the logo is N/A on EM-09 (Steve, 2026-10-09). Unless a check says otherwise, a Script check passes when it finds nothing, is Partly when the problem affects fewer than half of the items it checked, and fails at half or more. Every result carries evidence: the total count and up to ten layers, of which the report links up to three.
 
 **Verified by** is **Script** when a Plugin API script returns the data and the result follows from the rule with no judgment, or **Judgment** when a script or a screenshot gathers the data and the agent decides, because the call depends on what a layer is for.
 
@@ -342,6 +342,7 @@ Some things that decide whether an email works exist only in the HTML or the sen
 
 ## Version history
 
+- **0.5.1 (2026-10-09):** The N/A rule says that an empty frame counts as missing for EM-02, EM-04 and EM-05, and that a logo-only email is N/A on EM-09, as the rule already implied; from the 0.5.0 Claude Code run on the Faults page.
 - **0.5.0 (2026-10-08):** Steve's rulings on the questions from the Claude Code version's first run: EM-20 gains a test for which icons carry meaning; EM-25 is still N/A with one version but lists merge tags and their content-field notes; EM-09 and EM-31 count an image seen clearly in a frame's screenshot as looked at.
 - **0.4.2 (2026-10-08):** A link to the scripts README that had been pasted twice is repaired, with no change in meaning.
 - **0.4.1 (2026-10-08):** Clarifications from the Claude Code runs of cases 1 and 2, with no check changed in meaning: an empty email is N/A on everything but EM-01, EM-17 doesn't take a canvas caption as a note, and EM-31 is N/A with no alt notes.

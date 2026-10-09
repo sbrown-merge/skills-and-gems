@@ -4,14 +4,14 @@ description: Checks an email design in a Figma file against email best practices
 compatibility: Requires the remote Figma MCP server with its use_figma and get_screenshot tools, and Figma's figma-use skill.
 metadata:
   mcp-server: figma
-  version: "0.5.0"
+  version: "0.5.1"
 ---
 
 # merge-email-check
 
 This skill checks an email design against what decides how it reads in real mail apps: Outlook at work with images blocked, Gmail and Apple Mail in dark mode, and screen readers.
 
-Version 0.5.0. This is the Claude Code version; a version for Figma's own agent is built from the same rules and scripts, so both give the same results on the same design.
+Version 0.5.1. This is the Claude Code version; a version for Figma's own agent is built from the same rules and scripts, so both give the same results on the same design.
 
 ## How to run this skill
 
@@ -86,7 +86,7 @@ Small text in a screenshot isn't reliably readable: when you can't read it, say 
 
 Judge every check below from the data and screenshots, running no scripts, once for each email in the scope. Missing data makes a check Couldn't check, naming the read that failed.
 
-Each check is Pass, Partly, Fail, Couldn't check or N/A, with evidence: the count and up to three examples linked to their layers. A check can also carry **flags**, items for the designer to judge, which are listed without changing its result. A check is N/A for an email that has none of what it looks at, such as no icons for EM-14, no mobile frame for EM-02, or no desktop content for EM-04, and an email with nothing drawn is N/A on every check but EM-01. Unless a check below says otherwise, a check judged from a count uses the **default rule**: Pass when nothing is found, Partly when the problem affects fewer than half of the items checked, Fail at half or more.
+Each check is Pass, Partly, Fail, Couldn't check or N/A, with evidence: the count and up to three examples linked to their layers. A check can also carry **flags**, items for the designer to judge, which are listed without changing its result. A check is N/A for an email that has none of what it looks at, such as no icons for EM-14, no mobile frame for EM-02, or no desktop content for EM-04 or EM-02 (an empty frame counts as missing), or only the logo for EM-09, and an email with nothing drawn is N/A on every check but EM-01. Unless a check below says otherwise, a check judged from a count uses the **default rule**: Pass when nothing is found, Partly when the problem affects fewer than half of the items checked, Fail at half or more.
 
 If the layout part's `notes.matched` is 0, the file uses none of the note kinds, so EM-03, EM-06, EM-07, EM-12 and EM-23 are Couldn't check, and the report suggests the eight note kinds above.
 
@@ -109,7 +109,7 @@ Write for a designer with a few minutes: plain words, complete sentences, US spe
 
 <Two or three sentences: ready or not, and the first thing to do.>
 
-Checked <date> with merge-email-check 0.5.0. Scope: <scope ID>. Emails: <names>. House numbers: <MERGE's, or what changed>.
+Checked <date> with merge-email-check 0.5.1. Scope: <scope ID>. Emails: <names>. House numbers: <MERGE's, or what changed>.
 
 ## Scorecard
 
