@@ -1,153 +1,216 @@
 # Figma credit estimator: worked examples
 
-These are finished reports made by MERGE's Figma credit calculator, for the Figma credit estimator gem and MERGE One agent to match. Each shows what a person typed and the report it produces, with the date fixed at 2026-10-09; a real report carries the date it's prepared. This file is built from the calculator; don't edit it by hand.
+These are finished conversations made with MERGE's Figma credit calculator, for the Figma credit estimator gem and MERGE One agent to match. The reports' date is fixed at 2026-10-09; a real report carries the date it's prepared. This file is built from the calculator; don't edit it by hand.
 
 ## Contents
 
 <!-- toc -->
 - Asking for the figures
-- Design hours only
-- Design hours with spike work
-- A duration with several groups and spike work
+- Design hours
+- A duration, confirmed with no staffing sheet yet
+- A duration that doesn't match the staffing sheet
+- A spike work estimate
+- Closing the reply
 <!-- /toc -->
 
 ## Asking for the figures
 
 When the person's message has no hours or duration, ask once, in one message, like this:
 
-> To estimate the Figma credits, I need one of these:
->
-> - **Design hours:** the total from your estimate.
-> - **Or a duration:** for each group of designers, how many weeks, how many designers, and what share of their time.
+> To estimate the Figma credits, I need the total design hours from your staffing sheet. If you don't have a staffing sheet yet, give me how many designers, for how many weeks, and at what effort, such as 2 designers for 6 weeks at 80%.
 >
 > Only these roles' time counts: Experience: any UX designer, UI designer or experience designer, at any level up to and including VP; Studio: Studio Designer, Studio UX Designer, Studio Manager and Studio Production.
->
-> Will any work be done mostly by Figma's agent, such as building a design system or a large component library? If so, how many designers, and for how many weeks?
 
-## Design hours only
+## Design hours
 
-The person typed: "How much should we budget for Figma credits on the Acme website redesign? We've estimated 520 design hours, and there's no design-system work."
+The person types: "How much should we budget for Figma credits on the Acme website redesign? The staffing sheet has 520 design hours."
 
-The report:
+You reply:
 
 ````markdown
 # Figma AI credit estimate: Acme website redesign
 
-**Recommended Experience out-of-pocket: $4,238.** Prepared 2026-10-09, with MERGE's Figma credit rates version 0.1.0.
+**Recommended Experience out-of-pocket: $4,245.** Prepared 2026-10-09 with version 0.2.0 of MERGE's Figma credit estimator, rates calibrated 2026-10-09.
 
 ## What we entered
 
-- 520 design hours, which is 86.7 designer-days at 6 design hours a day.
+- 520 design hours, as entered.
 
 ## How we got there
 
-| Item | Quantity | Credits | Cost |
-| --- | --- | --- | --- |
-| Design time | 86.7 designer-days × 2,000 credits | 173,400 | $3,260 |
-| Subtotal at $0.0188 a credit | | 173,400 | $3,260 |
-| Padding | 30% | | $978 |
-| **Recommended** | | | **$4,238** |
+- **Design time:** 520 design hours × 334 credits an hour = 173,680 credits, which at $0.0188 a credit is $3,265.
+- **Padding:** 30% of $3,265 is $980.
+- **Recommended:** $3,265 + $980 = $4,245.
 
 ## Assumptions
 
-- **2,000 credits a designer-day.** That's the average of the busiest months of MERGE's heaviest Figma AI users, 1,745 credits a working day, rounded up.
-- **6 design hours a working day and 5 working days a week,** with nothing taken out for holidays or vacation.
+- **334 credits a design hour.** MERGE's heaviest Figma AI users averaged 1,745 credits a working day in their busiest months. Rounded up to 2,000 a day and spread over a 6-hour design day, that's 333.3 an hour, rounded up.
 - **$0.0188 a credit,** Figma's pay-as-you-go price. The free credits that come with each Figma seat aren't deducted.
-- **Spike work at 7,600 credits a designer-day,** from the heaviest agent-led design-system work on record. It's added on top of design time, because it covers agent work beyond a normal day: overtime, weekends and holidays.
 - **Only design roles' time is counted:** Experience: any UX designer, UI designer or experience designer, at any level up to and including VP; Studio: Studio Designer, Studio UX Designer, Studio Manager and Studio Production.
 
 ## Caveats
 
 - The 30% padding covers people who aren't counted but sometimes use Figma's AI, such as a content strategist editing copy with the agent, and the uncertainty in the rates.
 - The rates were set on 2026-10-09, mostly from use of Figma's agent during its free beta, and will be re-checked against billed use.
-- A single day of spike work can run far above its average: the busiest on record used 40,592 credits, about $763.
 - Figma bills credits per person per month, not per program, so this is an estimate rather than a share of a Figma invoice.
-- No spike work is included. Work done mostly by Figma's agent, such as building a design system, would add about $186 for each designer's working day on it.
+- Spike work isn't included. If any work will be done mostly by Figma's agent, such as building a design system, plan for it with a separate spike work estimate: give how many designers, and for how many weeks.
 ````
 
-## Design hours with spike work
+## A duration, confirmed with no staffing sheet yet
 
-The person typed: "We have 540 design hours, and one designer will spend two weeks building the design system mostly with Figma's agent."
+The person types: "Pitch for a pharma mobile app, no staffing sheet yet: two UI designers for 6 weeks at 80%, and a VP of Experience Design for 6 weeks at 20%."
 
-The report:
+You reply:
 
 ````markdown
-# Figma AI credit estimate
+Your entry converts to 432 design hours:
 
-**Recommended Experience out-of-pocket: $6,257.** Prepared 2026-10-09, with MERGE's Figma credit rates version 0.1.0.
+- 2 designers × 6 weeks × 5 days × 8 hours × 80% = 384 design hours.
+- 1 designer × 6 weeks × 5 days × 8 hours × 20% = 48 design hours.
+- That's 432 design hours in all.
 
-## What we entered
-
-- 540 design hours, which is 90 designer-days at 6 design hours a day.
-- Spike work: 1 designer for 2 weeks, which is 10 spike days.
-
-## How we got there
-
-| Item | Quantity | Credits | Cost |
-| --- | --- | --- | --- |
-| Design time | 90 designer-days × 2,000 credits | 180,000 | $3,384 |
-| Spike work | 10 spike days × 7,600 credits | 76,000 | $1,429 |
-| Subtotal at $0.0188 a credit | | 256,000 | $4,813 |
-| Padding | 30% | | $1,444 |
-| **Recommended** | | | **$6,257** |
-
-## Assumptions
-
-- **2,000 credits a designer-day.** That's the average of the busiest months of MERGE's heaviest Figma AI users, 1,745 credits a working day, rounded up.
-- **6 design hours a working day and 5 working days a week,** with nothing taken out for holidays or vacation.
-- **$0.0188 a credit,** Figma's pay-as-you-go price. The free credits that come with each Figma seat aren't deducted.
-- **Spike work at 7,600 credits a designer-day,** from the heaviest agent-led design-system work on record. It's added on top of design time, because it covers agent work beyond a normal day: overtime, weekends and holidays.
-- **Only design roles' time is counted:** Experience: any UX designer, UI designer or experience designer, at any level up to and including VP; Studio: Studio Designer, Studio UX Designer, Studio Manager and Studio Production.
-
-## Caveats
-
-- The 30% padding covers people who aren't counted but sometimes use Figma's AI, such as a content strategist editing copy with the agent, and the uncertainty in the rates.
-- The rates were set on 2026-10-09, mostly from use of Figma's agent during its free beta, and will be re-checked against billed use.
-- A single day of spike work can run far above its average: the busiest on record used 40,592 credits, about $763.
-- Figma bills credits per person per month, not per program, so this is an estimate rather than a share of a Figma invoice.
+Does 432 design hours match the design hours on your staffing sheet? Reply yes, no, or that there's no staffing sheet yet.
 ````
 
-## A duration with several groups and spike work
+The person types: "There's no staffing sheet yet."
 
-The person typed: "Pitch for a pharma mobile app: 4 weeks of discovery with one UX designer at half time, then 7 weeks of design with two UI designers full time and a VP of Experience Design at 20%, then 6 weeks of dev support with one UI designer at a quarter of their time. Both UI designers will spend the first week and a half of design building the component library mostly with Figma's agent."
-
-The report:
+You reply:
 
 ````markdown
 # Figma AI credit estimate: Pharma mobile app pitch
 
-**Recommended Experience out-of-pocket: $7,405.** Prepared 2026-10-09, with MERGE's Figma credit rates version 0.1.0.
+**Recommended Experience out-of-pocket: $3,527.** Prepared 2026-10-09 with version 0.2.0 of MERGE's Figma credit estimator, rates calibrated 2026-10-09.
 
 ## What we entered
 
-- 1 designer for 4 weeks at 50% of their time, which is 10 designer-days.
-- 2 designers for 7 weeks at 100% of their time, which is 70 designer-days.
-- 1 designer for 7 weeks at 20% of their time, which is 7 designer-days.
-- 1 designer for 6 weeks at 25% of their time, which is 7.5 designer-days.
-- Spike work: 2 designers for 1.5 weeks, which is 15 spike days.
+- 384 design hours, converted from 2 designers × 6 weeks × 5 days × 8 hours × 80%, with no staffing sheet yet to check it against.
+- 48 design hours, converted from 1 designer × 6 weeks × 5 days × 8 hours × 20%, with no staffing sheet yet to check it against.
+- That's 432 design hours in all.
 
 ## How we got there
 
-| Item | Quantity | Credits | Cost |
-| --- | --- | --- | --- |
-| Design time | 94.5 designer-days × 2,000 credits | 189,000 | $3,553 |
-| Spike work | 15 spike days × 7,600 credits | 114,000 | $2,143 |
-| Subtotal at $0.0188 a credit | | 303,000 | $5,696 |
-| Padding | 30% | | $1,709 |
-| **Recommended** | | | **$7,405** |
+- **Design time:** 432 design hours × 334 credits an hour = 144,288 credits, which at $0.0188 a credit is $2,713.
+- **Padding:** 30% of $2,713 is $814.
+- **Recommended:** $2,713 + $814 = $3,527.
 
 ## Assumptions
 
-- **2,000 credits a designer-day.** That's the average of the busiest months of MERGE's heaviest Figma AI users, 1,745 credits a working day, rounded up.
-- **6 design hours a working day and 5 working days a week,** with nothing taken out for holidays or vacation.
+- **334 credits a design hour.** MERGE's heaviest Figma AI users averaged 1,745 credits a working day in their busiest months. Rounded up to 2,000 a day and spread over a 6-hour design day, that's 333.3 an hour, rounded up.
+- **A converted duration counts 8 hours a day at full effort and 5 days a week,** with nothing taken out for holidays or vacation.
 - **$0.0188 a credit,** Figma's pay-as-you-go price. The free credits that come with each Figma seat aren't deducted.
-- **Spike work at 7,600 credits a designer-day,** from the heaviest agent-led design-system work on record. It's added on top of design time, because it covers agent work beyond a normal day: overtime, weekends and holidays.
 - **Only design roles' time is counted:** Experience: any UX designer, UI designer or experience designer, at any level up to and including VP; Studio: Studio Designer, Studio UX Designer, Studio Manager and Studio Production.
 
 ## Caveats
 
 - The 30% padding covers people who aren't counted but sometimes use Figma's AI, such as a content strategist editing copy with the agent, and the uncertainty in the rates.
 - The rates were set on 2026-10-09, mostly from use of Figma's agent during its free beta, and will be re-checked against billed use.
+- Figma bills credits per person per month, not per program, so this is an estimate rather than a share of a Figma invoice.
+- Spike work isn't included. If any work will be done mostly by Figma's agent, such as building a design system, plan for it with a separate spike work estimate: give how many designers, and for how many weeks.
+````
+
+## A duration that doesn't match the staffing sheet
+
+The person types: "Three designers for 4 weeks on the Fabrikam portal."
+
+You reply:
+
+````markdown
+Your entry converts to 480 design hours:
+
+- 3 designers × 4 weeks × 5 days × 8 hours × 100% = 480 design hours.
+
+Does 480 design hours match the design hours on your staffing sheet? Reply yes, no, or that there's no staffing sheet yet.
+````
+
+The person types: "No, that's too high."
+
+You reply:
+
+> Then please give me the total design hours from the staffing sheet, for the design roles only, and I'll use that instead.
+
+The person types: "The staffing sheet says 400."
+
+You reply:
+
+````markdown
+# Figma AI credit estimate: Fabrikam portal
+
+**Recommended Experience out-of-pocket: $3,266.** Prepared 2026-10-09 with version 0.2.0 of MERGE's Figma credit estimator, rates calibrated 2026-10-09.
+
+## What we entered
+
+- 400 design hours, as entered.
+
+## How we got there
+
+- **Design time:** 400 design hours × 334 credits an hour = 133,600 credits, which at $0.0188 a credit is $2,512.
+- **Padding:** 30% of $2,512 is $754.
+- **Recommended:** $2,512 + $754 = $3,266.
+
+## Assumptions
+
+- **334 credits a design hour.** MERGE's heaviest Figma AI users averaged 1,745 credits a working day in their busiest months. Rounded up to 2,000 a day and spread over a 6-hour design day, that's 333.3 an hour, rounded up.
+- **$0.0188 a credit,** Figma's pay-as-you-go price. The free credits that come with each Figma seat aren't deducted.
+- **Only design roles' time is counted:** Experience: any UX designer, UI designer or experience designer, at any level up to and including VP; Studio: Studio Designer, Studio UX Designer, Studio Manager and Studio Production.
+
+## Caveats
+
+- The 30% padding covers people who aren't counted but sometimes use Figma's AI, such as a content strategist editing copy with the agent, and the uncertainty in the rates.
+- The rates were set on 2026-10-09, mostly from use of Figma's agent during its free beta, and will be re-checked against billed use.
+- Figma bills credits per person per month, not per program, so this is an estimate rather than a share of a Figma invoice.
+- Spike work isn't included. If any work will be done mostly by Figma's agent, such as building a design system, plan for it with a separate spike work estimate: give how many designers, and for how many weeks.
+````
+
+## A spike work estimate
+
+The person types: "Two designers will spend two weeks building the Fabrikam design system mostly with Figma's agent. Can you price the spike work?"
+
+You reply:
+
+````markdown
+Your entry converts to 120 spike hours:
+
+- 2 designers × 2 weeks × 5 days × 6 hours = 120 spike hours.
+
+Is that right?
+````
+
+The person types: "Yes."
+
+You reply:
+
+````markdown
+# Figma AI spike work estimate: Fabrikam portal
+
+**Recommended Experience out-of-pocket for spike work: $3,715**, on top of the program's design-time estimate. Prepared 2026-10-09 with version 0.2.0 of MERGE's Figma credit estimator, rates calibrated 2026-10-09.
+
+## What we entered
+
+- 120 spike hours, converted from 2 designers × 2 weeks × 5 days × 6 hours, and confirmed as right.
+
+## How we got there
+
+- **Spike work:** 120 spike hours × 1,267 credits an hour = 152,040 credits, which at $0.0188 a credit is $2,858.
+- **Padding:** 30% of $2,858 is $857.
+- **Recommended:** $2,858 + $857 = $3,715.
+
+## Assumptions
+
+- **1,267 credits a spike hour,** for work done mostly by Figma's agent. The heaviest agent-led design-system work on record averaged 7,600 credits a working day; spread over a 6-hour day, that's 1,266.7 an hour, rounded up.
+- **A spike day counts 6 spike hours and a week 5 days,** because the rate was measured per working day.
+- **Spike work is added on top of design time,** because it covers agent work beyond a normal design day: overtime, weekends and holidays.
+- **$0.0188 a credit,** Figma's pay-as-you-go price. The free credits that come with each Figma seat aren't deducted.
+
+## Caveats
+
+- The 30% padding covers the uncertainty in the rate.
 - A single day of spike work can run far above its average: the busiest on record used 40,592 credits, about $763.
+- The rates were set on 2026-10-09, mostly from use of Figma's agent during its free beta, and will be re-checked against billed use.
 - Figma bills credits per person per month, not per program, so this is an estimate rather than a share of a Figma invoice.
 ````
+
+## Closing the reply
+
+After every report, end the reply with this, word for word:
+
+> Put the recommended figure in the staffing sheet's Experience out-of-pocket field, and attach this report to show how it was reached. Would you like me to save the report as a file you can attach?

@@ -6,26 +6,29 @@
 """Build the figma-credit-estimator versions from one source.
 
 Run from anywhere:
-    uv run scripts/build.py           # write claude/ from rates.toml, scripts/ and templates/
-    uv run scripts/build.py --check   # exit 1 if a built file is stale or the worked example drifts
+    uv run scripts/build.py           # write the built files from rates.toml, scripts/ and templates/
+    uv run scripts/build.py --check   # exit 1 if a built file is stale, the rates disagree, or an example drifts
 
 What it builds, and from what:
-    claude/SKILL.md              templates/claude-code.md, with {{VERSION}}, {{CALIBRATED}} and {{ROLES}} filled in
-    claude/rates.toml            rates.toml, copied
-    claude/scripts/estimate.py   scripts/estimate.py, copied
-    claude/references/rates.md   written from rates.toml: the rates sheet people read
-    gem-and-merge-one/instructions.md                        templates/assistant.md, with the rates and the
-                                                             calculator's own assumption and caveat sentences
-    gem-and-merge-one/knowledge/figma-credit-estimator-rates.md            the rates sheet, as above
-    gem-and-merge-one/knowledge/figma-credit-estimator-worked-examples.md  reports made by the calculator
+    claude/SKILL.md                     templates/claude-code.md, with the version, roles and closing filled in
+    claude/rates.toml                   rates.toml, copied
+    claude/scripts/estimate.py          scripts/estimate.py, copied
+    claude/references/rates.md          written from rates.toml: the rates sheet people read
+    gem-and-merge-one/instructions.md   templates/assistant.md, with the rates; held under 4,000 characters,
+                                        because a MERGE One agent reads only the first 4,000
+    gem-and-merge-one/knowledge/figma-credit-estimator-rates.md             the rates sheet, as above
+    gem-and-merge-one/knowledge/figma-credit-estimator-report-templates.md  templates/report-templates.md, with
+                                        the calculator's own sentences
+    gem-and-merge-one/knowledge/figma-credit-estimator-worked-examples.md   conversations and reports made by
+                                        the calculator
 
-Built files are never edited by hand; the next build overwrites them. The check also runs the
-arguments in examples/worked-example.json through the estimator and compares the recommended figure, so a
-change to the rates or the arithmetic shows up.
+Built files are never edited by hand; the next build overwrites them. The check also runs each set of
+arguments in examples/worked-example.json through the estimator and compares the recommended figure.
 """
 
 import argparse
 import json
+import math
 import pathlib
 import subprocess
 import sys
@@ -36,19 +39,44 @@ CLAUDE = ROOT / "claude"
 ASSISTANT = ROOT / "gem-and-merge-one"
 ESTIMATE = ROOT / "scripts" / "estimate.py"
 
-# The worked examples for the gem and MERGE One agent: what the person typed, and the
-# calculator arguments it becomes. Dated on the calibration date so the file is stable.
+# MERGE One agents read only the first 4,000 characters of their instructions (Steve, 2026-10-09).
+INSTRUCTIONS_LIMIT = 4000
+
+# The words every version ends its reply with, after the report.
+CLOSING = ("Put the recommended figure in the staffing sheet's Experience out-of-pocket field, and attach this report "
+           "to show how it was reached. Would you like me to save the report as a file you can attach?")
+
+# What every version says when a converted total doesn't match the staffing sheet.
+ASK_FOR_HOURS = ("Then please give me the total design hours from the staffing sheet, for the design roles only, "
+                 "and I'll use that instead.")
+
+# The worked examples for the gem and MERGE One agent. Each is a conversation: what the person
+# typed, then either a calculator run or a fixed reply. Dated on the calibration date.
 EXAMPLES = [
-    ("Design hours only",
-     "How much should we budget for Figma credits on the Acme website redesign? We've estimated 520 design hours, and there's no design-system work.",
-     ["--hours", "520", "--program", "Acme website redesign"]),
-    ("Design hours with spike work",
-     "We have 540 design hours, and one designer will spend two weeks building the design system mostly with Figma's agent.",
-     ["--hours", "540", "--spike", "2:1"]),
-    ("A duration with several groups and spike work",
-     "Pitch for a pharma mobile app: 4 weeks of discovery with one UX designer at half time, then 7 weeks of design with two UI designers full time and a VP of Experience Design at 20%, then 6 weeks of dev support with one UI designer at a quarter of their time. Both UI designers will spend the first week and a half of design building the component library mostly with Figma's agent.",
-     ["--weeks", "4:1:0.5", "--weeks", "7:2", "--weeks", "7:1:0.2", "--weeks", "6:1:0.25", "--spike", "1.5:2",
-      "--program", "Pharma mobile app pitch"]),
+    ("Design hours", [
+        ("person", "How much should we budget for Figma credits on the Acme website redesign? The staffing sheet has 520 design hours."),
+        ("run", ["--hours", "520", "--program", "Acme website redesign"]),
+    ]),
+    ("A duration, confirmed with no staffing sheet yet", [
+        ("person", "Pitch for a pharma mobile app, no staffing sheet yet: two UI designers for 6 weeks at 80%, and a VP of Experience Design for 6 weeks at 20%."),
+        ("run", ["--weeks", "6:2:0.8", "--weeks", "6:1:0.2"]),
+        ("person", "There's no staffing sheet yet."),
+        ("run", ["--weeks", "6:2:0.8", "--weeks", "6:1:0.2", "--confirmed", "no-sheet", "--program", "Pharma mobile app pitch"]),
+    ]),
+    ("A duration that doesn't match the staffing sheet", [
+        ("person", "Three designers for 4 weeks on the Fabrikam portal."),
+        ("run", ["--weeks", "4:3"]),
+        ("person", "No, that's too high."),
+        ("reply", ASK_FOR_HOURS),
+        ("person", "The staffing sheet says 400."),
+        ("run", ["--hours", "400", "--program", "Fabrikam portal"]),
+    ]),
+    ("A spike work estimate", [
+        ("person", "Two designers will spend two weeks building the Fabrikam design system mostly with Figma's agent. Can you price the spike work?"),
+        ("run", ["--spike", "2:2"]),
+        ("person", "Yes."),
+        ("run", ["--spike", "2:2", "--confirmed", "yes", "--program", "Fabrikam portal"]),
+    ]),
 ]
 
 
@@ -61,10 +89,22 @@ def roles_text(r):
     return "\n".join(f"- {x}" for x in r["roles"]["counted"]) + f'\n\nNot counted: {r["roles"]["not_counted"]}'
 
 
+def rates_agree(r):
+    """The hourly rates must be the daily rates over a 6-hour day, rounded up to a whole credit."""
+    rt = r["rates"]
+    ok = True
+    for hourly, daily in (("credits_per_hour", "credits_per_day"), ("spike_credits_per_hour", "spike_credits_per_day")):
+        want = math.ceil(rt[daily] / rt["design_hours_per_day"])
+        if rt[hourly] != want:
+            print(f"rates.toml: {hourly} is {rt[hourly]}, but {daily} over {rt['design_hours_per_day']} hours "
+                  f"rounded up is {want}", file=sys.stderr)
+            ok = False
+    return ok
+
+
 def rates_sheet(r):
     """The rates sheet people read, written from rates.toml."""
     rt = r["rates"]
-    per_hour = rt["credits_per_day"] / rt["design_hours_per_day"]
     price, pad = rt["price_per_credit"], 1 + rt["padding"]
 
     def money(credits):
@@ -72,38 +112,34 @@ def rates_sheet(r):
 
     return f"""# Figma credit estimator: rates sheet
 
-These are the figures the Figma credit estimator uses to price a program's Figma AI credits. They're MERGE's decided rates, version {r["version"]}, calibrated on {r["calibrated"]}. The recommended amount goes in the staffing sheet as a single {r["output"]["line_item"]} figure, and the estimator's report can be attached to show how it was reached. This sheet is built from the estimator's `rates.toml`; don't edit it by hand.
+These are the figures the Figma credit estimator uses to price a program's Figma AI credits. They're MERGE's decided rates, calibrated on {r["calibrated"]}, in version {r["version"]} of the estimator. The estimator works in design hours from the staffing sheet, and the recommended amount goes in the staffing sheet as a single {r["output"]["line_item"]} figure, with the estimator's report attached to show how it was reached. This sheet is built from the estimator's `rates.toml`; don't edit it by hand.
 
 ## The rates
 
-This table lists every figure the estimator uses.
+These are every figure the estimator uses. They're a list rather than a table, because Gemini breaks Markdown tables when it adds source chips to them.
 
-| Value | Figure |
-| --- | --- |
-| Credits a designer-day | {rt["credits_per_day"]:,} |
-| Design hours a working day | {rt["design_hours_per_day"]} |
-| Credits a design hour | {per_hour:,.2f} |
-| Working days a week | {rt["days_per_week"]} |
-| Price a credit | ${price} (Figma's pay-as-you-go price) |
-| Padding | {rt["padding"]:.0%} |
-| **Recommended cost a design hour** | **{money(per_hour)}** |
-| Recommended cost a designer-day | {money(rt["credits_per_day"])} |
-| Recommended cost a designer-week | {money(rt["credits_per_day"] * rt["days_per_week"])} |
-| Spike credits a designer-day | {rt["spike_credits_per_day"]:,} |
-| **Spike cost a designer-day** | **{money(rt["spike_credits_per_day"])}** |
-| Busiest spike day on record | {rt["spike_peak_day_credits"]:,} credits, about ${rt["spike_peak_day_credits"] * price:,.0f} |
+- **Credits a design hour:** {rt["credits_per_hour"]:,}
+- **Recommended cost a design hour:** {money(rt["credits_per_hour"])}
+- **Credits a spike hour:** {rt["spike_credits_per_hour"]:,}
+- **Recommended cost a spike hour:** {money(rt["spike_credits_per_hour"])}
+- **Price a credit:** ${price}, Figma's pay-as-you-go price
+- **Padding:** {rt["padding"]:.0%}
+- **Converting a duration to design hours:** {rt["days_per_week"]} days a week and {rt["workday_hours"]} hours a day at full effort, so 80% effort is {rt["workday_hours"] * 0.8:g} hours a day
+- **Converting spike work to spike hours:** {rt["days_per_week"]} days a week and {rt["design_hours_per_day"]} spike hours a day
+- **Busiest spike day on record:** {rt["spike_peak_day_credits"]:,} credits, about ${rt["spike_peak_day_credits"] * price:,.0f}
 
 ## Why the figures are set high
 
 The estimator is meant to come out high, because AI credits are a small part of a program's cost: an estimate a few hundred dollars high won't lose the work, but one that's low comes out of our margin. These choices push it up.
 
 - **The rate comes from our heaviest users.** {r["calibration_note"]} That average was {rt["heavy_user_average"]:,} credits a working day, rounded up to {rt["credits_per_day"]:,} to allow for work done mostly with Figma's agent.
-- **Six design hours a day**, so meetings and other overhead don't dilute the rate.
-- **Five working days a week**, with no time taken out for holidays or vacation.
+- **A six-hour design day.** The {rt["credits_per_day"]:,} credits a day are spread over six design hours, so meetings and other overhead don't dilute the rate, and the result is rounded up to {rt["credits_per_hour"]:,} credits an hour. Staffing-sheet hours usually count a full eight-hour day, so the estimate runs higher than the daily average.
 - **No free credits.** Every Figma seat gets free credits each month, and the estimator leaves them out, pricing every credit at pay-as-you-go.
 - **{rt["padding"]:.0%} padding**, which also covers people the calculation doesn't count, such as a content strategist using Figma's agent to edit copy.
 
-**Spike work is priced separately.** Work such as a design system built mostly by Figma's agent runs at several times the normal rate, so it's priced separately and added on top of design time. A spike day is one designer's working day on that work, so two designers on two weeks of it is 20 spike days. It's added rather than swapped for design time because it covers agent work beyond a normal day: overtime, weekends and holidays. A single spike day can cost far more than the average.
+**Spike work is a separate estimate.** Work such as a design system built mostly by Figma's agent runs at several times the normal rate, so it isn't in the design-time estimate; the person asks for a spike work estimate of its own, and plans for that figure on top. Its rate is the heaviest agent-led design-system work on record, {rt["spike_credits_per_day"]:,} credits a working day, over a six-hour day and rounded up to {rt["spike_credits_per_hour"]:,} credits a spike hour. Two designers on two weeks of it is 2 × 10 days × 6 hours = 120 spike hours. It's added rather than swapped for design time because it covers agent work beyond a normal day: overtime, weekends and holidays. A single spike day can cost far more than the average.
+
+**A duration is checked before it's priced.** Someone without a staffing-sheet total can give designers, weeks and effort instead. The estimator converts that to hours and asks whether the total matches the staffing sheet before it prices anything, and the report records the answer.
 
 ## Whose time counts
 
@@ -121,7 +157,7 @@ def run_estimate(args):
     out = subprocess.run([sys.executable, str(ESTIMATE), *args], capture_output=True, text=True)
     if out.returncode:
         fail(f"the calculator failed on {args}: {out.stderr.strip()}")
-    return out.stdout
+    return out.stdout.rstrip("\n")
 
 
 def section(report, heading):
@@ -137,87 +173,115 @@ def section(report, heading):
     return body
 
 
-def assistant_instructions(r):
+def marked(plain, converted):
+    """The converted report's lines, with a note before any line only a converted report has."""
+    out = []
+    for line in converted:
+        if line not in plain:
+            out.append("<only when the hours were converted from a duration:>")
+        out.append(line)
+    return "\n".join(out)
+
+
+def assistant_values(r):
     rt = r["rates"]
     date = r["calibrated"]
-    with_spike = run_estimate(["--hours", "6", "--spike", "1:1", "--prepared", date])
-    no_spike = run_estimate(["--hours", "6", "--prepared", date])
-    late = run_estimate(["--hours", "6", "--spike", "1:1", "--prepared", "2999-01-01"])
-    caveats = section(with_spike, "Caveats")
-    extra_no_spike = [x for x in section(no_spike, "Caveats") if x not in caveats]
-    extra_late = [x for x in section(late, "Caveats") if x not in caveats]
-    if len(extra_no_spike) != 1 or len(extra_late) != 1:
-        fail("couldn't find the calculator's no-spike and re-calibration caveats")
+    design = run_estimate(["--hours", "6", "--prepared", date])
+    design_conv = run_estimate(["--weeks", "1:1", "--confirmed", "sheet", "--prepared", date])
+    spike = run_estimate(["--spike-hours", "6", "--prepared", date])
+    spike_conv = run_estimate(["--spike", "1:1", "--confirmed", "yes", "--prepared", date])
+    late = run_estimate(["--hours", "6", "--prepared", "2999-01-01"])
+    extra_late = [x for x in section(late, "Caveats") if x not in section(design, "Caveats")]
+    if len(extra_late) != 1:
+        fail("couldn't find the calculator's re-calibration caveat")
     price, pad = rt["price_per_credit"], rt["padding"]
-    values = {
-        "VERSION": r["version"], "CALIBRATED": r["calibrated"], "ROLES": roles_text(r),
+
+    def rec(credits):
+        return f"{credits * price * (1 + pad):.4f}".rstrip("0").rstrip(".")
+
+    return {
+        "VERSION": r["version"], "CALIBRATED": r["calibrated"], "CLOSING": CLOSING, "ASK_FOR_HOURS": ASK_FOR_HOURS,
+        "ROLES": roles_text(r), "ROLES_SHORT": "; ".join(r["roles"]["counted"]),
         "LINE_ITEM": r["output"]["line_item"], "RECALIBRATE_AFTER": r["recalibrate_after"],
-        "CREDITS_PER_DAY": f'{rt["credits_per_day"]:,}', "HOURS_PER_DAY": str(rt["design_hours_per_day"]),
-        "DAYS_PER_WEEK": str(rt["days_per_week"]), "PRICE": str(price), "PADDING": f"{pad:.0%}",
-        "PADDING_DECIMAL": f"{pad:g}", "SPIKE_CREDITS": f'{rt["spike_credits_per_day"]:,}',
-        "DESIGNER_DAY_REC": f'{rt["credits_per_day"] * price * (1 + pad):.4f}'.rstrip("0").rstrip("."),
-        "SPIKE_DAY_REC": f'{rt["spike_credits_per_day"] * price * (1 + pad):.4f}'.rstrip("0").rstrip("."),
-        "ASSUMPTIONS": "\n".join(section(with_spike, "Assumptions")), "CAVEATS": "\n".join(caveats),
-        "NO_SPIKE_CAVEAT": extra_no_spike[0], "RECALIBRATE_CAVEAT": extra_late[0],
+        "CREDITS_PER_HOUR": f'{rt["credits_per_hour"]:,}', "SPIKE_CREDITS_PER_HOUR": f'{rt["spike_credits_per_hour"]:,}',
+        "DAYS_PER_WEEK": str(rt["days_per_week"]), "WORKDAY_HOURS": str(rt["workday_hours"]),
+        "SPIKE_DAY_HOURS": str(rt["design_hours_per_day"]),
+        "PRICE": str(price), "PADDING": f"{pad:.0%}", "PADDING_DECIMAL": f"{pad:g}",
+        "HOUR_REC": rec(rt["credits_per_hour"]), "SPIKE_HOUR_REC": rec(rt["spike_credits_per_hour"]),
+        "DESIGN_ASSUMPTIONS": marked(section(design, "Assumptions"), section(design_conv, "Assumptions")),
+        "DESIGN_CAVEATS": "\n".join(section(design, "Caveats")),
+        "SPIKE_ASSUMPTIONS": marked(section(spike, "Assumptions"), section(spike_conv, "Assumptions")),
+        "SPIKE_CAVEATS": "\n".join(section(spike, "Caveats")),
+        "RECALIBRATE_CAVEAT": extra_late[0],
     }
-    text = (ROOT / "templates" / "assistant.md").read_text()
+
+
+def render(name, values):
+    text = (ROOT / "templates" / name).read_text()
     for k, v in values.items():
         text = text.replace("{{" + k + "}}", v)
     if "{{" in text:
-        fail("templates/assistant.md has a placeholder the build doesn't fill")
+        fail(f"templates/{name} has a placeholder the build doesn't fill")
+    return text
+
+
+def assistant_instructions(values):
+    text = render("assistant.md", values)
+    if len(text) > INSTRUCTIONS_LIMIT:
+        fail(f"gem-and-merge-one/instructions.md is {len(text):,} characters; MERGE One reads only the first "
+             f"{INSTRUCTIONS_LIMIT:,}, so shorten templates/assistant.md or move text to a knowledge file")
     return text
 
 
 def worked_examples(r):
-    titles = [t for t, _, _ in EXAMPLES]
+    titles = [t for t, _ in EXAMPLES]
     out = ["# Figma credit estimator: worked examples", "",
-           "These are finished reports made by MERGE's Figma credit calculator, for the Figma credit estimator gem and MERGE One agent to match. "
-           f"Each shows what a person typed and the report it produces, with the date fixed at {r['calibrated']}; a real report carries the date it's prepared. "
+           "These are finished conversations made with MERGE's Figma credit calculator, for the Figma credit estimator gem and MERGE One agent to match. "
+           f"The reports' date is fixed at {r['calibrated']}; a real report carries the date it's prepared. "
            "This file is built from the calculator; don't edit it by hand.", "",
-           "## Contents", "", "<!-- toc -->", "- Asking for the figures"] + [f"- {t}" for t in titles] + ["<!-- /toc -->", "",
+           "## Contents", "", "<!-- toc -->", "- Asking for the figures"] + [f"- {t}" for t in titles] + ["- Closing the reply", "<!-- /toc -->", "",
            "## Asking for the figures", "",
            "When the person's message has no hours or duration, ask once, in one message, like this:", "",
-           "> To estimate the Figma credits, I need one of these:", ">",
-           "> - **Design hours:** the total from your estimate.",
-           "> - **Or a duration:** for each group of designers, how many weeks, how many designers, and what share of their time.", ">",
-           "> Only these roles' time counts: " + "; ".join(r["roles"]["counted"]) + ".", ">",
-           "> Will any work be done mostly by Figma's agent, such as building a design system or a large component library? If so, how many designers, and for how many weeks?"]
-    for title, message, args in EXAMPLES:
-        report = run_estimate(args + ["--prepared", r["calibrated"]]).rstrip("\n")
-        out += ["", f"## {title}", "", f"The person typed: \"{message}\"", "", "The report:", "", "````markdown", report, "````"]
+           "> To estimate the Figma credits, I need the total design hours from your staffing sheet. If you don't have a staffing sheet yet, "
+           "give me how many designers, for how many weeks, and at what effort, such as 2 designers for 6 weeks at 80%.", ">",
+           "> Only these roles' time counts: " + "; ".join(r["roles"]["counted"]) + "."]
+    for title, turns in EXAMPLES:
+        out += ["", f"## {title}"]
+        for who, what in turns:
+            if who == "person":
+                out += ["", f"The person types: \"{what}\""]
+            elif who == "reply":
+                out += ["", "You reply:", "", f"> {what}"]
+            else:
+                out += ["", "You reply:", "", "````markdown", run_estimate(what + ["--prepared", r["calibrated"]]), "````"]
+    out += ["", "## Closing the reply", "", "After every report, end the reply with this, word for word:", "", f"> {CLOSING}"]
     return "\n".join(out) + "\n"
 
 
 def built(r):
-    tpl = (ROOT / "templates" / "claude-code.md").read_text()
-    skill = (tpl.replace("{{VERSION}}", r["version"]).replace("{{CALIBRATED}}", r["calibrated"])
-             .replace("{{ROLES}}", roles_text(r)))
-    if "{{" in skill:
-        fail("templates/claude-code.md has a placeholder the build doesn't fill")
+    values = assistant_values(r)
     return {
-        CLAUDE / "SKILL.md": skill,
+        CLAUDE / "SKILL.md": render("claude-code.md", values),
         CLAUDE / "rates.toml": (ROOT / "rates.toml").read_text(),
-        CLAUDE / "scripts" / "estimate.py": (ROOT / "scripts" / "estimate.py").read_text(),
+        CLAUDE / "scripts" / "estimate.py": ESTIMATE.read_text(),
         CLAUDE / "references" / "rates.md": rates_sheet(r),
-        ASSISTANT / "instructions.md": assistant_instructions(r),
+        ASSISTANT / "instructions.md": assistant_instructions(values),
         ASSISTANT / "knowledge" / "figma-credit-estimator-rates.md": rates_sheet(r),
+        ASSISTANT / "knowledge" / "figma-credit-estimator-report-templates.md": render("report-templates.md", values),
         ASSISTANT / "knowledge" / "figma-credit-estimator-worked-examples.md": worked_examples(r),
     }
 
 
 def example_matches():
     want = json.loads((ROOT / "examples" / "worked-example.json").read_text())
-    out = subprocess.run([sys.executable, str(ROOT / "scripts" / "estimate.py"), *want["args"], "--json"],
-                         capture_output=True, text=True)
-    if out.returncode:
-        print(out.stderr, file=sys.stderr)
-        return False
-    got = json.loads(out.stdout)
-    actual = round(got["recommended"])
-    if actual != want["recommended"]:
-        print(f"worked example: recommended is ${actual:,}, expected ${want['recommended']:,}", file=sys.stderr)
-        return False
-    return True
+    ok = True
+    for check in want["checks"]:
+        got = json.loads(run_estimate(check["args"] + ["--json"]))
+        if got.get("recommended") != check["recommended"]:
+            print(f"worked example {check['args']}: recommended is {got.get('recommended')}, "
+                  f"expected {check['recommended']}", file=sys.stderr)
+            ok = False
+    return ok
 
 
 def main():
@@ -226,6 +290,8 @@ def main():
     a = ap.parse_args()
     with open(ROOT / "rates.toml", "rb") as f:
         r = tomllib.load(f)
+    if not rates_agree(r):
+        sys.exit(1)
     files = built(r)
     if a.check:
         stale = [p for p, text in files.items() if not p.exists() or p.read_text() != text]
@@ -234,7 +300,9 @@ def main():
         ok = example_matches()
         if stale or not ok:
             sys.exit(1)
-        print(f"ok: claude/ and gem-and-merge-one/ are current at version {r['version']}, and the worked example matches")
+        size = len((ASSISTANT / "instructions.md").read_text())
+        print(f"ok: claude/ and gem-and-merge-one/ are current at version {r['version']}, the worked examples match, "
+              f"and the instructions are {size:,} of {INSTRUCTIONS_LIMIT:,} characters")
         return
     for p, text in files.items():
         p.parent.mkdir(parents=True, exist_ok=True)

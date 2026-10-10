@@ -1,5 +1,7 @@
 {
-  "about": "The plan's worked example: 540 design hours and one designer on two weeks of spike work. build.py --check runs these arguments and compares the recommended figure.",
-  "args": ["--hours", "540", "--spike", "2:1"],
-  "recommended": 6257
+  "about": "The plan's worked example: a program with 540 design hours, and a separate spike work estimate for one designer on two weeks of agent-built design-system work. build.py --check runs each set of arguments and compares the recommended figure.",
+  "checks": [
+    {"args": ["--hours", "540"], "recommended": 4408},
+    {"args": ["--spike", "2:1", "--confirmed", "yes"], "recommended": 1858}
+  ]
 }

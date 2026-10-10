@@ -8,7 +8,7 @@
 # Every decision below is Steve Brown's, 2026-10-09, recorded with its evidence in
 # CCE-AI-strategy/budget/2026-10-09 figma-credit-estimator-plan.md (decisions E1 to E8).
 
-version = "0.1.0"
+version = "0.2.0"
 calibrated = "2026-10-09"
 calibration_note = "It's the average of their busiest Figma credit periods between 2026-02-07 and 2026-10-07, counting Figma Make and Figma's agent together and leaving out one design-system spike. Most of the agent use in that window was during its free beta."
 recalibrate_after = "2026-11-07"
@@ -20,9 +20,17 @@ heavy_user_average = 1745
 credits_per_day = 2000
 # E2: design hours in a working day, so meetings and overhead don't dilute the rate.
 design_hours_per_day = 6
-# Working days in a week, for estimates given in weeks. Holidays aren't taken out,
-# which keeps the estimate high.
+# The rate the estimator charges: credits_per_day / design_hours_per_day, 333 1/3, rounded
+# up to a whole credit so every line of the report checks by hand (Steve, 2026-10-09).
+# build.py --check fails if this stops matching the two figures above.
+credits_per_hour = 334
+
+# Converting a duration to hours, for someone without a staffing-sheet total: designers x
+# weeks x days_per_week x workday_hours x effort, where effort is a share of an 8-hour day
+# (80% is 6.4 hours) and 100% when not given. The person confirms the result against the
+# staffing sheet before the estimate runs (Steve, 2026-10-09). Holidays aren't taken out.
 days_per_week = 5
+workday_hours = 8
 # E3: every credit priced at pay-as-you-go, with no seat grant. Figma's price since 2026-08-25.
 price_per_credit = 0.0188
 # E4: padding on the net figure. Also covers occasional users the calculation doesn't
@@ -31,6 +39,10 @@ padding = 0.30
 # E7: spike work, priced by the designer-day: Andrew Bokermann's average on Abbott in the
 # 2026-09-07 credit period (7,601 credits a working day), rounded.
 spike_credits_per_day = 7600
+# Charged per spike hour: spike_credits_per_day over a 6-hour day, 1,266 2/3, rounded up.
+# A spike day converts to design_hours_per_day spike hours, because the rate was measured
+# per working day, so a converted spike day still costs about 7,600 credits.
+spike_credits_per_hour = 1267
 # The busiest single spike day on record, 2026-10-02, for the report's warning.
 spike_peak_day_credits = 40592
 
