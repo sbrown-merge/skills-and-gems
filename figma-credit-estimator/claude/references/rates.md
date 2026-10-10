@@ -1,6 +1,6 @@
 # Figma credit estimator: rates sheet
 
-These are the figures the Figma credit estimator uses to price a program's Figma AI credits. They're MERGE's decided rates, calibrated on 2026-10-09, in version 0.2.0 of the estimator. The estimator works in design hours from the staffing sheet, and the recommended amount goes in the staffing sheet as a single Experience out-of-pocket figure, with the estimator's report attached to show how it was reached. This sheet is built from the estimator's `rates.toml`; don't edit it by hand.
+These are the figures the Figma credit estimator uses to price a program's Figma AI credits. They're MERGE's decided rates, calibrated on 2026-10-09, in version 0.3.0 of the estimator. The estimator works in design hours from the staffing sheet, and the recommended amount goes in the staffing sheet as a single Experience out-of-pocket figure, with the estimator's report attached to show how it was reached. This sheet is built from the estimator's `rates.toml`; don't edit it by hand.
 
 ## The rates
 

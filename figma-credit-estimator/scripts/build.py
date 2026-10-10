@@ -37,10 +37,34 @@ import tomllib
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 CLAUDE = ROOT / "claude"
 ASSISTANT = ROOT / "gem-and-merge-one"
+# The Gemini app skill. Google's rule is that a skill's name starts with a verb, and the folder
+# name must match it, so it isn't called figma-credit-estimator like the Claude skill.
+GEMINI_NAME = "estimate-figma-credits"
+GEMINI = ROOT / "gemini" / GEMINI_NAME
 ESTIMATE = ROOT / "scripts" / "estimate.py"
 
 # MERGE One agents read only the first 4,000 characters of their instructions (Steve, 2026-10-09).
 INSTRUCTIONS_LIMIT = 4000
+
+# One description for every version, so the Claude skill, the Gemini skill, and the gem and
+# MERGE One setup steps say the same thing. Google and Agent Skills both cap it at 1,024 characters.
+DESCRIPTION = ("Estimates how much Figma AI credits will cost on a MERGE program from the total design hours on its "
+               "staffing sheet. Returns one recommended Experience out-of-pocket figure, padded on purpose, with a short "
+               "report of the inputs, arithmetic, assumptions and caveats to attach as justification. Without a "
+               "staffing-sheet total it converts designers, weeks and effort to hours and confirms the total first. Also "
+               "prices spike work, such as an agent-built design system, as a separate estimate on request. Use when "
+               "someone asks what Figma credits, Figma AI, Figma Make or the Figma agent will cost on a program, pitch or "
+               "SOW, or wants an AI-credit or out-of-pocket figure for a staffing sheet.")
+DESCRIPTION_LIMIT = 1024
+
+# How each version names its knowledge files: by title for the gem and MERGE One agent, by path
+# for the Gemini skill, whose files sit in its folder.
+REFS_BY_TITLE = {"REF_TEMPLATES": 'the knowledge file "Figma credit estimator: report templates"',
+                 "REF_EXAMPLES": '"Figma credit estimator: worked examples"',
+                 "REF_RATES": '"Figma credit estimator: rates sheet"'}
+REFS_BY_PATH = {"REF_TEMPLATES": "`references/report-templates.md`",
+                "REF_EXAMPLES": "`references/worked-examples.md`",
+                "REF_RATES": "`references/rates.md`"}
 
 # The words every version ends its reply with, after the report.
 CLOSING = ("Put the recommended figure in the staffing sheet's Experience out-of-pocket field, and attach this report "
@@ -200,7 +224,7 @@ def assistant_values(r):
         return f"{credits * price * (1 + pad):.4f}".rstrip("0").rstrip(".")
 
     return {
-        "VERSION": r["version"], "CALIBRATED": r["calibrated"], "CLOSING": CLOSING, "ASK_FOR_HOURS": ASK_FOR_HOURS,
+        "VERSION": r["version"], "CALIBRATED": r["calibrated"], "DESCRIPTION": DESCRIPTION, **REFS_BY_TITLE, "CLOSING": CLOSING, "ASK_FOR_HOURS": ASK_FOR_HOURS,
         "ROLES": roles_text(r), "ROLES_SHORT": "; ".join(r["roles"]["counted"]),
         "LINE_ITEM": r["output"]["line_item"], "RECALIBRATE_AFTER": r["recalibrate_after"],
         "CREDITS_PER_HOUR": f'{rt["credits_per_hour"]:,}', "SPIKE_CREDITS_PER_HOUR": f'{rt["spike_credits_per_hour"]:,}',
@@ -233,10 +257,17 @@ def assistant_instructions(values):
     return text
 
 
+def gemini_skill(values):
+    body = render("assistant.md", {**values, **REFS_BY_PATH})
+    front = (f"---\nname: {GEMINI_NAME}\ndescription: {DESCRIPTION}\nmetadata:\n  version: \"{values['VERSION']}\"\n---\n\n"
+             f"# {GEMINI_NAME}\n\n")
+    return front + body
+
+
 def worked_examples(r):
     titles = [t for t, _ in EXAMPLES]
     out = ["# Figma credit estimator: worked examples", "",
-           "These are finished conversations made with MERGE's Figma credit calculator, for the Figma credit estimator gem and MERGE One agent to match. "
+           "These are finished conversations made with MERGE's Figma credit calculator, for the gem, the MERGE One agent and the Gemini skill to match. "
            f"The reports' date is fixed at {r['calibrated']}; a real report carries the date it's prepared. "
            "This file is built from the calculator; don't edit it by hand.", "",
            "## Contents", "", "<!-- toc -->", "- Asking for the figures"] + [f"- {t}" for t in titles] + ["- Closing the reply", "<!-- /toc -->", "",
@@ -259,6 +290,9 @@ def worked_examples(r):
 
 
 def built(r):
+    if len(DESCRIPTION) > DESCRIPTION_LIMIT or ": " in DESCRIPTION:
+        fail(f"DESCRIPTION is {len(DESCRIPTION):,} characters or contains ': '; it must fit in {DESCRIPTION_LIMIT:,} "
+             "and stay valid unquoted YAML")
     values = assistant_values(r)
     return {
         CLAUDE / "SKILL.md": render("claude-code.md", values),
@@ -269,7 +303,26 @@ def built(r):
         ASSISTANT / "knowledge" / "figma-credit-estimator-rates.md": rates_sheet(r),
         ASSISTANT / "knowledge" / "figma-credit-estimator-report-templates.md": render("report-templates.md", values),
         ASSISTANT / "knowledge" / "figma-credit-estimator-worked-examples.md": worked_examples(r),
+        GEMINI / "SKILL.md": gemini_skill(values),
+        GEMINI / "references" / "rates.md": rates_sheet(r),
+        GEMINI / "references" / "report-templates.md": render("report-templates.md", values),
+        GEMINI / "references" / "worked-examples.md": worked_examples(r),
     }
+
+
+def write_zips():
+    """The upload files, which git ignores: the Claude skill with its folder at the root, and the
+    Gemini skill with SKILL.md at the root, as Google asks. No hidden files, which Google warns can
+    fail an upload."""
+    import zipfile
+    for src, zpath, prefix in ((CLAUDE, ROOT / "figma-credit-estimator.zip", "figma-credit-estimator/"),
+                               (GEMINI, ROOT / f"{GEMINI_NAME}.zip", "")):
+        with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as z:
+            for f in sorted(src.rglob("*")):
+                rel = f.relative_to(src)
+                if f.is_file() and not any(part.startswith(".") for part in rel.parts):
+                    z.write(f, prefix + rel.as_posix())
+        print(f"wrote {zpath.relative_to(ROOT)}")
 
 
 def example_matches():
@@ -301,13 +354,14 @@ def main():
         if stale or not ok:
             sys.exit(1)
         size = len((ASSISTANT / "instructions.md").read_text())
-        print(f"ok: claude/ and gem-and-merge-one/ are current at version {r['version']}, the worked examples match, "
+        print(f"ok: claude/, gem-and-merge-one/ and gemini/ are current at version {r['version']}, the worked examples match, "
               f"and the instructions are {size:,} of {INSTRUCTIONS_LIMIT:,} characters")
         return
     for p, text in files.items():
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(text)
         print(f"wrote {p.relative_to(ROOT)}")
+    write_zips()
 
 
 if __name__ == "__main__":

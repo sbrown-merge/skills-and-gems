@@ -2,14 +2,14 @@
 name: figma-credit-estimator
 description: Estimates how much Figma AI credits will cost on a MERGE program from the total design hours on its staffing sheet. Returns one recommended Experience out-of-pocket figure, padded on purpose, with a short report of the inputs, arithmetic, assumptions and caveats to attach as justification. Without a staffing-sheet total it converts designers, weeks and effort to hours and confirms the total first. Also prices spike work, such as an agent-built design system, as a separate estimate on request. Use when someone asks what Figma credits, Figma AI, Figma Make or the Figma agent will cost on a program, pitch or SOW, or wants an AI-credit or out-of-pocket figure for a staffing sheet.
 metadata:
-  version: "0.2.0"
+  version: "0.3.0"
 ---
 
 # figma-credit-estimator
 
 This skill prices the Figma AI credits a program will use, so the cost goes into the estimate instead of being absorbed after the work is sold. The figures come from MERGE's decided rates, which are set high on purpose, and everything is priced by the hour.
 
-Version 0.2.0, rates calibrated 2026-10-09.
+Version 0.3.0, rates calibrated 2026-10-09.
 
 It gives two kinds of estimate, each as its own report: a **design-time estimate**, which every program needs, from the design hours on the staffing sheet, and a **spike work estimate**, only when the person asks for one, for work done mostly by Figma's agent, such as building a design system. Spike work is a separate figure the person plans for on top; never fold it into the design-time estimate.
 

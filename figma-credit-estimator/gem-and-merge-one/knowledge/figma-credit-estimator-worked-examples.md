@@ -1,6 +1,6 @@
 # Figma credit estimator: worked examples
 
-These are finished conversations made with MERGE's Figma credit calculator, for the Figma credit estimator gem and MERGE One agent to match. The reports' date is fixed at 2026-10-09; a real report carries the date it's prepared. This file is built from the calculator; don't edit it by hand.
+These are finished conversations made with MERGE's Figma credit calculator, for the gem, the MERGE One agent and the Gemini skill to match. The reports' date is fixed at 2026-10-09; a real report carries the date it's prepared. This file is built from the calculator; don't edit it by hand.
 
 ## Contents
 
@@ -30,7 +30,7 @@ You reply:
 ````markdown
 # Figma AI credit estimate: Acme website redesign
 
-**Recommended Experience out-of-pocket: $4,245.** Prepared 2026-10-09 with version 0.2.0 of MERGE's Figma credit estimator, rates calibrated 2026-10-09.
+**Recommended Experience out-of-pocket: $4,245.** Prepared 2026-10-09 with version 0.3.0 of MERGE's Figma credit estimator, rates calibrated 2026-10-09.
 
 ## What we entered
 
@@ -79,7 +79,7 @@ You reply:
 ````markdown
 # Figma AI credit estimate: Pharma mobile app pitch
 
-**Recommended Experience out-of-pocket: $3,527.** Prepared 2026-10-09 with version 0.2.0 of MERGE's Figma credit estimator, rates calibrated 2026-10-09.
+**Recommended Experience out-of-pocket: $3,527.** Prepared 2026-10-09 with version 0.3.0 of MERGE's Figma credit estimator, rates calibrated 2026-10-09.
 
 ## What we entered
 
@@ -135,7 +135,7 @@ You reply:
 ````markdown
 # Figma AI credit estimate: Fabrikam portal
 
-**Recommended Experience out-of-pocket: $3,266.** Prepared 2026-10-09 with version 0.2.0 of MERGE's Figma credit estimator, rates calibrated 2026-10-09.
+**Recommended Experience out-of-pocket: $3,266.** Prepared 2026-10-09 with version 0.3.0 of MERGE's Figma credit estimator, rates calibrated 2026-10-09.
 
 ## What we entered
 
@@ -182,7 +182,7 @@ You reply:
 ````markdown
 # Figma AI spike work estimate: Fabrikam portal
 
-**Recommended Experience out-of-pocket for spike work: $3,715**, on top of the program's design-time estimate. Prepared 2026-10-09 with version 0.2.0 of MERGE's Figma credit estimator, rates calibrated 2026-10-09.
+**Recommended Experience out-of-pocket for spike work: $3,715**, on top of the program's design-time estimate. Prepared 2026-10-09 with version 0.3.0 of MERGE's Figma credit estimator, rates calibrated 2026-10-09.
 
 ## What we entered
 

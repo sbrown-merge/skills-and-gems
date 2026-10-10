@@ -1,6 +1,6 @@
 # Figma credit estimator: report templates
 
-These are the two report layouts the Figma credit estimator writes, with every fixed sentence, for the gem and MERGE One agent to follow word for word. Fill in only the parts in angle brackets. Version 0.2.0 of the estimator, rates calibrated 2026-10-09. This file is built from the estimator's calculator; don't edit it by hand.
+These are the two report layouts the Figma credit estimator writes, with every fixed sentence, for the gem, the MERGE One agent and the Gemini skill to follow word for word. Fill in only the parts in angle brackets. Version 0.3.0 of the estimator, rates calibrated 2026-10-09. This file is built from the estimator's calculator; don't edit it by hand.
 
 ## Contents
 
@@ -18,7 +18,7 @@ Write it in this layout, as normal formatted text. Fill in the parts in angle br
 ```
 # Figma AI credit estimate: <program name, or leave off ": <program name>" if none was given>
 
-**Recommended Experience out-of-pocket: $<recommended>.** Prepared <today's date as YYYY-MM-DD> with version 0.2.0 of MERGE's Figma credit estimator, rates calibrated 2026-10-09.
+**Recommended Experience out-of-pocket: $<recommended>.** Prepared <today's date as YYYY-MM-DD> with version 0.3.0 of MERGE's Figma credit estimator, rates calibrated 2026-10-09.
 
 ## What we entered
 
@@ -56,7 +56,7 @@ Write it in this layout, as normal formatted text, in the same way.
 ```
 # Figma AI spike work estimate: <program name, or leave off ": <program name>" if none was given>
 
-**Recommended Experience out-of-pocket for spike work: $<recommended>**, on top of the program's design-time estimate. Prepared <today's date as YYYY-MM-DD> with version 0.2.0 of MERGE's Figma credit estimator, rates calibrated 2026-10-09.
+**Recommended Experience out-of-pocket for spike work: $<recommended>**, on top of the program's design-time estimate. Prepared <today's date as YYYY-MM-DD> with version 0.3.0 of MERGE's Figma credit estimator, rates calibrated 2026-10-09.
 
 ## What we entered
 

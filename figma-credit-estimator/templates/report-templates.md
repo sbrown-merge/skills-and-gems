@@ -1,6 +1,6 @@
 # Figma credit estimator: report templates
 
-These are the two report layouts the Figma credit estimator writes, with every fixed sentence, for the gem and MERGE One agent to follow word for word. Fill in only the parts in angle brackets. Version {{VERSION}} of the estimator, rates calibrated {{CALIBRATED}}. This file is built from the estimator's calculator; don't edit it by hand.
+These are the two report layouts the Figma credit estimator writes, with every fixed sentence, for the gem, the MERGE One agent and the Gemini skill to follow word for word. Fill in only the parts in angle brackets. Version {{VERSION}} of the estimator, rates calibrated {{CALIBRATED}}. This file is built from the estimator's calculator; don't edit it by hand.
 
 ## Contents
 

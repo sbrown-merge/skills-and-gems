@@ -8,7 +8,7 @@
 # Every decision below is Steve Brown's, 2026-10-09, recorded with its evidence in
 # CCE-AI-strategy/budget/2026-10-09 figma-credit-estimator-plan.md (decisions E1 to E8).
 
-version = "0.2.0"
+version = "0.3.0"
 calibrated = "2026-10-09"
 calibration_note = "It's the average of their busiest Figma credit periods between 2026-02-07 and 2026-10-07, counting Figma Make and Figma's agent together and leaving out one design-system spike. Most of the agent use in that window was during its free beta."
 recalibrate_after = "2026-11-07"
