@@ -1,0 +1,91 @@
+{
+  "skill": "merge-build-readiness",
+  "version": "0.1",
+  "date": "2026-10-04",
+  "fileKey": "giNpPc5llGmhmsjadTEtkk",
+  "model": "unknown",
+  "agentTools": {
+    "runPluginAPICode": true,
+    "takeScreenshot": false,
+    "addComment": true,
+    "screenshotNote": "Not tested by the prescribed steps."
+  },
+  "probes": {
+    "fileKey": {"ok": true, "value": "giNpPc5llGmhmsjadTEtkk"},
+    "currentUser": {"ok": false, "error": "in get_currentUser: \"currentUser\" is not a supported API"},
+    "pageLoadAsync": {"ok": true, "value": 27},
+    "fileThumbnail": {"ok": false, "error": "in getFileThumbnailNodeAsync: \"getFileThumbnailNodeAsync\" is not a supported API"},
+    "variables": {"ok": true, "value": 353},
+    "collections": {"ok": true, "value": ["1 modes", "2 modes", "2 modes", "2 modes"]},
+    "variableScopes": {"ok": true, "value": 329},
+    "variableCodeSyntax": {"ok": true, "value": 0},
+    "variableDescriptions": {"ok": true, "value": 92},
+    "variablePublishStatus": {"ok": true, "value": "UNPUBLISHED"},
+    "collectionPublishStatus": {"ok": true, "value": "UNPUBLISHED"},
+    "textStyles": {"ok": true, "value": 13},
+    "textStyleBoundVariables": {"ok": true, "value": ["letterSpacing", "fontSize", "fontFamily", "lineHeight", "fontWeight"]},
+    "stylePublishStatus": {"ok": false, "error": "not a function"},
+    "effectStyles": {"ok": true, "value": 5},
+    "findAllWithCriteria": {"ok": true, "value": 4},
+    "componentDescriptions": {"ok": true, "value": 0},
+    "componentPropertyDefinitions": {"ok": true, "value": 6},
+    "componentPublishStatus": {"ok": true, "value": "UNPUBLISHED"},
+    "slots": {"ok": true, "value": 21},
+    "annotationCategories": {"ok": true, "value": ["Development", "Interaction", "Accessibility", "Content", "Stark (custom)"]},
+    "annotationsRead": {"ok": true, "value": 0},
+    "prototypeReactions": {"ok": true, "value": 0},
+    "devStatus": {"ok": false, "error": "in get_devStatus: \"devStatus\" is not a supported API"},
+    "detachedInfo": {"ok": true, "value": 0},
+    "explicitVariableModes": {"ok": true, "value": 22},
+    "instanceOverrides": {"ok": true, "value": 1},
+    "textSegments": {"ok": true, "value": 1},
+    "loadAllPagesAsync": {
+      "ok": false,
+      "error": "SyntaxError: unexpected token in expression: ')'",
+      "note": "The prescribed script failed to parse; API availability was not tested."
+    }
+  },
+  "writeProbe": {
+    "baseline": {
+      "nodes": 435,
+      "hash": "abf94c3d",
+      "annotations": 0,
+      "variables": 353,
+      "variableHash": "29143165",
+      "styles": 18,
+      "styleHash": "c114f921",
+      "pages": 24
+    },
+    "create": {
+      "createdNodeIds": ["240:513"],
+      "annotation": {
+        "ok": true,
+        "lineBreaksKept": true,
+        "readBack": "Rule: Test annotation from merge-build-readiness\nStatus: Open question for the designer"
+      }
+    },
+    "comment": {
+      "ok": true,
+      "uuid": "6428e273-017f-4138-bc81-245173d74ab8",
+      "remainsUntilManuallyDeleted": true
+    },
+    "delete": {
+      "deleted": true,
+      "removedNodeIds": ["240:513"]
+    },
+    "verification": {
+      "intact": true,
+      "changed": [],
+      "now": {
+        "nodes": 435,
+        "hash": "abf94c3d",
+        "annotations": 0,
+        "variables": 353,
+        "variableHash": "29143165",
+        "styles": 18,
+        "styleHash": "c114f921",
+        "pages": 24
+      }
+    }
+  }
+}

@@ -20,13 +20,18 @@ To re-verify on a new machine: `which soffice pdftoppm gs mutool; ls /Applicatio
 
 ## Python
 
-Default `python3` is Homebrew **3.12** at `/opt/homebrew/opt/python@3.12`. It is PEP-668 externally managed, so installs need `python3 -m pip install --user --break-system-packages <pkg>`. A CommandLineTools Python 3.9 also exists and has ReportLab 5.0.0.
+**Rebuilt 2026-09-25 around `uv`.** Default `python3` is Homebrew **3.14** (`/opt/homebrew/opt/python`, which follows Homebrew's current version). It has **no third-party packages, on purpose**: it is PEP-668 externally managed, and nothing is installed into it or with `pip install --user` any more. Packages come from `uv` (`/opt/homebrew/bin/uv`) in one of two ways:
 
-Present on 3.12 (installed and smoke-tested 2026-08-26): **Pillow, numpy, python-pptx, lxml, defusedxml, markitdown, pyyaml, reportlab**. The `markitdown` CLI is at `~/Library/Python/3.12/bin/markitdown`, on PATH via `~/.zshrc`, so it runs bare.
+| Need | Use | Notes |
+| --- | --- | --- |
+| A command-line tool | `uv tool install <pkg>` | Own isolated environment; the command lands in `~/.local/bin`, which is on PATH. Installed 2026-09-25: **`markitdown`** 0.1.8 with the `pdf,pptx,docx,xlsx` extras (so it reads PDFs now), and **`fonttools`** 4.66.0 (`fonttools`, `ttx`, `pyftsubset`, `pyftmerge`) |
+| A library for a one-off script, outside any repo | `uv run --no-project --with <pkg> python script.py` | Nothing installed permanently; uv caches the environment, so a repeat run starts in about 0.4 s |
+
+**Image tooling for screenshots (verified 2026-09-25):** `uv run --no-project --with pillow --with opencv-python-headless python script.py` gives Pillow 12.3.0 and OpenCV 5.0.0 on numpy 2.5.3. Use the headless OpenCV build; the full `opencv-python` adds only GUI windows, which a script never uses. **pypdf** the same way: `uv run --no-project --with pypdf python script.py`.
 
 Absent: `pandoc`, `wkhtmltopdf`, `weasyprint`.
 
-The skill's own scripts need only the standard library and `zsh`. `Pillow` is optional, for reading image sizes.
+The skill's own scripts need only the standard library and `zsh`, so bare `python3` runs them. `Pillow` is optional, for reading image sizes; get it with `uv run --no-project --with pillow`.
 
 ## Node
 
@@ -49,7 +54,7 @@ Two Fraunces facts worth keeping, and they generalize to any variable font famil
 
 ## PDFs
 
-**Checking a PDF here (added 2026-09-09):** the *PDF Tools* MCP server rasterizes any page via Quick Look (`render_pdf_page`, 1-indexed, up to ~1800 px) and extracts text per page (`read_pdf_pages`); it may only touch `~/Documents`, `~/Downloads` and `~/Desktop`. Use it for the visual pass and the fidelity read-back. No Python PDF text extractor is installable: `pip install --user pypdf` is refused as an externally managed environment (PEP 668). A font-leak check must look at text-showing operators, not font names, because every ReportLab file lists `/BaseFont /Helvetica` from the canvas's initial state; page streams are ASCII85-wrapped Flate, so decode both before scanning for `Tf` and `Tj`.
+**Checking a PDF here (added 2026-09-09):** the *PDF Tools* MCP server rasterizes any page via Quick Look (`PDF_Tools:render_pdf_page`, 1-indexed, up to ~1800 px) and extracts text per page (`PDF_Tools:read_pdf_pages`); it may only touch `~/Documents`, `~/Downloads` and `~/Desktop`. Use it for the visual pass and the fidelity read-back. Since 2026-09-25 there are two Python text extractors as well: `markitdown file.pdf` (the uv tool has the `pdf` extra), and pypdf through `uv run --no-project --with pypdf`. A font-leak check must look at text-showing operators, not font names, because every ReportLab file lists `/BaseFont /Helvetica` from the canvas's initial state; page streams are ASCII85-wrapped Flate, so decode both before scanning for `Tf` and `Tj`.
 
 **Producing:** ReportLab is the only working route here. Pure-Python wheel, no system libraries. Working implementations to copy or extend: `scripts/make_brief_pdf.py` in `merge-casting-app-internal`, and `scripts/build-pdfs.py` in `CCE-AI-strategy`.
 
@@ -57,6 +62,17 @@ Two Fraunces facts worth keeping, and they generalize to any variable font famil
 
 - The in-app browser preview renders PDFs but **caches aggressively**; it keeps serving a stale copy after a re-render. Write each render to a new filename.
 - For text-level verification, decode the streams. ReportLab writes them **ASCII85-encoded then Flate-compressed**: `base64.a85decode(data, adobe=True)` first, then `zlib.decompress`, then pull the visible words from the `(...)` operators. A first guess that the streams were plain or single-Flate was wrong and cost time.
+
+## Keynote scripting (added 2026-09-22)
+
+| Fact | Status | Notes |
+| --- | --- | --- |
+| Automation (Apple Events) to Keynote | **Granted** | `get name`, `count of documents`, `export … as slide images`, `close saving no` all work |
+| **Accessibility (assistive access)** | **Locked by IT; cannot be granted** (Steve Brown, 2026-09-22) | Any `tell application "System Events" to tell process "Keynote" …` fails with -1719/-1728 and raises a prompt the user cannot accept. Do not use System Events on this Mac |
+| Scripted `open` of a .pptx on a fresh Keynote | **Unreliable** | -609 with a crash dialog, or -1708 import placeholder, seen 2026-09-22 on both new and old pptxgenjs decks; the same files opened via `open -a Keynote <file>`. `render_pptx.sh` now falls back to that route and exports `front document` |
+| Crash reports | `~/Library/Logs/DiagnosticReports/Keynote-*.ips` | Not readable from a sandboxed session; the user can share them with IT |
+
+The incident is written up for IT in the CCE AI strategy repo, `scripts/2026-09-22 keynote-automation-incident-note-for-it.md`.
 
 ## Where this came from
 

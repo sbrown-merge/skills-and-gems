@@ -10,8 +10,10 @@ Written by Steve Brown with Claude, consolidated 2026-09-09 from three projects'
 | --- | --- |
 | `SKILL.md` | The skill itself. Claude reads this when the skill triggers |
 | `scripts/render_pptx.sh deck.pptx outdir [png\|jpeg]` | Launches Keynote, exports every slide as an image, prints the paths. The launch step is the fix that made this reliable |
-| `scripts/check_pptx_package.py deck.pptx` | Read-only structural check: slide list, relationships, parts and content types agree; orphaned parts listed; comment parts and real speaker notes reported |
+| `scripts/check_pptx_package.py deck.pptx` | Structural check: slide list, relationships, parts and content types agree; orphaned parts listed; comment parts and real speaker notes reported. `--remove-orphans deck.pptx cleaned.pptx` writes a copy without the orphans; the input is never modified |
 | `references/environment.md` | What is and is not installed on the machine this was built on, with dates. **Per machine. Re-verify on yours** |
+| `EVAL.md` | Three test cases from real failures, with a results table per model. Run them after any change to the skill or when a new model ships |
+| `pptx-visual-qa.skill` | The folder packaged as a zip for installing elsewhere. Rebuild it after every change |
 
 ## Install
 
@@ -20,7 +22,7 @@ cp -R pptx-visual-qa ~/.claude/skills/
 chmod +x ~/.claude/skills/pptx-visual-qa/scripts/*
 ```
 
-Claude Code picks up user-level skills from `~/.claude/skills/` at the start of a session. The first render will ask macOS for permission to let your terminal or the Claude app control Keynote; allow it once. Optional: `python3 -m pip install --user "markitdown[pptx]"` for the text-dump check (add `--break-system-packages` on a Homebrew Python).
+Claude Code picks up user-level skills from `~/.claude/skills/` at the start of a session. The first render will ask macOS for permission to let your terminal or the Claude app control Keynote; allow it once. Optional, for the text-dump check: `uv tool install "markitdown[pdf,pptx]"` (install uv first with `brew install uv`).
 
 ## Try it
 
